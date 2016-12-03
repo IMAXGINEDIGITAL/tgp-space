@@ -9,129 +9,107 @@
         e.preventDefault();
     });
 
-    function findDivisor(num, closeTo) {
-        var diff = Infinity;
-        for (var i = 1; i <= num; i++) {
-            if (num % i === 0) {
-                var d = Math.abs(i - closeTo);
-                if (d <= diff) {
-                    diff = d;
-                } else if (d > diff) {
-                    break;
-                }
-            }
-        }
-        return i;
-    }
-
-    var fogColorRGB = [125, 125, 125];
-    var fogDestiny = 0.1;
-    function mixFogExp2(fragColor, fogColor, viewDistance) {
-        var fogFactor = 1 / Math.exp(viewDistance * viewDistance * fogDestiny * fogDestiny);
-        fogFactor = Math.max(Math.min(fogFactor, 1), 0);
-
-        return (1 - fogFactor) * fogColor + fogFactor * fragColor;
-    }
-
-    function fadeFog(imageDataIn, x, y, width, height, viewDistance) {
-        x = Math.round(x);
-        y = Math.round(y);
-        width = Math.round(width);
-        height = Math.round(height);
-
-        var imageDataOut = new ImageData(imageDataIn.width, imageDataIn.height);
-        var l = (y + height - 1) * imageDataIn.width + (x + width);
-        for (var i = y * imageDataIn.width + x; i < l; i += imageDataIn.width) {
-            for (var j = i; j - i < width; j++) {
-                imageDataOut.data[j * 4] = Math.round(
-                    mixFogExp2(
-                        imageDataIn.data[j * 4] / 255,
-                        fogColorRGB[0] / 255,
-                        viewDistance
-                    ) * 255
-                );
-                imageDataOut.data[j * 4 + 1] = Math.round(
-                    mixFogExp2(
-                        imageDataIn.data[j * 4 + 1] / 255,
-                        fogColorRGB[0] / 255,
-                        viewDistance
-                    ) * 255
-                );
-                imageDataOut.data[j * 4 + 2] = Math.round(
-                    mixFogExp2(
-                        imageDataIn.data[j * 4 + 2] / 255,
-                        fogColorRGB[0] / 255,
-                        viewDistance
-                    ) * 255
-                );
-                imageDataOut.data[j * 4 + 3] = imageDataIn.data[j * 4 + 3];
-            }
-        }
-        return imageDataOut;
-    }
-
     var viewport = document.body.getBoundingClientRect();
+
+    var stageEl = document.getElementById('stage');
+    var stageView = stageEl.getBoundingClientRect();
+    stageEl.style.backgroundImage = 'url(assets/galaxy-small.jpg)';
+
     var startX = -766 + viewport.width / 2;
     var startY = -984 + viewport.height / 2;
 
-    var elementsEl = document.getElementById('stage-elements');
-    var elementsView = elementsEl.getBoundingClientRect();
-
     var mapEl = document.getElementById('stage-minimap');
     var mapView = mapEl.getBoundingClientRect();
+    var mapStageRatio = mapView.width / stageView.width;
+    mapEl.style.height = stageView.height * mapStageRatio + 'px';
+    mapView = mapEl.getBoundingClientRect();
 
+    var mapMiniCanvas = mapEl.querySelector('.map');
+    mapMiniCanvas.width = mapView.width;
+    mapMiniCanvas.height = mapView.height;
+    var mapMiniCtx = mapMiniCanvas.getContext('2d');
+    mapMiniCtx.fillStyle = 'rgba(0, 0, 0, 1)';
+    mapMiniCtx.fillRect(0, 0, mapView.width, mapView.height);
     var mapIndiEl = mapEl.querySelector('.indicator');  
-    mapIndiEl.style.width = viewport.width / elementsView.width * mapView.width + 'px';
-    mapIndiEl.style.height = viewport.height / elementsView.height * mapView.height + 'px';
     var mapIndiView = mapIndiEl.getBoundingClientRect();
-
-    var offcanvas = document.createElement('canvas');
-    offcanvas.style.width = elementsView.width + 'px';
-    offcanvas.style.height = elementsView.height + 'px';
-    offcanvas.width = elementsView.width;
-    offcanvas.height = elementsView.height;
-    var offcontext = offcanvas.getContext('2d');
-    offcontext.drawImage(image, 0, 0, elementsView.width, elementsView.height);
     
-    var imageData = offcontext.getImageData(0, 0, elementsView.width, elementsView.height);
-
-    var galaxyFogCanvas = document.getElementById('galaxy-fog');
-    var galaxyFogView = galaxyFogCanvas.getBoundingClientRect();
-    galaxyFogCanvas.width = galaxyFogView.width;
-    galaxyFogCanvas.height = galaxyFogView.height;
-    var galaxyFogCtx = galaxyFogCanvas.getContext('2d');
-
-    function targetMapIndi(x, y) {
+    function setMapIndi(x, y) {
+        x = -(x - viewport.width / 3) * mapStageRatio - mapIndiView.width / 2;
+        y = -(y - viewport.height / 3) * mapStageRatio - mapIndiView.height / 2;
         mapIndiEl.style.transform = 'translate3d(' 
-                                        + (-x / elementsView.width * mapView.width) + 'px,' 
-                                        + (-y / elementsView.height * mapView.height) + 'px, 0px)';
+                                        + x + 'px,' 
+                                        + y + 'px, 0px)';
     }
 
-    function drawFog(x, y, fade) {
-        var startDistance = 20;
-        var duration = 3 * 1000;
-        var startTime = Date.now();
+    function clearMap(x, y) {
+        x = -x * mapStageRatio;
+        y = -y * mapStageRatio;
+        var width = viewport.width * mapStageRatio;
+        var height = viewport.height * mapStageRatio;
+        mapMiniCtx.fillStyle = 'rgba(255, 255, 255, 1)';
+        mapMiniCtx.fillRect(x, y, width, height);
+    }
 
-        function draw(distance) {
-            var imageDataOut = fadeFog(imageData, -x, -y, galaxyFogView.width, galaxyFogView.height, distance);
-            galaxyFogCtx.clearRect(0, 0, galaxyFogView.width, galaxyFogView.height);
-            galaxyFogCtx.putImageData(imageDataOut, x, y, -x, -y, galaxyFogView.width, galaxyFogView.height);
-        }
-
-        if (fade) {
-            function fadeOut() {
-                var elapsed = Date.now() - startTime;
-                var distance = startDistance * (1 - elapsed / duration);
-                distance = Math.max(0, distance);
-                if (distance > 0.1) {
-                    requestAnimationFrame(fadeOut);
-                    draw(distance);
-                } 
+    var noiseImageData = new ImageData(stageView.width, stageView.height);
+    var stageNoiseCanvas = document.getElementById('stage-noise');
+    var stageNoiseView = stageNoiseCanvas.getBoundingClientRect();
+    stageNoiseCanvas.width = stageNoiseView.width;
+    stageNoiseCanvas.height = stageNoiseView.height;
+    var stageNoiseCtx = stageNoiseCanvas.getContext('2d');
+    
+    function makeNoise() {
+        var simplex = new SimplexNoise();
+        for (var y = 0; y < stageView.height; y++) {
+            for (var x = 0; x < stageView.width; x++) {
+                var value = simplex.noise2D(x, y);
+                // if (value > 0.00001) {
+                    var i = (y * stageView.width + x) * 4;
+                    noiseImageData.data[i] = 
+                        noiseImageData.data[i + 1] =
+                        noiseImageData.data[i + 2] = 255;
+                    noiseImageData.data[i + 3] = (value * 0.5 + 0.5) * 255;
+                // }
             }
+        }
+    }
 
-            requestAnimationFrame(fadeOut);
-        } else {
-            draw(startDistance);
+    function drawNoise(x, y) {
+        stageNoiseCtx.clearRect(0, 0, stageNoiseView.width, stageNoiseView.height);
+        stageNoiseCtx.putImageData(noiseImageData, x, y, -x, -y, stageNoiseView.width, stageNoiseView.height);
+    }
+
+    function recordNoise(x, y) {
+        x = Math.round(-x);
+        y = Math.round(-y);
+
+        for (var yy = y; yy - y < stageNoiseView.height; yy++) {
+            for (var xx = x; xx - x < stageNoiseView.width; xx++) {
+                var i = (yy * stageView.width + xx) * 4;
+                if (noiseImageData.data[i + 3] > 0) {
+                    noiseFadeRecord.push(i);
+                }
+            }
+        }
+    }
+
+    function clearNoise() {
+        if (xyRecord.length === 0) return;
+
+        var record = xyRecord[0];
+        var x = record[0];
+        var y = record[1];
+        var allClear = true;
+        for (var yy = y; yy - y < stageNoiseView.height; yy++) {
+            for (var xx = x; xx - x < stageNoiseView.width; xx++) {
+                var i = (yy * stageView.width + xx) * 4;
+                noiseImageData.data[i + 3] -= 15 + Math.random() * 5;
+                if (noiseImageData.data[i + 3] > 0) {
+                    allClear = false;
+                }
+            }
+        }
+        if (allClear) {
+            xyRecord.shift();
         }
     }
 
@@ -145,16 +123,39 @@
         disablePointer: true
     }); 
 
-    myScroll.on('scroll', function() {
-        targetMapIndi(myScroll.x, myScroll.y);
-        // drawFog(myScroll.x, myScroll.y, false);
+    var isScrolling = false;
+    myScroll.on('scrollStart', function() {
+        isScrolling = true;
     });
 
+    myScroll.on('scroll', function() {
+        var x = myScroll.x;
+        var y = myScroll.y;
+        setMapIndi(x, y);
+    });
+
+    var xyRecord = [];
     myScroll.on('scrollEnd', function() {
-        // drawFog(myScroll.x, myScroll.y, true);
+        var x = myScroll.x;
+        var y = myScroll.y;
+        setMapIndi(x, y);
+        clearMap(x, y);
+        xyRecord.unshift([Math.round(-x), Math.round(-y)]);
+        isScrolling = false;
     });
 
     myScroll.scrollTo(startX, startY);
-    targetMapIndi(startX, startY);
-    drawFog(startX, startY, true);
+    setMapIndi(startX, startY);
+    clearMap(startX, startY);
+    makeNoise();
+    xyRecord.unshift([Math.round(-startX), Math.round(-startY)]);
+
+    function tick() {
+        requestAnimationFrame(tick);
+        if (!isScrolling) {
+            clearNoise();
+        }
+        drawNoise(myScroll.x, myScroll.y);
+    }
+    requestAnimationFrame(tick);
 });

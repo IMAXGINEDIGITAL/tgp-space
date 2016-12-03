@@ -6,12 +6,14 @@
 <link href="index.css" rel="stylesheet" />
 </head>
 <body id="stage-wrap">
-<div id="stage-elements"></div>
-<canvas id="galaxy-fog"></canvas>
+<div id="stage"></div>
+<canvas id="stage-noise"></canvas>
 <div id="stage-minimap">
+    <canvas class="map"></canvas>
     <div class="indicator"></div>
 </div>
 <script src="lib/iscroll-probe.js"></script>
+<script src="lib/simplex-noise.js"></script>
 <script src="index.js"></script>
 </body>
 </html>
