@@ -77,13 +77,13 @@
         for (var y = 0; y < stageView.height; y++) {
             for (var x = 0; x < stageView.width; x++) {
                 var value = simplex.noise2D(x, y);
-                // if (value > 0.00001) {
+                if (value > 0.00001) {
                     var i = (y * stageView.width + x) * 4;
                     noiseImageData.data[i] = 
                         noiseImageData.data[i + 1] =
                         noiseImageData.data[i + 2] = 255;
-                    noiseImageData.data[i + 3] = (value * 0.5 + 0.5) * 255;
-                // }
+                    noiseImageData.data[i + 3] = value * 255;
+                }
             }
         }
 
