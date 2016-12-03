@@ -5,19 +5,27 @@
     }
     bgImage.src = './assets/galaxy-small.jpg';
 })(function(image) {
-    document.addEventListener('toucmove', function(e) {
+    document.addEventListener('touchstart', function(e) {
         e.preventDefault();
     });
 
+    document.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener('touchend', function(e) {
+        e.preventDefault();
+    });
+
+    // viewport
     var viewport = document.body.getBoundingClientRect();
 
+    // stage
     var stageEl = document.getElementById('stage');
     var stageView = stageEl.getBoundingClientRect();
     stageEl.style.backgroundImage = 'url(assets/galaxy-small.jpg)';
 
-    var startX = -766 + viewport.width / 2;
-    var startY = -984 + viewport.height / 2;
-
+    // map
     var mapEl = document.getElementById('stage-minimap');
     var mapView = mapEl.getBoundingClientRect();
     var mapStageRatio = mapView.width / stageView.width;
@@ -50,13 +58,20 @@
         mapMiniCtx.fillRect(x, y, width, height);
     }
 
-    var noiseImageData = new ImageData(stageView.width, stageView.height);
+    // noise
     var stageNoiseCanvas = document.getElementById('stage-noise');
     var stageNoiseView = stageNoiseCanvas.getBoundingClientRect();
     stageNoiseCanvas.width = stageNoiseView.width;
     stageNoiseCanvas.height = stageNoiseView.height;
+    var stageNoiseRadius = 10;
     var stageNoiseCtx = stageNoiseCanvas.getContext('2d');
+    stageNoiseCtx.globalCompositeOperation = 'destination-out';
     
+    var cachedNoiseCanvas = document.createElement('canvas');
+    cachedNoiseCanvas.width = stageView.width;
+    cachedNoiseCanvas.height = stageView.height;
+    var cachedNoiseCtx = cachedNoiseCanvas.getContext('2d');
+    var noiseImageData = new ImageData(stageView.width, stageView.height);
     function makeNoise() {
         var simplex = new SimplexNoise();
         for (var y = 0; y < stageView.height; y++) {
@@ -71,6 +86,9 @@
                 // }
             }
         }
+
+        cachedNoiseCtx.putImageData(noiseImageData, 0, 0);
+        cachedNoiseCtx.globalCompositeOperation = 'destination-out';
     }
 
     function drawNoise(x, y) {
@@ -78,84 +96,106 @@
         stageNoiseCtx.putImageData(noiseImageData, x, y, -x, -y, stageNoiseView.width, stageNoiseView.height);
     }
 
-    function recordNoise(x, y) {
-        x = Math.round(-x);
-        y = Math.round(-y);
-
-        for (var yy = y; yy - y < stageNoiseView.height; yy++) {
-            for (var xx = x; xx - x < stageNoiseView.width; xx++) {
-                var i = (yy * stageView.width + xx) * 4;
-                if (noiseImageData.data[i + 3] > 0) {
-                    noiseFadeRecord.push(i);
-                }
-            }
-        }
-    }
-
     function clearNoise() {
-        if (xyRecord.length === 0) return;
+        if (scrollRecord.length === 0) return;
 
-        var record = xyRecord[0];
-        var x = record[0];
-        var y = record[1];
-        var allClear = true;
-        for (var yy = y; yy - y < stageNoiseView.height; yy++) {
-            for (var xx = x; xx - x < stageNoiseView.width; xx++) {
-                var i = (yy * stageView.width + xx) * 4;
-                noiseImageData.data[i + 3] -= 15 + Math.random() * 5;
-                if (noiseImageData.data[i + 3] > 0) {
-                    allClear = false;
-                }
-            }
-        }
-        if (allClear) {
-            xyRecord.shift();
+        var record = scrollRecord[0];
+        var x = record.x;
+        var y = record.y;
+        var r = record.r;
+
+        if (r >= stageNoiseView.height / 2) {
+            scrollRecord.shift();
+            
+            var cx = x + viewport.width / 2;
+            var cy = y + viewport.height / 2;
+            var gradient = cachedNoiseCtx.createRadialGradient(cx, cy, r - stageNoiseRadius * 7, cx, cy, r);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 255)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            cachedNoiseCtx.fillStyle = gradient;
+            cachedNoiseCtx.beginPath();
+            cachedNoiseCtx.arc(cx, cy, r, 0, Math.PI * 2);
+            cachedNoiseCtx.fill();
+            cachedNoiseCtx.closePath();
+            noiseImageData = cachedNoiseCtx.getImageData(0, 0, stageView.width, stageView.height);
+        } else {
+            record.r = r = Math.min(stageNoiseView.height / 2, r + stageNoiseRadius);
+
+            var cx = stageNoiseView.width / 2;
+            var cy = stageNoiseView.height / 2;
+            var gradient = cachedNoiseCtx.createRadialGradient(cx, cy, 0, cx, cy, r);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 255)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            stageNoiseCtx.fillStyle = gradient;
+            stageNoiseCtx.beginPath();
+            stageNoiseCtx.arc(cx, cy, r, 0, Math.PI * 2);
+            stageNoiseCtx.fill();
+            stageNoiseCtx.closePath();
         }
     }
 
+    makeNoise();
+
+    // scroll
     var myScroll = new IScroll('#stage-wrap', {
         mouseWheel: false,
         probeType: 3,
         scrollX: true,
         scrollY: true,
+        freeScroll: true,
         bounce: false,
         disableMouse: true,
         disablePointer: true
     }); 
 
+    var startX = -766 + viewport.width / 2;
+    var startY = -984 + viewport.height / 2;
     var isScrolling = false;
-    myScroll.on('scrollStart', function() {
+    var scrollRecord = [];
+    function scrollStart() {
         isScrolling = true;
-    });
+    }
 
-    myScroll.on('scroll', function() {
+    function scroll() {
         var x = myScroll.x;
         var y = myScroll.y;
         setMapIndi(x, y);
-    });
+        drawNoise(myScroll.x, myScroll.y);
+    }
 
-    var xyRecord = [];
-    myScroll.on('scrollEnd', function() {
+    function scrollEnd() {
         var x = myScroll.x;
         var y = myScroll.y;
         setMapIndi(x, y);
         clearMap(x, y);
-        xyRecord.unshift([Math.round(-x), Math.round(-y)]);
+        scrollRecord.unshift({
+            x: Math.round(-x), 
+            y: Math.round(-y),
+            r: 0
+        });
         isScrolling = false;
-    });
+    }
 
+    myScroll.on('scrollStart', scrollStart);
+    myScroll.on('scroll', scroll);
+    myScroll.on('scrollEnd', scrollEnd);
     myScroll.scrollTo(startX, startY);
-    setMapIndi(startX, startY);
-    clearMap(startX, startY);
-    makeNoise();
-    xyRecord.unshift([Math.round(-startX), Math.round(-startY)]);
+    scrollStart();
+    scroll();
+    scrollEnd();
 
+    var raf = requestAnimationFrame ||
+                webkitRequestAnimationFrame ||
+                function(fn) {return setTimeout(fn, 1 / 60)};
+
+    // tick
     function tick() {
-        requestAnimationFrame(tick);
+        raf(tick);
         if (!isScrolling) {
             clearNoise();
         }
-        drawNoise(myScroll.x, myScroll.y);
     }
-    requestAnimationFrame(tick);
+    raf(tick);
 });
