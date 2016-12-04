@@ -1,10 +1,6 @@
-(function(loaded) {
-    var bgImage = new Image();
-    bgImage.onload = function() {
-        loaded(bgImage);
-    }
-    bgImage.src = './assets/galaxy-small.jpg';
-})(function(image) {
+(function(fn) {
+    window.startGame = fn;
+})(function() {
     var raf = window.requestAnimationFrame ||
                 window.webkitRequestAnimationFrame ||
                 function(fn) {return setTimeout(fn, 1 / 60)};
@@ -313,6 +309,7 @@
     scrollTo(0, -stageView.height + viewport.height);
 
     var logoEl = document.getElementById('logo');
+    logoEl.style.backgroundImage = 'url(assets/logo.png)';
     function flashLogo() {
         function handler() {
             logoEl.removeEventListener('webkitAnimationEnd', handler);
