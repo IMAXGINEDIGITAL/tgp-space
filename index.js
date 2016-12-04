@@ -141,6 +141,7 @@
     // scroll
     var myScroll = new IScroll('#stage-wrap', {
         mouseWheel: false,
+        deceleration: 0.01,
         probeType: 3,
         scrollX: true,
         scrollY: true,
