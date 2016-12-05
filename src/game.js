@@ -1,4 +1,15 @@
+const TEMPLATE = `
+<div id="stage"></div>
+<canvas id="stage-noise"></canvas>
+<div id="stage-minimap">
+    <canvas class="map"></canvas>
+    <div class="indicator"></div>
+</div>
+<div id="logo"></div>
+`;
+
 (function(fn) {
+
     window.startGame = fn;
 })(function() {
     var raf = window.requestAnimationFrame ||
