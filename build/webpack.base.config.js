@@ -9,7 +9,6 @@ module.exports = {
             path.join(root, 'src', 'preload.js')
         ],
         game: [
-            path.join(root, 'lib', 'iscroll-probe.js'),
             path.join(root, 'src', 'game.js')
         ]
     },

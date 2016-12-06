@@ -2,33 +2,77 @@ import './preload.css';
 import {
     win,
     doc,
+    appendStyle,
     domready,
     Promise,
+    delay,
+    defer,
     createjs
 } from './util';
 
-const TEMPLATE = `
-    <div class="bg-light"></div>
-    <div class="logo"></div>
-    <div class="light-lazer"></div>
-    <div class="light-point"></div>
-    <div class="human"></div>
+const TEMPLATE_PRELOAD = `
+    <div class="bg-light" rol="image"></div>
+    <div class="logo" rol="image"></div>
+    <div class="light-lazer" rol="image"></div>
+    <div class="light-point" rol="image"></div>
+    <div class="human" rol="image"></div>
     <div class="progress">已加载<b>20</b>%</div>
 `;
 
-const ready = domready();
+const TEMPLATE_GAME = `
+    <div id="stage-wrap">
+        <div class="stage">
+            <div class="galaxy-top" rol="image"></div>
+            <div class="galaxy-mid" rol="image"></div>
+            <div class="galaxy-bottom" rol="image"></div>
+        </div>
+        <div class="elements">
+            <div class="static"></div>
+            <div class="dynamic"></div>
+        </div>
+    </div>
+    <div id="stage-star" class="star" rol="image"></div>
+    <canvas id="stage-cloud"></canvas>
+    <div id="elements-count" class="kuhei"></div>
+    <div id="stage-map" class="scope" rol="image">
+        <div class="galaxy-map wrap" rol="image">
+            <canvas class="map"></canvas>
+            <div class="indicator"></div>
+        </div>
+        <div class="close" rol="image"></div>
+    </div>
+`;
 
-const loadPreloadManifest = () => new Promise((resolve, reject) => {
+const items = {};
+const ready = defer();
+window.preload = ready.promise;
+
+function updateImage(viewport, item) {
+    let el = viewport.querySelector(`.${item.id}[rol="image"]`);
+    if (!el
+           && viewport.className.indexOf(item.id) > -1
+           && viewport.getAttribute('rol') === 'image') {
+        el = viewport;
+    }
+    if (el) {
+        el.style.backgroundImage = `url(${item.src})`;
+    }
+}
+
+let progressTextEl;
+function setProgress(sVal, eVal, loaded, total) {
+    const percent = (loaded / total).toFixed(2);
+    const val = Math.round(sVal + (eVal - sVal) * percent);
+
+    progressTextEl = progressTextEl || doc.querySelector('.progress b');
+    progressTextEl.textContent = String(val);
+    return [percent, val];
+}
+
+const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
     const queue = new createjs.LoadQueue(true);
 
-    queue.on('fileload', e => {
-        const {item} = e;
-
-        const el = doc.querySelector(`.${item.id}`);
-        el.style.backgroundImage = `url(${item.src})`;
-    });
-
-    const progressTextEl = doc.querySelector('.progress b');
+    queue.on('fileload', e => updateImage(viewport, e.item));
 
     queue.on('progress', e => {
         const {
@@ -36,14 +80,12 @@ const loadPreloadManifest = () => new Promise((resolve, reject) => {
             total
         } = e;
 
-        const percent = (loaded / total).toFixed(2);
-        const all = Math.round(percent * 30 + 20);
-        progressTextEl.textContent = String(all);
+        setProgress(20, 50, loaded, total);
     });
 
-    queue.on('error', reject);
+    queue.on('error', () => reject(viewport));
 
-    queue.on('complete', resolve);
+    queue.on('complete', () => resolve(viewport));
 
     queue.loadManifest({
         path: 'assets/preload/',
@@ -70,10 +112,10 @@ function processLight(percent) {
     lightPointEl = lightPointEl || doc.querySelector('.light-point');
     lightLazerEl = lightLazerEl || doc.querySelector('.light-lazer');
 
-    if (percent >= 0.6 && percent < 0.9) {
+    if (percent >= 60 && percent < 90) {
         lightPointEl.className = 'light-point anime';
         lightLazerEl.className = 'light-lazer anime';
-    } else if (percent >= 0.9) {
+    } else if (percent >= 60) {
         lightPointEl.className = 'light-point anime end';
         lightLazerEl.className = 'light-lazer anime end';
     }
@@ -82,17 +124,38 @@ function processLight(percent) {
 let logoEl;
 function processLogo(percent) {
     logoEl = logoEl || doc.querySelector('.logo');
-    if (percent >= 0.9 && percent < 1) {
+    if (percent >= 90 && percent < 100) {
         logoEl.className = 'logo anime';
-    } else if (percent >= 1) {
+    } else if (percent >= 100) {
         logoEl.className = 'logo anime end';
     }
 }
 
-const loadGameManifest = () => new Promise((resolve, reject) => {
+const loadGameManifest = viewport => new Promise((resolve, reject) => {
     const queue = new createjs.LoadQueue(true);
 
-    const progressTextEl = doc.querySelector('.progress b');
+    queue.on('fileload', e => {
+        const {item} = e;
+        items[item.id] = item;
+
+        if (item.type === createjs.AbstractLoader.IMAGE) {
+            updateImage(viewport, item);
+        } else if (item.type === createjs.AbstractLoader.TEXT) {
+            appendStyle(`
+                @font-face {
+                    font-family: 'KuHei';
+                    src: url(${item.src}) format('truetype');
+                }
+
+                .kuhei {
+                    font-family: 'KuHei';
+                    font-style:normal;
+                    -webkit-font-smoothing: antialiased;
+                    -webkit-text-stroke-width: 0.2px;
+                }
+            `);
+        }
+    });
 
     queue.on('progress', e => {
         const {
@@ -100,24 +163,29 @@ const loadGameManifest = () => new Promise((resolve, reject) => {
             total
         } = e;
 
-        const percent = (loaded / total).toFixed(2);
-        const all = Math.round(percent * 50 + 50);
-        progressTextEl.textContent = String(all);
+        const [percent, val] = setProgress(50, 100, loaded, total);
         processBackground(percent);
-        processLight(all / 100);
-        processLogo(all / 100);
+        processLight(val);
+        processLogo(val);
     });
 
-    queue.on('error', reject);
+    queue.on('error', () => reject(viewport));
 
-    queue.on('complete', resolve);
+    queue.on('complete', () => resolve(viewport));
 
     queue.loadManifest({
         path: 'assets/game/',
         manifest: [
-            'galaxy-1.jpg',
-            'galaxy-2.jpg',
-            'galaxy-3.jpg'
+            {id: 'galaxy-top', src: 'galaxy-1.jpg'},
+            {id: 'galaxy-mid', src: 'galaxy-2.jpg'},
+            {id: 'galaxy-bottom', src: 'galaxy-3.jpg'},
+            {id: 'galaxy-map', src: 'map.jpg'},
+            {id: 'cloud', src: 'cloud.png'},
+            {id: 'star', src: 'star.png'},
+            {id: 'pop', src: 'pop.png'},
+            {id: 'scope', src: 'scope.png'},
+            {id: 'close', src: 'close.png'},
+            {id: 'font', src: 'font.ttf'}
         ]
     });
 
@@ -130,17 +198,35 @@ const loadGameManifest = () => new Promise((resolve, reject) => {
 });
 
 domready()
-    .then(() => {
+    .then(() => { // load preload manifest
         doc.body.setAttribute('id', 'preload');
+        doc.body.setAttribute('rol', 'image');
         doc.body.className = 'bg-dark';
-        doc.body.innerHTML = TEMPLATE;
+        doc.body.innerHTML = TEMPLATE_PRELOAD;
 
-        return loadPreloadManifest();
+        return loadPreloadManifest(doc.body);
     })
-    .then(() => {
+    .then(() => {  // load game manifest
+        const body = document.createElement('div');
+        body.innerHTML = TEMPLATE_GAME;
 
-        return loadGameManifest();
+        return loadGameManifest(body);
     })
-    .then(() => window.startGame);
+    // .then(gameBody => delay(1500).then(() => gameBody))
+    .then(gameBody => {
+        const fragment = document.createDocumentFragment();
+        const children = [...gameBody.children];
+        for (const child of children) {
+            fragment.appendChild(child); 
+        }
 
+        doc.body.removeAttribute('id');
+        doc.body.removeAttribute('rol');
+        doc.body.style.cssText = '';
+        doc.body.className = '';
+        doc.body.innerHTML = '';
+        doc.body.appendChild(fragment);
 
+        ready.resolve(items);
+    })
+    .catch(() => ready.reject());

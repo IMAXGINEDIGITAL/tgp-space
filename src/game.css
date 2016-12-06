@@ -1,73 +1,10 @@
-#stage-wrap {
+#game {
     width: 100%;
     height: 100%;
     padding: 0;
     margin: 0;
     position: relative;
 }
-
-#stage {
-    width: 1500px;
-    height: 5336px;
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-
-#stage-minimap {
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-sizing: border-box;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 25px;
-    background-color: rgba(0, 0, 0, 0.8);
-    overflow: hidden;
-}
-
-#stage-minimap .map {
-    width: 100%;
-    height: 100%;
-}
-
-#stage-minimap .indicator {
-    left: 0;
-    top: 0;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    position: absolute;
-    background-color: rgb(50, 50, 50);
-    opacity: 0;
-    -webkit-animation: flash 0.4s linear 0s infinite alternate;
-}
-
-#stage-noise {
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    position: absolute;
-}
-
-#logo {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    display: none;
-    opacity: 0;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-
-#logo.flash {
-    display: block;
-    -webkit-animation: flash 0.4s linear 0s 4 alternate;
-}
-
 
 @-webkit-keyframes flash {
     0% {
@@ -77,4 +14,28 @@
     100% {
         opacity: 1;
     }
+}
+
+@-webkit-keyframes infiroll {
+    0% {
+        -webkit-transform: translateY(-50%) translateZ(9px);
+    }
+
+    100% {
+        -webkit-transform: translateY(0) translateZ(9px);
+    }
+}
+
+#stage-star {
+    position: absolute;
+    width: 100%;
+    height: 200%;
+    left: 0;
+    top: 0;
+    opacity: 0.5;
+    -webkit-transform: translateY(-50%) translateZ(9px);
+    -webkit-animation: infiroll 5s linear 0s infinite;
+    background-position: center 0;
+    background-repeat: repeat-y;
+    background-size: contain;
 }
