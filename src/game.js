@@ -81,16 +81,23 @@ preload
             clearId = ticker.add(tick);
         });
 
-        // const starTick = star.roll();
-        // const starId = ticker.add(starTick);
+        let starYRoll = -star.vh;
+        const starTick = () => {
+            starYRoll++;
+            if (starYRoll > 0) {
+                starYRoll = -star.vh;
+            }
+        }
+        const starId = ticker.add(starTick);
 
         ticker.on('aftertick', e => {
             let updated = false;
 
             if (scroller.isScrolling ||
-                    ticker.has(clearId)) {
+                    ticker.has(clearId) ||
+                    ticker.has(starId)) {
                 stage.render.drawImage(galaxy.canvas, -scrollX, -scrollY);
-                stage.render.drawImage(star.canvas, 0, 0);
+                stage.render.drawImage(star.canvas, 0, starYRoll);
                 stage.render.drawImage(staticElements.canvas, -scrollX, -scrollY);
                 stage.render.drawImage(cloud.canvas, -scrollX, -scrollY);
                 updated = true;

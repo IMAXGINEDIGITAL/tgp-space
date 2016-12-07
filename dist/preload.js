@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(149);
+	module.exports = __webpack_require__(150);
 
 
 /***/ },
@@ -1506,12 +1506,13 @@
 /* 146 */,
 /* 147 */,
 /* 148 */,
-/* 149 */
+/* 149 */,
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _getIterator2 = __webpack_require__(150);
+	var _getIterator2 = __webpack_require__(151);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1519,13 +1520,13 @@
 	
 	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 	
-	var _slicedToArray2 = __webpack_require__(153);
+	var _slicedToArray2 = __webpack_require__(154);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
-	__webpack_require__(157);
+	__webpack_require__(158);
 	
-	var _amfeEnv = __webpack_require__(159);
+	var _amfeEnv = __webpack_require__(160);
 	
 	var _util = __webpack_require__(6);
 	
@@ -1729,21 +1730,21 @@
 	});
 
 /***/ },
-/* 150 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(151), __esModule: true };
+	module.exports = { "default": __webpack_require__(152), __esModule: true };
 
 /***/ },
-/* 151 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(152);
+	module.exports = __webpack_require__(153);
 
 /***/ },
-/* 152 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var anObject = __webpack_require__(23)
@@ -1755,18 +1756,18 @@
 	};
 
 /***/ },
-/* 153 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _isIterable2 = __webpack_require__(154);
+	var _isIterable2 = __webpack_require__(155);
 	
 	var _isIterable3 = _interopRequireDefault(_isIterable2);
 	
-	var _getIterator2 = __webpack_require__(150);
+	var _getIterator2 = __webpack_require__(151);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1811,21 +1812,21 @@
 	}();
 
 /***/ },
-/* 154 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(155), __esModule: true };
+	module.exports = { "default": __webpack_require__(156), __esModule: true };
 
 /***/ },
-/* 155 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(156);
+	module.exports = __webpack_require__(157);
 
 /***/ },
-/* 156 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classof   = __webpack_require__(59)
@@ -1839,13 +1840,13 @@
 	};
 
 /***/ },
-/* 157 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(158);
+	var content = __webpack_require__(159);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -1865,7 +1866,7 @@
 	}
 
 /***/ },
-/* 158 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -1879,7 +1880,7 @@
 
 
 /***/ },
-/* 159 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1889,27 +1890,27 @@
 	});
 	exports.Version = exports.params = exports.thirdapp = exports.aliapp = exports.os = exports.browser = undefined;
 	
-	var _aliapp = __webpack_require__(160);
+	var _aliapp = __webpack_require__(161);
 	
 	var _aliapp2 = _interopRequireDefault(_aliapp);
 	
-	var _browser = __webpack_require__(163);
+	var _browser = __webpack_require__(164);
 	
 	var _browser2 = _interopRequireDefault(_browser);
 	
-	var _os = __webpack_require__(162);
+	var _os = __webpack_require__(163);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
-	var _thirdapp = __webpack_require__(164);
+	var _thirdapp = __webpack_require__(165);
 	
 	var _thirdapp2 = _interopRequireDefault(_thirdapp);
 	
-	var _params = __webpack_require__(165);
+	var _params = __webpack_require__(166);
 	
 	var _params2 = _interopRequireDefault(_params);
 	
-	var _version = __webpack_require__(161);
+	var _version = __webpack_require__(162);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -1923,7 +1924,7 @@
 	exports.Version = _version2.default;
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1932,11 +1933,11 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(161);
+	var _version = __webpack_require__(162);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
-	var _os = __webpack_require__(162);
+	var _os = __webpack_require__(163);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
@@ -2005,7 +2006,7 @@
 	exports.default = aliapp;
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2096,7 +2097,7 @@
 	exports.default = Version;
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2105,7 +2106,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(161);
+	var _version = __webpack_require__(162);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2157,7 +2158,7 @@
 	exports.default = os;
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2166,7 +2167,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(161);
+	var _version = __webpack_require__(162);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2255,7 +2256,7 @@
 	exports.default = browser;
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2293,7 +2294,7 @@
 	exports.default = thirdapp;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports) {
 
 	'use strict';
