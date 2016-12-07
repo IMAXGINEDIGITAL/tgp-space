@@ -23,7 +23,7 @@
 
 #stage-map::before {
     content: '点击查看全宇宙';
-    color: #01c1b7;
+    color: #016fa0;
     font-size: 12px;
     width: 50px;
     line-height: 1.2em;
@@ -37,13 +37,14 @@
 }
 
 #stage-map .wrap {
-    border: 1px solid #01c1b7;
+    border: 1px solid #016fa0;
     box-sizing: border-box;
     width: 25px;
-    height: 88.9px;
+    height: 84px;
     background-position: 0 0;
     background-repeat: no-repeat;
     background-size: contain;
+    background-color: #000;
     overflow: hidden;
     position: relative;
 }

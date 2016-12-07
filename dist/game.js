@@ -57,21 +57,35 @@
 	
 	var _util = __webpack_require__(6);
 	
-	var _stage = __webpack_require__(61);
+	var _scroller = __webpack_require__(61);
+	
+	var _scroller2 = _interopRequireDefault(_scroller);
+	
+	var _stage = __webpack_require__(121);
 	
 	var _stage2 = _interopRequireDefault(_stage);
 	
-	var _map = __webpack_require__(123);
+	var _galaxy = __webpack_require__(128);
 	
-	var _map2 = _interopRequireDefault(_map);
+	var _galaxy2 = _interopRequireDefault(_galaxy);
 	
-	var _cloud = __webpack_require__(126);
+	var _cloud = __webpack_require__(129);
 	
 	var _cloud2 = _interopRequireDefault(_cloud);
 	
-	var _elements = __webpack_require__(129);
+	var _star = __webpack_require__(166);
 	
-	var _elements2 = _interopRequireDefault(_elements);
+	var _star2 = _interopRequireDefault(_star);
+	
+	var _elements = __webpack_require__(125);
+	
+	var _map = __webpack_require__(130);
+	
+	var _map2 = _interopRequireDefault(_map);
+	
+	var _ticker = __webpack_require__(133);
+	
+	var _ticker2 = _interopRequireDefault(_ticker);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -79,77 +93,105 @@
 	
 	var items = void 0;
 	var viewport = void 0;
+	var scroller = void 0;
+	var ticker = void 0;
 	var stage = void 0;
-	var map = void 0;
+	var galaxy = void 0;
 	var cloud = void 0;
-	var elements = void 0;
+	var star = void 0;
+	var staticElements = void 0;
+	var elementCount = void 0;
+	var map = void 0;
 	
 	preload.then(function (e) {
 	    // stage
 	    items = e;
-	
 	    viewport = _util.doc.body;
 	    viewport.addEventListener('touchmove', function (e) {
 	        return e.preventDefault();
 	    });
-	
+	    ticker = new _ticker2.default();
+	}).then(function () {
 	    stage = new _stage2.default(viewport);
 	    return stage.ready();
+	}).then(function () {
+	    scroller = new _scroller2.default(stage.width, stage.height, stage.vw, stage.vh, 0.3);
+	    return scroller.ready();
+	}).then(function () {
+	    var promises = [];
+	
+	    galaxy = new _galaxy2.default(stage, items);
+	    promises.push(galaxy.ready());
+	
+	    staticElements = new _elements.StaticElements(stage, items);
+	    promises.push(staticElements.ready());
+	
+	    cloud = new _cloud2.default(stage, items);
+	    promises.push(cloud.ready());
+	
+	    star = new _star2.default(stage, items);
+	    promises.push(star.ready());
+	
+	    return _util.Promise.all(promises);
+	}).then(function () {
+	    // render
+	    var scrollX = 0;
+	    var scrollY = 0;
+	
+	    scroller.on('scrolling', function (e) {
+	        scrollX = e.x;
+	        scrollY = e.y;
+	    });
+	
+	    var clearId = void 0;
+	    scroller.on('scrollend', function (e) {
+	        var tick = cloud.clear(e.x, e.y);
+	        clearId = ticker.add(tick);
+	    });
+	
+	    // const starTick = star.roll();
+	    // const starId = ticker.add(starTick);
+	
+	    ticker.on('aftertick', function (e) {
+	        var updated = false;
+	
+	        if (scroller.isScrolling || ticker.has(clearId)) {
+	            stage.render.drawImage(galaxy.canvas, -scrollX, -scrollY);
+	            stage.render.drawImage(star.canvas, 0, 0);
+	            stage.render.drawImage(staticElements.canvas, -scrollX, -scrollY);
+	            stage.render.drawImage(cloud.canvas, -scrollX, -scrollY);
+	            updated = true;
+	        }
+	
+	        updated && stage.commit();
+	    });
 	}).then(function () {
 	    // map
 	    map = new _map2.default(viewport, stage.hSlice, stage.vSlice);
 	
-	    stage.on('scrolling', function (e) {
+	    scroller.on('scrolling', function (e) {
 	        var xp = e.x / stage.width;
 	        var yp = e.y / stage.height;
 	        map.update(xp, yp);
 	    });
 	
-	    stage.on('scrollend', function (e) {
+	    scroller.on('scrollend', function (e) {
 	        var xp = e.x / stage.width;
 	        var yp = e.y / stage.height;
-	        map.update(xp, yp);
 	        map.clear(xp, yp);
 	    });
 	
 	    return map.ready();
 	}).then(function () {
-	    // cloud
-	    var image = new Image();
-	    image.loaded = (0, _util.defer)();
-	    image.onload = function () {
-	        return image.loaded.resolve();
-	    };
-	    image.src = items.cloud.src;
-	
-	    cloud = new _cloud2.default(viewport, image, stage.width, stage.height, stage.hSlice, stage.vSlice);
-	
-	    stage.on('scrolling', function (e) {
-	        var xp = e.x / stage.width;
-	        var yp = e.y / stage.height;
-	        cloud.update(xp, yp);
-	    });
-	
-	    stage.on('scrollend', function (e) {
-	        var xp = e.x / stage.width;
-	        var yp = e.y / stage.height;
-	        cloud.clear(xp, yp);
-	    });
-	
-	    return image.loaded.promise.then(function () {
-	        return cloud.ready();
-	    });
+	    // elements
+	    elementCount = new _elements.ElementCount(viewport);
+	    return elementCount.ready();
 	}).then(function () {
 	    // bone
-	    var _getRect = (0, _util.getRect)(viewport),
-	        vw = _getRect.width,
-	        vh = _getRect.height;
-	
-	    stage.scrollTo(stage.width / 2 - vw / 2, stage.height - vh);
-	}).then(function () {
-	    // elements
-	    elements = new _elements2.default(viewport, stage.width, stage.height, stage.hSlice, stage.vSlice);
-	    return elements.ready();
+	    var boneX = stage.width / 2 - stage.vw / 2;
+	    var boneY = stage.height - stage.vh / 2;
+	    scroller.scrollTo(boneX, boneY);
+	    ticker.run();
 	});
 
 /***/ },
@@ -1523,136 +1565,146 @@
 	
 	var _inherits3 = _interopRequireDefault(_inherits2);
 	
-	__webpack_require__(104);
-	
 	var _util = __webpack_require__(6);
 	
-	var _event = __webpack_require__(106);
+	__webpack_require__(104);
+	
+	var _event = __webpack_require__(105);
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _iscrollProbe = __webpack_require__(122);
-	
-	var _iscrollProbe2 = _interopRequireDefault(_iscrollProbe);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Stage = function (_Event) {
-	    (0, _inherits3.default)(Stage, _Event);
+	var Scroller = function (_Event) {
+	    (0, _inherits3.default)(Scroller, _Event);
 	
-	    function Stage(viewport) {
-	        (0, _classCallCheck3.default)(this, Stage);
+	    function Scroller(width, height, vw, vh) {
+	        var scale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+	        (0, _classCallCheck3.default)(this, Scroller);
 	
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (Stage.__proto__ || (0, _getPrototypeOf2.default)(Stage)).call(this));
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Scroller.__proto__ || (0, _getPrototypeOf2.default)(Scroller)).call(this));
 	
-	        _this.viewport = viewport;
-	        _this.width = 3750;
-	        _this.height = 13340;
-	        _this.hSlice = 5;
-	        _this.vSlice = 10;
+	        _this._isScrolling = false;
+	        _this._enable = true;
+	        _this._scale = scale;
 	
-	        _this.wrapEl = (0, _util.query)(viewport, '#stage-wrap');
+	        _this.width = width;
+	        _this.height = height;
+	        _this.vw = vw;
+	        _this.vh = vh;
+	        _this.x = 0;
+	        _this.y = 0;
+	        _this.lx = 0;
+	        _this.ly = 0;
+	        _this.sx = 0;
+	        _this.sy = 0;
 	        return _this;
 	    }
 	
-	    (0, _createClass3.default)(Stage, [{
-	        key: '_viewReady',
-	        value: function _viewReady() {
-	            var _this2 = this;
-	
-	            return new _util.Promise(function (resolve, reject) {
-	                var _getRect = (0, _util.getRect)(_this2.viewport),
-	                    vw = _getRect.width;
-	
-	                _this2.height = vw / (_this2.width / _this2.hSlice) * _this2.height;
-	                _this2.width = vw * _this2.hSlice;
-	                _this2.wrapEl.style.width = _this2.width + 'px';
-	                _this2.wrapEl.style.height = _this2.height + 'px';
-	                _this2.wrapEl.style.display = 'block';
-	                resolve();
-	            });
-	        }
-	    }, {
-	        key: '_emitScrollEvent',
-	        value: function _emitScrollEvent(name) {
-	            this.emit(name, {
-	                x: Math.round(-this.scroller.x),
-	                y: Math.round(-this.scroller.y),
-	                lastX: Math.round(-this.scroller.lastX),
-	                lastY: Math.round(-this.scroller.lastY)
-	            });
-	        }
-	    }, {
-	        key: '_scrollReady',
-	        value: function _scrollReady() {
-	            var _this3 = this;
-	
-	            this._isScrolling = false;
-	
-	            this.scroller = new _iscrollProbe2.default(this.viewport, {
-	                mouseWheel: false,
-	                preventDefault: true,
-	                deceleration: 0.05,
-	                tap: true,
-	                probeType: 3,
-	                scrollX: true,
-	                scrollY: true,
-	                freeScroll: true,
-	                bounce: false,
-	                disableMouse: true,
-	                disablePointer: true
-	            });
-	
-	            var scrollStart = function scrollStart() {
-	                _this3._isScrolling = true;
-	                _this3.scroller.lastX = _this3.scroller.x;
-	                _this3.scroller.lastY = _this3.scroller.y;
-	                _this3._emitScrollEvent('scrollStart');
+	    (0, _createClass3.default)(Scroller, [{
+	        key: '_emit',
+	        value: function _emit(name) {
+	            var e = {
+	                x: this.x,
+	                y: this.y,
+	                lx: this.lx,
+	                ly: this.ly
 	            };
 	
-	            var scroll = function scroll() {
-	                return _this3._emitScrollEvent('scrolling');
-	            };
-	
-	            var scrollEnd = function scrollEnd() {
-	                _this3._isScrolling = false;
-	                _this3._emitScrollEvent('scrollend');
-	            };
-	
-	            this.scroller.on('scrollstart', scrollStart);
-	
-	            this.scroller.on('scroll', scroll);
-	
-	            this.scroller.on('scrollEnd', scrollEnd);
-	
-	            this.scrollTo = function (x, y) {
-	                scrollStart();
-	                _this3.scroller.scrollTo(-x, -y);
-	                scroll();
-	                scrollEnd();
-	            };
+	            this.emit(name, e);
 	        }
 	    }, {
 	        key: 'ready',
 	        value: function ready() {
-	            var _this4 = this;
+	            var _this2 = this;
 	
-	            return this._viewReady().then(function () {
-	                return _this4._scrollReady();
-	            }).then(function () {
-	                return _this4;
+	            return new _util.Promise(function (resolve, reject) {
+	                _this2._isScrolling = false;
+	
+	                var emitStart = function emitStart() {
+	                    _this2._isScrolling = true;
+	                    _this2.lx = _this2.x;
+	                    _this2.ly = _this2.y;
+	                    _this2._emit('scrollstart');
+	                };
+	
+	                var emitScroll = function emitScroll() {
+	                    return _this2._emit('scrolling');
+	                };
+	
+	                var emitEnd = function emitEnd() {
+	                    _this2._isScrolling = false;
+	                    _this2._emit('scrollend');
+	                };
+	
+	                var calXY = function calXY(e, noScale) {
+	                    var displacementX = e.displacementX,
+	                        displacementY = e.displacementY;
+	
+	
+	                    var scale = noScale ? 1 : _this2._scale;
+	                    var x = _this2.lx - displacementX * scale;
+	                    var y = _this2.ly - displacementY * scale;
+	
+	                    x = Math.min(Math.max(0, x), _this2.width - _this2.vw);
+	                    y = Math.min(Math.max(0, y), _this2.height - _this2.vh);
+	
+	                    _this2.x = x;
+	                    _this2.y = y;
+	                    return true;
+	                };
+	
+	                _util.doc.body.addEventListener('panstart', function (e) {
+	                    return _this2._enable && emitStart();
+	                });
+	
+	                _util.doc.body.addEventListener('panmove', function (e) {
+	                    return _this2._enable && calXY(e) && emitScroll();
+	                });
+	
+	                _util.doc.body.addEventListener('panend', function (e) {
+	                    return _this2._enable && emitEnd();
+	                });
+	
+	                _this2.scrollTo = function (x, y) {
+	                    emitStart();
+	                    calXY({
+	                        displacementX: _this2.x - x,
+	                        displacementY: _this2.y - y
+	                    }, true);
+	                    emitScroll();
+	                    emitEnd();
+	                };
+	
+	                resolve();
 	            });
 	        }
 	    }, {
-	        key: 'scrolling',
+	        key: 'isScrolling',
 	        get: function get() {
 	            return this._isScrolling;
 	        }
+	    }, {
+	        key: 'scale',
+	        get: function get() {
+	            return this._scale;
+	        },
+	        set: function set(scale) {
+	            this._scale = scale;
+	        }
+	    }, {
+	        key: 'enable',
+	        get: function get() {
+	            return this._enable;
+	        },
+	        set: function set(enable) {
+	            this._enable = enable;
+	        }
 	    }]);
-	    return Stage;
+	    return Scroller;
 	}(_event2.default);
 	
-	exports.default = Stage;
+	exports.default = Scroller;
 
 /***/ },
 /* 62 */
@@ -2481,46 +2533,516 @@
 
 /***/ },
 /* 104 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	// style-loader: Adds some css to the DOM by adding a <style> tag
+	'use strict';
 	
-	// load the styles
-	var content = __webpack_require__(105);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(5)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./stage.css", function() {
-				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./stage.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	(function (win) {
+	
+	    'use strict';
+	
+	    // major events supported:
+	    // panstart
+	    // panmove
+	    // panend
+	    // swipe
+	    // longpress
+	
+	    // extra events supported:
+	    // dualtouchstart
+	    // dualtouch
+	    // dualtouchend
+	    // verticalpanstart
+	    // horizontalpanstart
+	    // verticalpanmove
+	    // horizontalpanmove
+	    // tap
+	    // doubletap
+	    // verticalswipe
+	    // horizontalswipe
+	    // pressend
+	
+	    var doc = win.document,
+	        docEl = doc.documentElement,
+	        slice = Array.prototype.slice,
+	        gestures = {},
+	        lastTap = null;
+	
+	    /**
+	    * 找到两个结点共同的最小根结点
+	    * 如果跟结点不存在，则返回null
+	    *
+	    * @param  {Element} el1 第一个结点
+	    * @param  {Element} el2 第二个结点
+	    * @return {Element}     根结点
+	    */
+	    function getCommonAncestor(el1, el2) {
+	        var el = el1;
+	        while (el) {
+	            if (el.contains(el2) || el === el2) {
+	                return el;
+	            }
+	            el = el.parentNode;
+	        }
+	        return null;
+	    }
+	
+	    /**
+	    * 触发一个事件
+	    *
+	    * @param  {Element} element 目标结点
+	    * @param  {string}  type    事件类型
+	    * @param  {object}  extra   对事件对象的扩展
+	    */
+	    function fireEvent(element, type, extra) {
+	        var event = doc.createEvent('HTMLEvents');
+	        event.initEvent(type, true, true);
+	
+	        if ((typeof extra === 'undefined' ? 'undefined' : _typeof(extra)) === 'object') {
+	            for (var p in extra) {
+	                event[p] = extra[p];
+	            }
+	        }
+	
+	        element.dispatchEvent(event);
+	    }
+	
+	    /**
+	    * 计算变换效果
+	    * 假设坐标系上有4个点ABCD
+	    * > 旋转：从AB旋转到CD的角度
+	    * > 缩放：从AB长度变换到CD长度的比例
+	    * > 位移：从A点位移到C点的横纵位移
+	    *
+	    * @param  {number} x1 上述第1个点的横坐标
+	    * @param  {number} y1 上述第1个点的纵坐标
+	    * @param  {number} x2 上述第2个点的横坐标
+	    * @param  {number} y2 上述第2个点的纵坐标
+	    * @param  {number} x3 上述第3个点的横坐标
+	    * @param  {number} y3 上述第3个点的纵坐标
+	    * @param  {number} x4 上述第4个点的横坐标
+	    * @param  {number} y4 上述第4个点的纵坐标
+	    * @return {object}    变换效果，形如{rotate, scale, translate[2], matrix[3][3]}
+	    */
+	    function calc(x1, y1, x2, y2, x3, y3, x4, y4) {
+	        var rotate = Math.atan2(y4 - y3, x4 - x3) - Math.atan2(y2 - y1, x2 - x1),
+	            scale = Math.sqrt((Math.pow(y4 - y3, 2) + Math.pow(x4 - x3, 2)) / (Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2))),
+	            translate = [x3 - scale * x1 * Math.cos(rotate) + scale * y1 * Math.sin(rotate), y3 - scale * y1 * Math.cos(rotate) - scale * x1 * Math.sin(rotate)];
+	        return {
+	            rotate: rotate,
+	            scale: scale,
+	            translate: translate,
+	            matrix: [[scale * Math.cos(rotate), -scale * Math.sin(rotate), translate[0]], [scale * Math.sin(rotate), scale * Math.cos(rotate), translate[1]], [0, 0, 1]]
+	        };
+	    }
+	
+	    /**
+	    * 捕获touchstart事件，将每一个新增的触点添加到gestrues
+	    * 如果之前尚无被记录的触点，则绑定touchmove, touchend, touchcancel事件
+	    *
+	    * 新增触点默认处于tapping状态
+	    * 500毫秒之后如果还处于tapping状态，则触发press手势
+	    * 如果触点数为2，则触发dualtouchstart手势，该手势的目标结点为两个触点共同的最小根结点
+	    *
+	    * @event
+	    * @param  {event} event
+	    */
+	    function touchstartHandler(event) {
+	
+	        if (Object.keys(gestures).length === 0) {
+	            docEl.addEventListener('touchmove', touchmoveHandler, false);
+	            docEl.addEventListener('touchend', touchendHandler, false);
+	            docEl.addEventListener('touchcancel', touchcancelHandler, false);
+	        }
+	
+	        var gesture, touch, touchRecord, elements;
+	
+	        function genPressHandler(element, touch) {
+	            return function () {
+	                if (gesture.status === 'tapping') {
+	                    gesture.status = 'pressing';
+	
+	                    fireEvent(element, 'longpress', {
+	                        // add touch data for weex
+	                        touch: touch,
+	                        touches: event.touches,
+	                        changedTouches: event.changedTouches,
+	                        touchEvent: event
+	                    });
+	                }
+	
+	                clearTimeout(gesture.pressingHandler);
+	                gesture.pressingHandler = null;
+	            };
+	        }
+	
+	        // record every touch
+	        for (var i = 0; i < event.changedTouches.length; i++) {
+	            touch = event.changedTouches[i];
+	            touchRecord = {};
+	
+	            for (var _p in touch) {
+	                touchRecord[_p] = touch[_p];
+	            }
+	
+	            gesture = {
+	                startTouch: touchRecord,
+	                startTime: Date.now(),
+	                status: 'tapping',
+	                element: event.srcElement || event.target,
+	                pressingHandler: setTimeout(genPressHandler(event.srcElement || event.target, event.changedTouches[i]), 500)
+	            };
+	            gestures[touch.identifier] = gesture;
+	        }
+	
+	        if (Object.keys(gestures).length === 2) {
+	            elements = [];
+	
+	            for (var p in gestures) {
+	                elements.push(gestures[p].element);
+	            }
+	
+	            fireEvent(getCommonAncestor(elements[0], elements[1]), 'dualtouchstart', {
+	                touches: slice.call(event.touches),
+	                touchEvent: event
+	            });
+	        }
+	    }
+	
+	    /**
+	    * 捕获touchmove事件，处理pan和dual的相关手势
+	    *
+	    * 1. 遍历每个触点：
+	    * > 如果触点之前处于tapping状态，且位移超过10像素，则认定为进入panning状态
+	    * 先触发panstart手势，然后根据移动的方向选择性触发horizontalpanstart或verticalpanstart手势
+	    * > 如果触点之前处于panning状态，则根据pan的初始方向触发horizontalpan或verticalpan手势
+	    *
+	    * 2. 如果当前触点数为2，则计算出几何变换的各项参数，触发dualtouch手势
+	    *
+	    * @event
+	    * @param  {event} event
+	    */
+	    function touchmoveHandler(event) {
+	        // TODO: 函数太大了，影响可读性，建议分解并加必要的注释
+	
+	        // 遍历每个触点：
+	        // 1. 如果触点之前处于tapping状态，且位移超过10像素，则认定为进入panning状态
+	        // 先触发panstart手势，然后根据移动的方向选择性触发horizontalpanstart或verticalpanstart手势
+	        // 2. 如果触点之前处于panning状态，则根据pan的初始方向触发horizontalpan或verticalpan手势
+	        for (var i = 0; i < event.changedTouches.length; i++) {
+	            var touch = event.changedTouches[i],
+	                gesture = gestures[touch.identifier];
+	
+	            if (!gesture) {
+	                return;
+	            }
+	
+	            if (!gesture.lastTouch) {
+	                gesture.lastTouch = gesture.startTouch;
+	            }
+	            if (!gesture.lastTime) {
+	                gesture.lastTime = gesture.startTime;
+	            }
+	            if (!gesture.velocityX) {
+	                gesture.velocityX = 0;
+	            }
+	            if (!gesture.velocityY) {
+	                gesture.velocityY = 0;
+	            }
+	            if (!gesture.duration) {
+	                gesture.duration = 0;
+	            }
+	
+	            var time = Date.now() - gesture.lastTime;
+	            var vx = (touch.clientX - gesture.lastTouch.clientX) / time,
+	                vy = (touch.clientY - gesture.lastTouch.clientY) / time;
+	
+	            var RECORD_DURATION = 70;
+	            if (time > RECORD_DURATION) {
+	                time = RECORD_DURATION;
+	            }
+	            if (gesture.duration + time > RECORD_DURATION) {
+	                gesture.duration = RECORD_DURATION - time;
+	            }
+	
+	            gesture.velocityX = (gesture.velocityX * gesture.duration + vx * time) / (gesture.duration + time);
+	            gesture.velocityY = (gesture.velocityY * gesture.duration + vy * time) / (gesture.duration + time);
+	            gesture.duration += time;
+	
+	            gesture.lastTouch = {};
+	
+	            for (var p in touch) {
+	                gesture.lastTouch[p] = touch[p];
+	            }
+	            gesture.lastTime = Date.now();
+	
+	            var displacementX = touch.clientX - gesture.startTouch.clientX,
+	                displacementY = touch.clientY - gesture.startTouch.clientY,
+	                distance = Math.sqrt(Math.pow(displacementX, 2) + Math.pow(displacementY, 2));
+	
+	            // magic number 10: moving 10px means pan, not tap
+	            if ((gesture.status === 'tapping' || gesture.status === 'pressing') && distance > 10) {
+	                gesture.status = 'panning';
+	                gesture.isVertical = !(Math.abs(displacementX) > Math.abs(displacementY));
+	
+	                fireEvent(gesture.element, 'panstart', {
+	                    touch: touch,
+	                    touches: event.touches,
+	                    changedTouches: event.changedTouches,
+	                    touchEvent: event,
+	                    isVertical: gesture.isVertical
+	                });
+	
+	                fireEvent(gesture.element, (gesture.isVertical ? 'vertical' : 'horizontal') + 'panstart', {
+	                    touch: touch,
+	                    touchEvent: event
+	                });
+	            }
+	
+	            if (gesture.status === 'panning') {
+	                gesture.panTime = Date.now();
+	
+	                fireEvent(gesture.element, 'panmove', {
+	                    displacementX: displacementX,
+	                    displacementY: displacementY,
+	                    touch: touch,
+	                    touches: event.touches,
+	                    changedTouches: event.changedTouches,
+	                    touchEvent: event,
+	                    isVertical: gesture.isVertical
+	                });
+	
+	                if (gesture.isVertical) {
+	                    fireEvent(gesture.element, 'verticalpanmove', {
+	                        displacementY: displacementY,
+	                        touch: touch,
+	                        touchEvent: event
+	                    });
+	                } else {
+	                    fireEvent(gesture.element, 'horizontalpanmove', {
+	                        displacementX: displacementX,
+	                        touch: touch,
+	                        touchEvent: event
+	                    });
+	                }
+	            }
+	        }
+	
+	        // 如果当前触点数为2，则计算出几何变换的各项参数，触发dualtouch手势
+	        if (Object.keys(gestures).length === 2) {
+	            var position = [],
+	                current = [],
+	                elements = [],
+	                transform = void 0;
+	
+	            for (var _i = 0; _i < event.touches.length; _i++) {
+	                var _touch = event.touches[_i];
+	                var _gesture = gestures[_touch.identifier];
+	                position.push([_gesture.startTouch.clientX, _gesture.startTouch.clientY]);
+	                current.push([_touch.clientX, _touch.clientY]);
+	            }
+	
+	            for (var _p2 in gestures) {
+	                elements.push(gestures[_p2].element);
+	            }
+	
+	            transform = calc(position[0][0], position[0][1], position[1][0], position[1][1], current[0][0], current[0][1], current[1][0], current[1][1]);
+	            fireEvent(getCommonAncestor(elements[0], elements[1]), 'dualtouch', {
+	                transform: transform,
+	                touches: event.touches,
+	                touchEvent: event
+	            });
+	        }
+	    }
+	
+	    /**
+	    * 捕获touchend事件
+	    *
+	    * 1. 如果当前触点数为2，则触发dualtouchend手势
+	    *
+	    * 2. 遍历每个触点：
+	    * > 如果处于tapping状态，则触发tap手势
+	    * 如果之前300毫秒出现过tap手势，则升级为doubletap手势
+	    * > 如果处于panning状态，则根据滑出的速度，触发panend/flick手势
+	    * flick手势被触发之后，再根据滑出的方向触发verticalflick/horizontalflick手势
+	    * > 如果处于pressing状态，则触发pressend手势
+	    *
+	    * 3. 解绑定所有相关事件
+	    *
+	    * @event
+	    * @param  {event} event
+	    */
+	    function touchendHandler(event) {
+	
+	        if (Object.keys(gestures).length === 2) {
+	            var elements = [];
+	            for (var p in gestures) {
+	                elements.push(gestures[p].element);
+	            }
+	            fireEvent(getCommonAncestor(elements[0], elements[1]), 'dualtouchend', {
+	                touches: slice.call(event.touches),
+	                touchEvent: event
+	            });
+	        }
+	
+	        for (var i = 0; i < event.changedTouches.length; i++) {
+	            var touch = event.changedTouches[i],
+	                id = touch.identifier,
+	                gesture = gestures[id];
+	
+	            if (!gesture) {
+	                continue;
+	            }
+	
+	            if (gesture.pressingHandler) {
+	                clearTimeout(gesture.pressingHandler);
+	                gesture.pressingHandler = null;
+	            }
+	
+	            if (gesture.status === 'tapping') {
+	                gesture.timestamp = Date.now();
+	                fireEvent(gesture.element, 'tap', {
+	                    touch: touch,
+	                    touchEvent: event
+	                });
+	
+	                if (lastTap && gesture.timestamp - lastTap.timestamp < 300) {
+	                    fireEvent(gesture.element, 'doubletap', {
+	                        touch: touch,
+	                        touchEvent: event
+	                    });
+	                }
+	
+	                lastTap = gesture;
+	            }
+	
+	            if (gesture.status === 'panning') {
+	                var now = Date.now();
+	                var duration = now - gesture.startTime,
+	
+	                // velocityX = (touch.clientX - gesture.startTouch.clientX) / duration,
+	                // velocityY = (touch.clientY - gesture.startTouch.clientY) / duration,
+	                displacementX = touch.clientX - gesture.startTouch.clientX,
+	                    displacementY = touch.clientY - gesture.startTouch.clientY;
+	
+	                var velocity = Math.sqrt(gesture.velocityY * gesture.velocityY + gesture.velocityX * gesture.velocityX);
+	                var isflick = velocity > 0.5 && now - gesture.lastTime < 100;
+	                var extra = {
+	                    duration: duration,
+	                    isflick: isflick,
+	                    velocityX: gesture.velocityX,
+	                    velocityY: gesture.velocityY,
+	                    displacementX: displacementX,
+	                    displacementY: displacementY,
+	                    touch: touch,
+	                    touches: event.touches,
+	                    changedTouches: event.changedTouches,
+	                    touchEvent: event,
+	                    isVertical: gesture.isVertical
+	                };
+	
+	                fireEvent(gesture.element, 'panend', extra);
+	                if (isflick) {
+	                    fireEvent(gesture.element, 'swipe', extra);
+	
+	                    if (gesture.isVertical) {
+	                        fireEvent(gesture.element, 'verticalswipe', extra);
+	                    } else {
+	                        fireEvent(gesture.element, 'horizontalswipe', extra);
+	                    }
+	                }
+	            }
+	
+	            if (gesture.status === 'pressing') {
+	                fireEvent(gesture.element, 'pressend', {
+	                    touch: touch,
+	                    touchEvent: event
+	                });
+	            }
+	
+	            delete gestures[id];
+	        }
+	
+	        if (Object.keys(gestures).length === 0) {
+	            docEl.removeEventListener('touchmove', touchmoveHandler, false);
+	            docEl.removeEventListener('touchend', touchendHandler, false);
+	            docEl.removeEventListener('touchcancel', touchcancelHandler, false);
+	        }
+	    }
+	
+	    /**
+	    * 捕获touchcancel事件
+	    *
+	    * 1. 如果当前触点数为2，则触发dualtouchend手势
+	    *
+	    * 2. 遍历每个触点：
+	    * > 如果处于panning状态，则触发panend手势
+	    * > 如果处于pressing状态，则触发pressend手势
+	    *
+	    * 3. 解绑定所有相关事件
+	    *
+	    * @event
+	    * @param  {event} event
+	    */
+	    function touchcancelHandler(event) {
+	        // TODO: 和touchendHandler大量重复，建议DRY
+	
+	        if (Object.keys(gestures).length === 2) {
+	            var elements = [];
+	            for (var p in gestures) {
+	                elements.push(gestures[p].element);
+	            }
+	            fireEvent(getCommonAncestor(elements[0], elements[1]), 'dualtouchend', {
+	                touches: slice.call(event.touches),
+	                touchEvent: event
+	            });
+	        }
+	
+	        for (var i = 0; i < event.changedTouches.length; i++) {
+	            var touch = event.changedTouches[i],
+	                id = touch.identifier,
+	                gesture = gestures[id];
+	
+	            if (!gesture) {
+	                continue;
+	            }
+	
+	            if (gesture.pressingHandler) {
+	                clearTimeout(gesture.pressingHandler);
+	                gesture.pressingHandler = null;
+	            }
+	
+	            if (gesture.status === 'panning') {
+	                fireEvent(gesture.element, 'panend', {
+	                    touch: touch,
+	                    touches: event.touches,
+	                    changedTouches: event.changedTouches,
+	                    touchEvent: event
+	                });
+	            }
+	            if (gesture.status === 'pressing') {
+	                fireEvent(gesture.element, 'pressend', {
+	                    touch: touch,
+	                    touchEvent: event
+	                });
+	            }
+	            delete gestures[id];
+	        }
+	
+	        if (Object.keys(gestures).length === 0) {
+	            docEl.removeEventListener('touchmove', touchmoveHandler, false);
+	            docEl.removeEventListener('touchend', touchendHandler, false);
+	            docEl.removeEventListener('touchcancel', touchcancelHandler, false);
+	        }
+	    }
+	
+	    docEl.addEventListener('touchstart', touchstartHandler, false);
+	})(window);
 
 /***/ },
 /* 105 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(4)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "#stage-wrap {\n    display: none;\n}\n\n#stage-wrap .stage {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-wrap .stage div {\n    width: 100%;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-wrap .stage .galaxy-top {\n    height: 20%;\n}\n\n#stage-wrap .stage .galaxy-mid, \n    #stage-wrap .galaxy-bottom {\n    height: 40%;\n}\n\n#stage-wrap .star {\n    position: absolute;\n    width: 100%;\n    height: 200%;\n    left: 0;\n    top: 0;\n    opacity: 0.5;\n    -webkit-transform: translateY(-50%) translateZ(9px);\n    -webkit-animation: infiroll 360s linear 0s infinite;\n    background-position: center center;\n    background-repeat: repeat;\n}\n\n#stage-wrap .elements {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n}\n\n#stage-wrap .elements > div {\n    position: absolute;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n}\n\n#stage-wrap .elements .static div {\n    width: 100%;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-wrap .elements-top {\n    height: 20%;\n}\n\n#stage-wrap .elements-mid,\n    #stage-wrap .elements-bottom {\n    height: 40%;\n}\n\n\n", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2534,7 +3056,7 @@
 	
 	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 	
-	var _eventEmitter = __webpack_require__(107);
+	var _eventEmitter = __webpack_require__(106);
 	
 	var _eventEmitter2 = _interopRequireDefault(_eventEmitter);
 	
@@ -2549,13 +3071,13 @@
 	(0, _eventEmitter2.default)(Event.prototype);
 
 /***/ },
-/* 107 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var d        = __webpack_require__(108)
-	  , callable = __webpack_require__(121)
+	var d        = __webpack_require__(107)
+	  , callable = __webpack_require__(120)
 	
 	  , apply = Function.prototype.apply, call = Function.prototype.call
 	  , create = Object.create, defineProperty = Object.defineProperty
@@ -2687,15 +3209,15 @@
 
 
 /***/ },
-/* 108 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var assign        = __webpack_require__(109)
-	  , normalizeOpts = __webpack_require__(116)
-	  , isCallable    = __webpack_require__(117)
-	  , contains      = __webpack_require__(118)
+	var assign        = __webpack_require__(108)
+	  , normalizeOpts = __webpack_require__(115)
+	  , isCallable    = __webpack_require__(116)
+	  , contains      = __webpack_require__(117)
 	
 	  , d;
 	
@@ -2756,18 +3278,18 @@
 
 
 /***/ },
-/* 109 */
+/* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(110)()
+	module.exports = __webpack_require__(109)()
 		? Object.assign
-		: __webpack_require__(111);
+		: __webpack_require__(110);
 
 
 /***/ },
-/* 110 */
+/* 109 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2782,13 +3304,13 @@
 
 
 /***/ },
-/* 111 */
+/* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var keys  = __webpack_require__(112)
-	  , value = __webpack_require__(115)
+	var keys  = __webpack_require__(111)
+	  , value = __webpack_require__(114)
 	
 	  , max = Math.max;
 	
@@ -2810,18 +3332,18 @@
 
 
 /***/ },
-/* 112 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(113)()
+	module.exports = __webpack_require__(112)()
 		? Object.keys
-		: __webpack_require__(114);
+		: __webpack_require__(113);
 
 
 /***/ },
-/* 113 */
+/* 112 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2835,7 +3357,7 @@
 
 
 /***/ },
-/* 114 */
+/* 113 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2848,7 +3370,7 @@
 
 
 /***/ },
-/* 115 */
+/* 114 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2860,7 +3382,7 @@
 
 
 /***/ },
-/* 116 */
+/* 115 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2883,7 +3405,7 @@
 
 
 /***/ },
-/* 117 */
+/* 116 */
 /***/ function(module, exports) {
 
 	// Deprecated
@@ -2894,18 +3416,18 @@
 
 
 /***/ },
-/* 118 */
+/* 117 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	module.exports = __webpack_require__(119)()
+	module.exports = __webpack_require__(118)()
 		? String.prototype.contains
-		: __webpack_require__(120);
+		: __webpack_require__(119);
 
 
 /***/ },
-/* 119 */
+/* 118 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2919,7 +3441,7 @@
 
 
 /***/ },
-/* 120 */
+/* 119 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2932,7 +3454,7 @@
 
 
 /***/ },
-/* 121 */
+/* 120 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2944,2131 +3466,403 @@
 
 
 /***/ },
+/* 121 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = undefined;
+	
+	var _classCallCheck2 = __webpack_require__(66);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	__webpack_require__(122);
+	
+	var _util = __webpack_require__(6);
+	
+	var _canvas = __webpack_require__(124);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Stage = function () {
+	    function Stage(viewport) {
+	        (0, _classCallCheck3.default)(this, Stage);
+	
+	        this.viewport = viewport;
+	        this.canvasEl = (0, _util.query)(viewport, '#stage');
+	        this.width = 3750;
+	        this.height = 13340;
+	        this.hSlice = 5;
+	        this.vSlice = 10;
+	    }
+	
+	    (0, _createClass3.default)(Stage, [{
+	        key: 'ready',
+	        value: function ready() {
+	            var _this = this;
+	
+	            return new _util.Promise(function (resolve, reject) {
+	                var _getRect = (0, _util.getRect)(_this.viewport),
+	                    vw = _getRect.width,
+	                    vh = _getRect.height;
+	
+	                _this.vw = vw;
+	                _this.vh = vh;
+	                _this.height = vw / (_this.width / _this.hSlice) * _this.height;
+	                _this.width = vw * _this.hSlice;
+	
+	                _this.canvasRender = new _canvas.CanvasRender(_this.canvasEl, vw, vh);
+	                _this.canvasRender.transferControlToOffscreen();
+	                resolve();
+	            });
+	        }
+	    }, {
+	        key: 'commit',
+	        value: function commit() {
+	            this.canvasRender.commit();
+	        }
+	    }, {
+	        key: 'canvas',
+	        get: function get() {
+	            return this.canvasRender.canvas;
+	        }
+	    }, {
+	        key: 'render',
+	        get: function get() {
+	            return this.canvasRender.render;
+	        }
+	    }]);
+	    return Stage;
+	}();
+	
+	exports.default = Stage;
+
+/***/ },
 /* 122 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*! iScroll v5.2.0 ~ (c) 2008-2016 Matteo Spinelli ~ http://cubiq.org/license */
-	(function (window, document, Math) {
-	var rAF = window.requestAnimationFrame	||
-		window.webkitRequestAnimationFrame	||
-		window.mozRequestAnimationFrame		||
-		window.oRequestAnimationFrame		||
-		window.msRequestAnimationFrame		||
-		function (callback) { window.setTimeout(callback, 1000 / 60); };
+	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
-	var utils = (function () {
-		var me = {};
-	
-		var _elementStyle = document.createElement('div').style;
-		var _vendor = (function () {
-			var vendors = ['t', 'webkitT', 'MozT', 'msT', 'OT'],
-				transform,
-				i = 0,
-				l = vendors.length;
-	
-			for ( ; i < l; i++ ) {
-				transform = vendors[i] + 'ransform';
-				if ( transform in _elementStyle ) return vendors[i].substr(0, vendors[i].length-1);
-			}
-	
-			return false;
-		})();
-	
-		function _prefixStyle (style) {
-			if ( _vendor === false ) return false;
-			if ( _vendor === '' ) return style;
-			return _vendor + style.charAt(0).toUpperCase() + style.substr(1);
+	// load the styles
+	var content = __webpack_require__(123);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(5)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./stage.css", function() {
+				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./stage.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
 		}
-	
-		me.getTime = Date.now || function getTime () { return new Date().getTime(); };
-	
-		me.extend = function (target, obj) {
-			for ( var i in obj ) {
-				target[i] = obj[i];
-			}
-		};
-	
-		me.addEvent = function (el, type, fn, capture) {
-			el.addEventListener(type, fn, !!capture);
-		};
-	
-		me.removeEvent = function (el, type, fn, capture) {
-			el.removeEventListener(type, fn, !!capture);
-		};
-	
-		me.prefixPointerEvent = function (pointerEvent) {
-			return window.MSPointerEvent ?
-				'MSPointer' + pointerEvent.charAt(7).toUpperCase() + pointerEvent.substr(8):
-				pointerEvent;
-		};
-	
-		me.momentum = function (current, start, time, lowerMargin, wrapperSize, deceleration) {
-			var distance = current - start,
-				speed = Math.abs(distance) / time,
-				destination,
-				duration;
-	
-			deceleration = deceleration === undefined ? 0.0006 : deceleration;
-	
-			destination = current + ( speed * speed ) / ( 2 * deceleration ) * ( distance < 0 ? -1 : 1 );
-			duration = speed / deceleration;
-	
-			if ( destination < lowerMargin ) {
-				destination = wrapperSize ? lowerMargin - ( wrapperSize / 2.5 * ( speed / 8 ) ) : lowerMargin;
-				distance = Math.abs(destination - current);
-				duration = distance / speed;
-			} else if ( destination > 0 ) {
-				destination = wrapperSize ? wrapperSize / 2.5 * ( speed / 8 ) : 0;
-				distance = Math.abs(current) + destination;
-				duration = distance / speed;
-			}
-	
-			return {
-				destination: Math.round(destination),
-				duration: duration
-			};
-		};
-	
-		var _transform = _prefixStyle('transform');
-	
-		me.extend(me, {
-			hasTransform: _transform !== false,
-			hasPerspective: _prefixStyle('perspective') in _elementStyle,
-			hasTouch: 'ontouchstart' in window,
-			hasPointer: !!(window.PointerEvent || window.MSPointerEvent), // IE10 is prefixed
-			hasTransition: _prefixStyle('transition') in _elementStyle
-		});
-	
-		/*
-		This should find all Android browsers lower than build 535.19 (both stock browser and webview)
-		- galaxy S2 is ok
-	    - 2.3.6 : `AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1`
-	    - 4.0.4 : `AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30`
-	   - galaxy S3 is badAndroid (stock brower, webview)
-	     `AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30`
-	   - galaxy S4 is badAndroid (stock brower, webview)
-	     `AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30`
-	   - galaxy S5 is OK
-	     `AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36 (Chrome/)`
-	   - galaxy S6 is OK
-	     `AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36 (Chrome/)`
-	  */
-		me.isBadAndroid = (function() {
-			var appVersion = window.navigator.appVersion;
-			// Android browser is not a chrome browser.
-			if (/Android/.test(appVersion) && !(/Chrome\/\d/.test(appVersion))) {
-				var safariVersion = appVersion.match(/Safari\/(\d+.\d)/);
-				if(safariVersion && typeof safariVersion === "object" && safariVersion.length >= 2) {
-					return parseFloat(safariVersion[1]) < 535.19;
-				} else {
-					return true;
-				}
-			} else {
-				return false;
-			}
-		})();
-	
-		me.extend(me.style = {}, {
-			transform: _transform,
-			transitionTimingFunction: _prefixStyle('transitionTimingFunction'),
-			transitionDuration: _prefixStyle('transitionDuration'),
-			transitionDelay: _prefixStyle('transitionDelay'),
-			transformOrigin: _prefixStyle('transformOrigin')
-		});
-	
-		me.hasClass = function (e, c) {
-			var re = new RegExp("(^|\\s)" + c + "(\\s|$)");
-			return re.test(e.className);
-		};
-	
-		me.addClass = function (e, c) {
-			if ( me.hasClass(e, c) ) {
-				return;
-			}
-	
-			var newclass = e.className.split(' ');
-			newclass.push(c);
-			e.className = newclass.join(' ');
-		};
-	
-		me.removeClass = function (e, c) {
-			if ( !me.hasClass(e, c) ) {
-				return;
-			}
-	
-			var re = new RegExp("(^|\\s)" + c + "(\\s|$)", 'g');
-			e.className = e.className.replace(re, ' ');
-		};
-	
-		me.offset = function (el) {
-			var left = -el.offsetLeft,
-				top = -el.offsetTop;
-	
-			// jshint -W084
-			while (el = el.offsetParent) {
-				left -= el.offsetLeft;
-				top -= el.offsetTop;
-			}
-			// jshint +W084
-	
-			return {
-				left: left,
-				top: top
-			};
-		};
-	
-		me.preventDefaultException = function (el, exceptions) {
-			for ( var i in exceptions ) {
-				if ( exceptions[i].test(el[i]) ) {
-					return true;
-				}
-			}
-	
-			return false;
-		};
-	
-		me.extend(me.eventType = {}, {
-			touchstart: 1,
-			touchmove: 1,
-			touchend: 1,
-	
-			mousedown: 2,
-			mousemove: 2,
-			mouseup: 2,
-	
-			pointerdown: 3,
-			pointermove: 3,
-			pointerup: 3,
-	
-			MSPointerDown: 3,
-			MSPointerMove: 3,
-			MSPointerUp: 3
-		});
-	
-		me.extend(me.ease = {}, {
-			quadratic: {
-				style: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-				fn: function (k) {
-					return k * ( 2 - k );
-				}
-			},
-			circular: {
-				style: 'cubic-bezier(0.1, 0.57, 0.1, 1)',	// Not properly "circular" but this looks better, it should be (0.075, 0.82, 0.165, 1)
-				fn: function (k) {
-					return Math.sqrt( 1 - ( --k * k ) );
-				}
-			},
-			back: {
-				style: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-				fn: function (k) {
-					var b = 4;
-					return ( k = k - 1 ) * k * ( ( b + 1 ) * k + b ) + 1;
-				}
-			},
-			bounce: {
-				style: '',
-				fn: function (k) {
-					if ( ( k /= 1 ) < ( 1 / 2.75 ) ) {
-						return 7.5625 * k * k;
-					} else if ( k < ( 2 / 2.75 ) ) {
-						return 7.5625 * ( k -= ( 1.5 / 2.75 ) ) * k + 0.75;
-					} else if ( k < ( 2.5 / 2.75 ) ) {
-						return 7.5625 * ( k -= ( 2.25 / 2.75 ) ) * k + 0.9375;
-					} else {
-						return 7.5625 * ( k -= ( 2.625 / 2.75 ) ) * k + 0.984375;
-					}
-				}
-			},
-			elastic: {
-				style: '',
-				fn: function (k) {
-					var f = 0.22,
-						e = 0.4;
-	
-					if ( k === 0 ) { return 0; }
-					if ( k == 1 ) { return 1; }
-	
-					return ( e * Math.pow( 2, - 10 * k ) * Math.sin( ( k - f / 4 ) * ( 2 * Math.PI ) / f ) + 1 );
-				}
-			}
-		});
-	
-		me.tap = function (e, eventName) {
-			var ev = document.createEvent('Event');
-			ev.initEvent(eventName, true, true);
-			ev.pageX = e.pageX;
-			ev.pageY = e.pageY;
-			e.target.dispatchEvent(ev);
-		};
-	
-		me.click = function (e) {
-			var target = e.target,
-				ev;
-	
-			if ( !(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName) ) {
-				ev = document.createEvent('MouseEvents');
-				ev.initMouseEvent('click', true, true, e.view, 1,
-					target.screenX, target.screenY, target.clientX, target.clientY,
-					e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
-					0, null);
-	
-				ev._constructed = true;
-				target.dispatchEvent(ev);
-			}
-		};
-	
-		return me;
-	})();
-	function IScroll (el, options) {
-		this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
-		this.scroller = this.wrapper.children[0];
-		this.scrollerStyle = this.scroller.style;		// cache style for better performance
-	
-		this.options = {
-	
-			resizeScrollbars: true,
-	
-			mouseWheelSpeed: 20,
-	
-			snapThreshold: 0.334,
-	
-	// INSERT POINT: OPTIONS
-			disablePointer : !utils.hasPointer,
-			disableTouch : utils.hasPointer || !utils.hasTouch,
-			disableMouse : utils.hasPointer || utils.hasTouch,
-			startX: 0,
-			startY: 0,
-			scrollY: true,
-			directionLockThreshold: 5,
-			momentum: true,
-	
-			bounce: true,
-			bounceTime: 600,
-			bounceEasing: '',
-	
-			preventDefault: true,
-			preventDefaultException: { tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ },
-	
-			HWCompositing: true,
-			useTransition: true,
-			useTransform: true,
-			bindToWrapper: typeof window.onmousedown === "undefined"
-		};
-	
-		for ( var i in options ) {
-			this.options[i] = options[i];
-		}
-	
-		// Normalize options
-		this.translateZ = this.options.HWCompositing && utils.hasPerspective ? ' translateZ(0)' : '';
-	
-		this.options.useTransition = utils.hasTransition && this.options.useTransition;
-		this.options.useTransform = utils.hasTransform && this.options.useTransform;
-	
-		this.options.eventPassthrough = this.options.eventPassthrough === true ? 'vertical' : this.options.eventPassthrough;
-		this.options.preventDefault = !this.options.eventPassthrough && this.options.preventDefault;
-	
-		// If you want eventPassthrough I have to lock one of the axes
-		this.options.scrollY = this.options.eventPassthrough == 'vertical' ? false : this.options.scrollY;
-		this.options.scrollX = this.options.eventPassthrough == 'horizontal' ? false : this.options.scrollX;
-	
-		// With eventPassthrough we also need lockDirection mechanism
-		this.options.freeScroll = this.options.freeScroll && !this.options.eventPassthrough;
-		this.options.directionLockThreshold = this.options.eventPassthrough ? 0 : this.options.directionLockThreshold;
-	
-		this.options.bounceEasing = typeof this.options.bounceEasing == 'string' ? utils.ease[this.options.bounceEasing] || utils.ease.circular : this.options.bounceEasing;
-	
-		this.options.resizePolling = this.options.resizePolling === undefined ? 60 : this.options.resizePolling;
-	
-		if ( this.options.tap === true ) {
-			this.options.tap = 'tap';
-		}
-	
-		if ( this.options.shrinkScrollbars == 'scale' ) {
-			this.options.useTransition = false;
-		}
-	
-		this.options.invertWheelDirection = this.options.invertWheelDirection ? -1 : 1;
-	
-		if ( this.options.probeType == 3 ) {
-			this.options.useTransition = false;	}
-	
-	// INSERT POINT: NORMALIZATION
-	
-		// Some defaults
-		this.x = 0;
-		this.y = 0;
-		this.directionX = 0;
-		this.directionY = 0;
-		this._events = {};
-	
-	// INSERT POINT: DEFAULTS
-	
-		this._init();
-		this.refresh();
-	
-		this.scrollTo(this.options.startX, this.options.startY);
-		this.enable();
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
 	}
-	
-	IScroll.prototype = {
-		version: '5.2.0',
-	
-		_init: function () {
-			this._initEvents();
-	
-			if ( this.options.scrollbars || this.options.indicators ) {
-				this._initIndicators();
-			}
-	
-			if ( this.options.mouseWheel ) {
-				this._initWheel();
-			}
-	
-			if ( this.options.snap ) {
-				this._initSnap();
-			}
-	
-			if ( this.options.keyBindings ) {
-				this._initKeys();
-			}
-	
-	// INSERT POINT: _init
-	
-		},
-	
-		destroy: function () {
-			this._initEvents(true);
-			clearTimeout(this.resizeTimeout);
-	 		this.resizeTimeout = null;
-			this._execEvent('destroy');
-		},
-	
-		_transitionEnd: function (e) {
-			if ( e.target != this.scroller || !this.isInTransition ) {
-				return;
-			}
-	
-			this._transitionTime();
-			if ( !this.resetPosition(this.options.bounceTime) ) {
-				this.isInTransition = false;
-				this._execEvent('scrollEnd');
-			}
-		},
-	
-		_start: function (e) {
-			// React to left mouse button only
-			if ( utils.eventType[e.type] != 1 ) {
-			  // for button property
-			  // http://unixpapa.com/js/mouse.html
-			  var button;
-		    if (!e.which) {
-		      /* IE case */
-		      button = (e.button < 2) ? 0 :
-		               ((e.button == 4) ? 1 : 2);
-		    } else {
-		      /* All others */
-		      button = e.button;
-		    }
-				if ( button !== 0 ) {
-					return;
-				}
-			}
-	
-			if ( !this.enabled || (this.initiated && utils.eventType[e.type] !== this.initiated) ) {
-				return;
-			}
-	
-			if ( this.options.preventDefault && !utils.isBadAndroid && !utils.preventDefaultException(e.target, this.options.preventDefaultException) ) {
-				e.preventDefault();
-			}
-	
-			var point = e.touches ? e.touches[0] : e,
-				pos;
-	
-			this.initiated	= utils.eventType[e.type];
-			this.moved		= false;
-			this.distX		= 0;
-			this.distY		= 0;
-			this.directionX = 0;
-			this.directionY = 0;
-			this.directionLocked = 0;
-	
-			this.startTime = utils.getTime();
-	
-			if ( this.options.useTransition && this.isInTransition ) {
-				this._transitionTime();
-				this.isInTransition = false;
-				pos = this.getComputedPosition();
-				this._translate(Math.round(pos.x), Math.round(pos.y));
-				this._execEvent('scrollEnd');
-			} else if ( !this.options.useTransition && this.isAnimating ) {
-				this.isAnimating = false;
-				this._execEvent('scrollEnd');
-			}
-	
-			this.startX    = this.x;
-			this.startY    = this.y;
-			this.absStartX = this.x;
-			this.absStartY = this.y;
-			this.pointX    = point.pageX;
-			this.pointY    = point.pageY;
-	
-			this._execEvent('beforeScrollStart');
-		},
-	
-		_move: function (e) {
-			if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
-				return;
-			}
-	
-			if ( this.options.preventDefault ) {	// increases performance on Android? TODO: check!
-				e.preventDefault();
-			}
-	
-			var point		= e.touches ? e.touches[0] : e,
-				deltaX		= point.pageX - this.pointX,
-				deltaY		= point.pageY - this.pointY,
-				timestamp	= utils.getTime(),
-				newX, newY,
-				absDistX, absDistY;
-	
-			this.pointX		= point.pageX;
-			this.pointY		= point.pageY;
-	
-			this.distX		+= deltaX;
-			this.distY		+= deltaY;
-			absDistX		= Math.abs(this.distX);
-			absDistY		= Math.abs(this.distY);
-	
-			// We need to move at least 10 pixels for the scrolling to initiate
-			if ( timestamp - this.endTime > 300 && (absDistX < 10 && absDistY < 10) ) {
-				return;
-			}
-	
-			// If you are scrolling in one direction lock the other
-			if ( !this.directionLocked && !this.options.freeScroll ) {
-				if ( absDistX > absDistY + this.options.directionLockThreshold ) {
-					this.directionLocked = 'h';		// lock horizontally
-				} else if ( absDistY >= absDistX + this.options.directionLockThreshold ) {
-					this.directionLocked = 'v';		// lock vertically
-				} else {
-					this.directionLocked = 'n';		// no lock
-				}
-			}
-	
-			if ( this.directionLocked == 'h' ) {
-				if ( this.options.eventPassthrough == 'vertical' ) {
-					e.preventDefault();
-				} else if ( this.options.eventPassthrough == 'horizontal' ) {
-					this.initiated = false;
-					return;
-				}
-	
-				deltaY = 0;
-			} else if ( this.directionLocked == 'v' ) {
-				if ( this.options.eventPassthrough == 'horizontal' ) {
-					e.preventDefault();
-				} else if ( this.options.eventPassthrough == 'vertical' ) {
-					this.initiated = false;
-					return;
-				}
-	
-				deltaX = 0;
-			}
-	
-			deltaX = this.hasHorizontalScroll ? deltaX : 0;
-			deltaY = this.hasVerticalScroll ? deltaY : 0;
-	
-			newX = this.x + deltaX;
-			newY = this.y + deltaY;
-	
-			// Slow down if outside of the boundaries
-			if ( newX > 0 || newX < this.maxScrollX ) {
-				newX = this.options.bounce ? this.x + deltaX / 3 : newX > 0 ? 0 : this.maxScrollX;
-			}
-			if ( newY > 0 || newY < this.maxScrollY ) {
-				newY = this.options.bounce ? this.y + deltaY / 3 : newY > 0 ? 0 : this.maxScrollY;
-			}
-	
-			this.directionX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
-			this.directionY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
-	
-			if ( !this.moved ) {
-				this._execEvent('scrollStart');
-			}
-	
-			this.moved = true;
-	
-			this._translate(newX, newY);
-	
-	/* REPLACE START: _move */
-			if ( timestamp - this.startTime > 300 ) {
-				this.startTime = timestamp;
-				this.startX = this.x;
-				this.startY = this.y;
-	
-				if ( this.options.probeType == 1 ) {
-					this._execEvent('scroll');
-				}
-			}
-	
-			if ( this.options.probeType > 1 ) {
-				this._execEvent('scroll');
-			}
-	/* REPLACE END: _move */
-	
-		},
-	
-		_end: function (e) {
-			if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
-				return;
-			}
-	
-			if ( this.options.preventDefault && !utils.preventDefaultException(e.target, this.options.preventDefaultException) ) {
-				e.preventDefault();
-			}
-	
-			var point = e.changedTouches ? e.changedTouches[0] : e,
-				momentumX,
-				momentumY,
-				duration = utils.getTime() - this.startTime,
-				newX = Math.round(this.x),
-				newY = Math.round(this.y),
-				distanceX = Math.abs(newX - this.startX),
-				distanceY = Math.abs(newY - this.startY),
-				time = 0,
-				easing = '';
-	
-			this.isInTransition = 0;
-			this.initiated = 0;
-			this.endTime = utils.getTime();
-	
-			// reset if we are outside of the boundaries
-			if ( this.resetPosition(this.options.bounceTime) ) {
-				return;
-			}
-	
-			this.scrollTo(newX, newY);	// ensures that the last position is rounded
-	
-			// we scrolled less than 10 pixels
-			if ( !this.moved ) {
-				if ( this.options.tap ) {
-					utils.tap(e, this.options.tap);
-				}
-	
-				if ( this.options.click ) {
-					utils.click(e);
-				}
-	
-				this._execEvent('scrollCancel');
-				return;
-			}
-	
-			if ( this._events.flick && duration < 200 && distanceX < 100 && distanceY < 100 ) {
-				this._execEvent('flick');
-				return;
-			}
-	
-			// start momentum animation if needed
-			if ( this.options.momentum && duration < 300 ) {
-				momentumX = this.hasHorizontalScroll ? utils.momentum(this.x, this.startX, duration, this.maxScrollX, this.options.bounce ? this.wrapperWidth : 0, this.options.deceleration) : { destination: newX, duration: 0 };
-				momentumY = this.hasVerticalScroll ? utils.momentum(this.y, this.startY, duration, this.maxScrollY, this.options.bounce ? this.wrapperHeight : 0, this.options.deceleration) : { destination: newY, duration: 0 };
-				newX = momentumX.destination;
-				newY = momentumY.destination;
-				time = Math.max(momentumX.duration, momentumY.duration);
-				this.isInTransition = 1;
-			}
-	
-	
-			if ( this.options.snap ) {
-				var snap = this._nearestSnap(newX, newY);
-				this.currentPage = snap;
-				time = this.options.snapSpeed || Math.max(
-						Math.max(
-							Math.min(Math.abs(newX - snap.x), 1000),
-							Math.min(Math.abs(newY - snap.y), 1000)
-						), 300);
-				newX = snap.x;
-				newY = snap.y;
-	
-				this.directionX = 0;
-				this.directionY = 0;
-				easing = this.options.bounceEasing;
-			}
-	
-	// INSERT POINT: _end
-	
-			if ( newX != this.x || newY != this.y ) {
-				// change easing function when scroller goes out of the boundaries
-				if ( newX > 0 || newX < this.maxScrollX || newY > 0 || newY < this.maxScrollY ) {
-					easing = utils.ease.quadratic;
-				}
-	
-				this.scrollTo(newX, newY, time, easing);
-				return;
-			}
-	
-			this._execEvent('scrollEnd');
-		},
-	
-		_resize: function () {
-			var that = this;
-	
-			clearTimeout(this.resizeTimeout);
-	
-			this.resizeTimeout = setTimeout(function () {
-				that.refresh();
-			}, this.options.resizePolling);
-		},
-	
-		resetPosition: function (time) {
-			var x = this.x,
-				y = this.y;
-	
-			time = time || 0;
-	
-			if ( !this.hasHorizontalScroll || this.x > 0 ) {
-				x = 0;
-			} else if ( this.x < this.maxScrollX ) {
-				x = this.maxScrollX;
-			}
-	
-			if ( !this.hasVerticalScroll || this.y > 0 ) {
-				y = 0;
-			} else if ( this.y < this.maxScrollY ) {
-				y = this.maxScrollY;
-			}
-	
-			if ( x == this.x && y == this.y ) {
-				return false;
-			}
-	
-			this.scrollTo(x, y, time, this.options.bounceEasing);
-	
-			return true;
-		},
-	
-		disable: function () {
-			this.enabled = false;
-		},
-	
-		enable: function () {
-			this.enabled = true;
-		},
-	
-		refresh: function () {
-			var rf = this.wrapper.offsetHeight;		// Force reflow
-	
-			this.wrapperWidth	= this.wrapper.clientWidth;
-			this.wrapperHeight	= this.wrapper.clientHeight;
-	
-	/* REPLACE START: refresh */
-	
-			this.scrollerWidth	= this.scroller.offsetWidth;
-			this.scrollerHeight	= this.scroller.offsetHeight;
-	
-			this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
-			this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
-	
-	/* REPLACE END: refresh */
-	
-			this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
-			this.hasVerticalScroll		= this.options.scrollY && this.maxScrollY < 0;
-	
-			if ( !this.hasHorizontalScroll ) {
-				this.maxScrollX = 0;
-				this.scrollerWidth = this.wrapperWidth;
-			}
-	
-			if ( !this.hasVerticalScroll ) {
-				this.maxScrollY = 0;
-				this.scrollerHeight = this.wrapperHeight;
-			}
-	
-			this.endTime = 0;
-			this.directionX = 0;
-			this.directionY = 0;
-	
-			this.wrapperOffset = utils.offset(this.wrapper);
-	
-			this._execEvent('refresh');
-	
-			this.resetPosition();
-	
-	// INSERT POINT: _refresh
-	
-		},
-	
-		on: function (type, fn) {
-			if ( !this._events[type] ) {
-				this._events[type] = [];
-			}
-	
-			this._events[type].push(fn);
-		},
-	
-		off: function (type, fn) {
-			if ( !this._events[type] ) {
-				return;
-			}
-	
-			var index = this._events[type].indexOf(fn);
-	
-			if ( index > -1 ) {
-				this._events[type].splice(index, 1);
-			}
-		},
-	
-		_execEvent: function (type) {
-			if ( !this._events[type] ) {
-				return;
-			}
-	
-			var i = 0,
-				l = this._events[type].length;
-	
-			if ( !l ) {
-				return;
-			}
-	
-			for ( ; i < l; i++ ) {
-				this._events[type][i].apply(this, [].slice.call(arguments, 1));
-			}
-		},
-	
-		scrollBy: function (x, y, time, easing) {
-			x = this.x + x;
-			y = this.y + y;
-			time = time || 0;
-	
-			this.scrollTo(x, y, time, easing);
-		},
-	
-		scrollTo: function (x, y, time, easing) {
-			easing = easing || utils.ease.circular;
-	
-			this.isInTransition = this.options.useTransition && time > 0;
-			var transitionType = this.options.useTransition && easing.style;
-			if ( !time || transitionType ) {
-					if(transitionType) {
-						this._transitionTimingFunction(easing.style);
-						this._transitionTime(time);
-					}
-				this._translate(x, y);
-			} else {
-				this._animate(x, y, time, easing.fn);
-			}
-		},
-	
-		scrollToElement: function (el, time, offsetX, offsetY, easing) {
-			el = el.nodeType ? el : this.scroller.querySelector(el);
-	
-			if ( !el ) {
-				return;
-			}
-	
-			var pos = utils.offset(el);
-	
-			pos.left -= this.wrapperOffset.left;
-			pos.top  -= this.wrapperOffset.top;
-	
-			// if offsetX/Y are true we center the element to the screen
-			if ( offsetX === true ) {
-				offsetX = Math.round(el.offsetWidth / 2 - this.wrapper.offsetWidth / 2);
-			}
-			if ( offsetY === true ) {
-				offsetY = Math.round(el.offsetHeight / 2 - this.wrapper.offsetHeight / 2);
-			}
-	
-			pos.left -= offsetX || 0;
-			pos.top  -= offsetY || 0;
-	
-			pos.left = pos.left > 0 ? 0 : pos.left < this.maxScrollX ? this.maxScrollX : pos.left;
-			pos.top  = pos.top  > 0 ? 0 : pos.top  < this.maxScrollY ? this.maxScrollY : pos.top;
-	
-			time = time === undefined || time === null || time === 'auto' ? Math.max(Math.abs(this.x-pos.left), Math.abs(this.y-pos.top)) : time;
-	
-			this.scrollTo(pos.left, pos.top, time, easing);
-		},
-	
-		_transitionTime: function (time) {
-			time = time || 0;
-	
-			var durationProp = utils.style.transitionDuration;
-			this.scrollerStyle[durationProp] = time + 'ms';
-	
-			if ( !time && utils.isBadAndroid ) {
-				this.scrollerStyle[durationProp] = '0.0001ms';
-				// remove 0.0001ms
-				var self = this;
-				rAF(function() {
-					if(self.scrollerStyle[durationProp] === '0.0001ms') {
-						self.scrollerStyle[durationProp] = '0s';
-					}
-				});
-			}
-	
-	
-			if ( this.indicators ) {
-				for ( var i = this.indicators.length; i--; ) {
-					this.indicators[i].transitionTime(time);
-				}
-			}
-	
-	
-	// INSERT POINT: _transitionTime
-	
-		},
-	
-		_transitionTimingFunction: function (easing) {
-			this.scrollerStyle[utils.style.transitionTimingFunction] = easing;
-	
-	
-			if ( this.indicators ) {
-				for ( var i = this.indicators.length; i--; ) {
-					this.indicators[i].transitionTimingFunction(easing);
-				}
-			}
-	
-	
-	// INSERT POINT: _transitionTimingFunction
-	
-		},
-	
-		_translate: function (x, y) {
-			if ( this.options.useTransform ) {
-	
-	/* REPLACE START: _translate */
-	
-				this.scrollerStyle[utils.style.transform] = 'translate(' + x + 'px,' + y + 'px)' + this.translateZ;
-	
-	/* REPLACE END: _translate */
-	
-			} else {
-				x = Math.round(x);
-				y = Math.round(y);
-				this.scrollerStyle.left = x + 'px';
-				this.scrollerStyle.top = y + 'px';
-			}
-	
-			this.x = x;
-			this.y = y;
-	
-	
-		if ( this.indicators ) {
-			for ( var i = this.indicators.length; i--; ) {
-				this.indicators[i].updatePosition();
-			}
-		}
-	
-	
-	// INSERT POINT: _translate
-	
-		},
-	
-		_initEvents: function (remove) {
-			var eventType = remove ? utils.removeEvent : utils.addEvent,
-				target = this.options.bindToWrapper ? this.wrapper : window;
-	
-			eventType(window, 'orientationchange', this);
-			eventType(window, 'resize', this);
-	
-			if ( this.options.click ) {
-				eventType(this.wrapper, 'click', this, true);
-			}
-	
-			if ( !this.options.disableMouse ) {
-				eventType(this.wrapper, 'mousedown', this);
-				eventType(target, 'mousemove', this);
-				eventType(target, 'mousecancel', this);
-				eventType(target, 'mouseup', this);
-			}
-	
-			if ( utils.hasPointer && !this.options.disablePointer ) {
-				eventType(this.wrapper, utils.prefixPointerEvent('pointerdown'), this);
-				eventType(target, utils.prefixPointerEvent('pointermove'), this);
-				eventType(target, utils.prefixPointerEvent('pointercancel'), this);
-				eventType(target, utils.prefixPointerEvent('pointerup'), this);
-			}
-	
-			if ( utils.hasTouch && !this.options.disableTouch ) {
-				eventType(this.wrapper, 'touchstart', this);
-				eventType(target, 'touchmove', this);
-				eventType(target, 'touchcancel', this);
-				eventType(target, 'touchend', this);
-			}
-	
-			eventType(this.scroller, 'transitionend', this);
-			eventType(this.scroller, 'webkitTransitionEnd', this);
-			eventType(this.scroller, 'oTransitionEnd', this);
-			eventType(this.scroller, 'MSTransitionEnd', this);
-		},
-	
-		getComputedPosition: function () {
-			var matrix = window.getComputedStyle(this.scroller, null),
-				x, y;
-	
-			if ( this.options.useTransform ) {
-				matrix = matrix[utils.style.transform].split(')')[0].split(', ');
-				x = +(matrix[12] || matrix[4]);
-				y = +(matrix[13] || matrix[5]);
-			} else {
-				x = +matrix.left.replace(/[^-\d.]/g, '');
-				y = +matrix.top.replace(/[^-\d.]/g, '');
-			}
-	
-			return { x: x, y: y };
-		},
-		_initIndicators: function () {
-			var interactive = this.options.interactiveScrollbars,
-				customStyle = typeof this.options.scrollbars != 'string',
-				indicators = [],
-				indicator;
-	
-			var that = this;
-	
-			this.indicators = [];
-	
-			if ( this.options.scrollbars ) {
-				// Vertical scrollbar
-				if ( this.options.scrollY ) {
-					indicator = {
-						el: createDefaultScrollbar('v', interactive, this.options.scrollbars),
-						interactive: interactive,
-						defaultScrollbars: true,
-						customStyle: customStyle,
-						resize: this.options.resizeScrollbars,
-						shrink: this.options.shrinkScrollbars,
-						fade: this.options.fadeScrollbars,
-						listenX: false
-					};
-	
-					this.wrapper.appendChild(indicator.el);
-					indicators.push(indicator);
-				}
-	
-				// Horizontal scrollbar
-				if ( this.options.scrollX ) {
-					indicator = {
-						el: createDefaultScrollbar('h', interactive, this.options.scrollbars),
-						interactive: interactive,
-						defaultScrollbars: true,
-						customStyle: customStyle,
-						resize: this.options.resizeScrollbars,
-						shrink: this.options.shrinkScrollbars,
-						fade: this.options.fadeScrollbars,
-						listenY: false
-					};
-	
-					this.wrapper.appendChild(indicator.el);
-					indicators.push(indicator);
-				}
-			}
-	
-			if ( this.options.indicators ) {
-				// TODO: check concat compatibility
-				indicators = indicators.concat(this.options.indicators);
-			}
-	
-			for ( var i = indicators.length; i--; ) {
-				this.indicators.push( new Indicator(this, indicators[i]) );
-			}
-	
-			// TODO: check if we can use array.map (wide compatibility and performance issues)
-			function _indicatorsMap (fn) {
-				if (that.indicators) {
-					for ( var i = that.indicators.length; i--; ) {
-						fn.call(that.indicators[i]);
-					}
-				}
-			}
-	
-			if ( this.options.fadeScrollbars ) {
-				this.on('scrollEnd', function () {
-					_indicatorsMap(function () {
-						this.fade();
-					});
-				});
-	
-				this.on('scrollCancel', function () {
-					_indicatorsMap(function () {
-						this.fade();
-					});
-				});
-	
-				this.on('scrollStart', function () {
-					_indicatorsMap(function () {
-						this.fade(1);
-					});
-				});
-	
-				this.on('beforeScrollStart', function () {
-					_indicatorsMap(function () {
-						this.fade(1, true);
-					});
-				});
-			}
-	
-	
-			this.on('refresh', function () {
-				_indicatorsMap(function () {
-					this.refresh();
-				});
-			});
-	
-			this.on('destroy', function () {
-				_indicatorsMap(function () {
-					this.destroy();
-				});
-	
-				delete this.indicators;
-			});
-		},
-	
-		_initWheel: function () {
-			utils.addEvent(this.wrapper, 'wheel', this);
-			utils.addEvent(this.wrapper, 'mousewheel', this);
-			utils.addEvent(this.wrapper, 'DOMMouseScroll', this);
-	
-			this.on('destroy', function () {
-				clearTimeout(this.wheelTimeout);
-				this.wheelTimeout = null;
-				utils.removeEvent(this.wrapper, 'wheel', this);
-				utils.removeEvent(this.wrapper, 'mousewheel', this);
-				utils.removeEvent(this.wrapper, 'DOMMouseScroll', this);
-			});
-		},
-	
-		_wheel: function (e) {
-			if ( !this.enabled ) {
-				return;
-			}
-	
-			e.preventDefault();
-	
-			var wheelDeltaX, wheelDeltaY,
-				newX, newY,
-				that = this;
-	
-			if ( this.wheelTimeout === undefined ) {
-				that._execEvent('scrollStart');
-			}
-	
-			// Execute the scrollEnd event after 400ms the wheel stopped scrolling
-			clearTimeout(this.wheelTimeout);
-			this.wheelTimeout = setTimeout(function () {
-				if(!that.options.snap) {
-					that._execEvent('scrollEnd');
-				}
-				that.wheelTimeout = undefined;
-			}, 400);
-	
-			if ( 'deltaX' in e ) {
-				if (e.deltaMode === 1) {
-					wheelDeltaX = -e.deltaX * this.options.mouseWheelSpeed;
-					wheelDeltaY = -e.deltaY * this.options.mouseWheelSpeed;
-				} else {
-					wheelDeltaX = -e.deltaX;
-					wheelDeltaY = -e.deltaY;
-				}
-			} else if ( 'wheelDeltaX' in e ) {
-				wheelDeltaX = e.wheelDeltaX / 120 * this.options.mouseWheelSpeed;
-				wheelDeltaY = e.wheelDeltaY / 120 * this.options.mouseWheelSpeed;
-			} else if ( 'wheelDelta' in e ) {
-				wheelDeltaX = wheelDeltaY = e.wheelDelta / 120 * this.options.mouseWheelSpeed;
-			} else if ( 'detail' in e ) {
-				wheelDeltaX = wheelDeltaY = -e.detail / 3 * this.options.mouseWheelSpeed;
-			} else {
-				return;
-			}
-	
-			wheelDeltaX *= this.options.invertWheelDirection;
-			wheelDeltaY *= this.options.invertWheelDirection;
-	
-			if ( !this.hasVerticalScroll ) {
-				wheelDeltaX = wheelDeltaY;
-				wheelDeltaY = 0;
-			}
-	
-			if ( this.options.snap ) {
-				newX = this.currentPage.pageX;
-				newY = this.currentPage.pageY;
-	
-				if ( wheelDeltaX > 0 ) {
-					newX--;
-				} else if ( wheelDeltaX < 0 ) {
-					newX++;
-				}
-	
-				if ( wheelDeltaY > 0 ) {
-					newY--;
-				} else if ( wheelDeltaY < 0 ) {
-					newY++;
-				}
-	
-				this.goToPage(newX, newY);
-	
-				return;
-			}
-	
-			newX = this.x + Math.round(this.hasHorizontalScroll ? wheelDeltaX : 0);
-			newY = this.y + Math.round(this.hasVerticalScroll ? wheelDeltaY : 0);
-	
-			this.directionX = wheelDeltaX > 0 ? -1 : wheelDeltaX < 0 ? 1 : 0;
-			this.directionY = wheelDeltaY > 0 ? -1 : wheelDeltaY < 0 ? 1 : 0;
-	
-			if ( newX > 0 ) {
-				newX = 0;
-			} else if ( newX < this.maxScrollX ) {
-				newX = this.maxScrollX;
-			}
-	
-			if ( newY > 0 ) {
-				newY = 0;
-			} else if ( newY < this.maxScrollY ) {
-				newY = this.maxScrollY;
-			}
-	
-			this.scrollTo(newX, newY, 0);
-	
-			if ( this.options.probeType > 1 ) {
-				this._execEvent('scroll');
-			}
-	
-	// INSERT POINT: _wheel
-		},
-	
-		_initSnap: function () {
-			this.currentPage = {};
-	
-			if ( typeof this.options.snap == 'string' ) {
-				this.options.snap = this.scroller.querySelectorAll(this.options.snap);
-			}
-	
-			this.on('refresh', function () {
-				var i = 0, l,
-					m = 0, n,
-					cx, cy,
-					x = 0, y,
-					stepX = this.options.snapStepX || this.wrapperWidth,
-					stepY = this.options.snapStepY || this.wrapperHeight,
-					el;
-	
-				this.pages = [];
-	
-				if ( !this.wrapperWidth || !this.wrapperHeight || !this.scrollerWidth || !this.scrollerHeight ) {
-					return;
-				}
-	
-				if ( this.options.snap === true ) {
-					cx = Math.round( stepX / 2 );
-					cy = Math.round( stepY / 2 );
-	
-					while ( x > -this.scrollerWidth ) {
-						this.pages[i] = [];
-						l = 0;
-						y = 0;
-	
-						while ( y > -this.scrollerHeight ) {
-							this.pages[i][l] = {
-								x: Math.max(x, this.maxScrollX),
-								y: Math.max(y, this.maxScrollY),
-								width: stepX,
-								height: stepY,
-								cx: x - cx,
-								cy: y - cy
-							};
-	
-							y -= stepY;
-							l++;
-						}
-	
-						x -= stepX;
-						i++;
-					}
-				} else {
-					el = this.options.snap;
-					l = el.length;
-					n = -1;
-	
-					for ( ; i < l; i++ ) {
-						if ( i === 0 || el[i].offsetLeft <= el[i-1].offsetLeft ) {
-							m = 0;
-							n++;
-						}
-	
-						if ( !this.pages[m] ) {
-							this.pages[m] = [];
-						}
-	
-						x = Math.max(-el[i].offsetLeft, this.maxScrollX);
-						y = Math.max(-el[i].offsetTop, this.maxScrollY);
-						cx = x - Math.round(el[i].offsetWidth / 2);
-						cy = y - Math.round(el[i].offsetHeight / 2);
-	
-						this.pages[m][n] = {
-							x: x,
-							y: y,
-							width: el[i].offsetWidth,
-							height: el[i].offsetHeight,
-							cx: cx,
-							cy: cy
-						};
-	
-						if ( x > this.maxScrollX ) {
-							m++;
-						}
-					}
-				}
-	
-				this.goToPage(this.currentPage.pageX || 0, this.currentPage.pageY || 0, 0);
-	
-				// Update snap threshold if needed
-				if ( this.options.snapThreshold % 1 === 0 ) {
-					this.snapThresholdX = this.options.snapThreshold;
-					this.snapThresholdY = this.options.snapThreshold;
-				} else {
-					this.snapThresholdX = Math.round(this.pages[this.currentPage.pageX][this.currentPage.pageY].width * this.options.snapThreshold);
-					this.snapThresholdY = Math.round(this.pages[this.currentPage.pageX][this.currentPage.pageY].height * this.options.snapThreshold);
-				}
-			});
-	
-			this.on('flick', function () {
-				var time = this.options.snapSpeed || Math.max(
-						Math.max(
-							Math.min(Math.abs(this.x - this.startX), 1000),
-							Math.min(Math.abs(this.y - this.startY), 1000)
-						), 300);
-	
-				this.goToPage(
-					this.currentPage.pageX + this.directionX,
-					this.currentPage.pageY + this.directionY,
-					time
-				);
-			});
-		},
-	
-		_nearestSnap: function (x, y) {
-			if ( !this.pages.length ) {
-				return { x: 0, y: 0, pageX: 0, pageY: 0 };
-			}
-	
-			var i = 0,
-				l = this.pages.length,
-				m = 0;
-	
-			// Check if we exceeded the snap threshold
-			if ( Math.abs(x - this.absStartX) < this.snapThresholdX &&
-				Math.abs(y - this.absStartY) < this.snapThresholdY ) {
-				return this.currentPage;
-			}
-	
-			if ( x > 0 ) {
-				x = 0;
-			} else if ( x < this.maxScrollX ) {
-				x = this.maxScrollX;
-			}
-	
-			if ( y > 0 ) {
-				y = 0;
-			} else if ( y < this.maxScrollY ) {
-				y = this.maxScrollY;
-			}
-	
-			for ( ; i < l; i++ ) {
-				if ( x >= this.pages[i][0].cx ) {
-					x = this.pages[i][0].x;
-					break;
-				}
-			}
-	
-			l = this.pages[i].length;
-	
-			for ( ; m < l; m++ ) {
-				if ( y >= this.pages[0][m].cy ) {
-					y = this.pages[0][m].y;
-					break;
-				}
-			}
-	
-			if ( i == this.currentPage.pageX ) {
-				i += this.directionX;
-	
-				if ( i < 0 ) {
-					i = 0;
-				} else if ( i >= this.pages.length ) {
-					i = this.pages.length - 1;
-				}
-	
-				x = this.pages[i][0].x;
-			}
-	
-			if ( m == this.currentPage.pageY ) {
-				m += this.directionY;
-	
-				if ( m < 0 ) {
-					m = 0;
-				} else if ( m >= this.pages[0].length ) {
-					m = this.pages[0].length - 1;
-				}
-	
-				y = this.pages[0][m].y;
-			}
-	
-			return {
-				x: x,
-				y: y,
-				pageX: i,
-				pageY: m
-			};
-		},
-	
-		goToPage: function (x, y, time, easing) {
-			easing = easing || this.options.bounceEasing;
-	
-			if ( x >= this.pages.length ) {
-				x = this.pages.length - 1;
-			} else if ( x < 0 ) {
-				x = 0;
-			}
-	
-			if ( y >= this.pages[x].length ) {
-				y = this.pages[x].length - 1;
-			} else if ( y < 0 ) {
-				y = 0;
-			}
-	
-			var posX = this.pages[x][y].x,
-				posY = this.pages[x][y].y;
-	
-			time = time === undefined ? this.options.snapSpeed || Math.max(
-				Math.max(
-					Math.min(Math.abs(posX - this.x), 1000),
-					Math.min(Math.abs(posY - this.y), 1000)
-				), 300) : time;
-	
-			this.currentPage = {
-				x: posX,
-				y: posY,
-				pageX: x,
-				pageY: y
-			};
-	
-			this.scrollTo(posX, posY, time, easing);
-		},
-	
-		next: function (time, easing) {
-			var x = this.currentPage.pageX,
-				y = this.currentPage.pageY;
-	
-			x++;
-	
-			if ( x >= this.pages.length && this.hasVerticalScroll ) {
-				x = 0;
-				y++;
-			}
-	
-			this.goToPage(x, y, time, easing);
-		},
-	
-		prev: function (time, easing) {
-			var x = this.currentPage.pageX,
-				y = this.currentPage.pageY;
-	
-			x--;
-	
-			if ( x < 0 && this.hasVerticalScroll ) {
-				x = 0;
-				y--;
-			}
-	
-			this.goToPage(x, y, time, easing);
-		},
-	
-		_initKeys: function (e) {
-			// default key bindings
-			var keys = {
-				pageUp: 33,
-				pageDown: 34,
-				end: 35,
-				home: 36,
-				left: 37,
-				up: 38,
-				right: 39,
-				down: 40
-			};
-			var i;
-	
-			// if you give me characters I give you keycode
-			if ( typeof this.options.keyBindings == 'object' ) {
-				for ( i in this.options.keyBindings ) {
-					if ( typeof this.options.keyBindings[i] == 'string' ) {
-						this.options.keyBindings[i] = this.options.keyBindings[i].toUpperCase().charCodeAt(0);
-					}
-				}
-			} else {
-				this.options.keyBindings = {};
-			}
-	
-			for ( i in keys ) {
-				this.options.keyBindings[i] = this.options.keyBindings[i] || keys[i];
-			}
-	
-			utils.addEvent(window, 'keydown', this);
-	
-			this.on('destroy', function () {
-				utils.removeEvent(window, 'keydown', this);
-			});
-		},
-	
-		_key: function (e) {
-			if ( !this.enabled ) {
-				return;
-			}
-	
-			var snap = this.options.snap,	// we are using this alot, better to cache it
-				newX = snap ? this.currentPage.pageX : this.x,
-				newY = snap ? this.currentPage.pageY : this.y,
-				now = utils.getTime(),
-				prevTime = this.keyTime || 0,
-				acceleration = 0.250,
-				pos;
-	
-			if ( this.options.useTransition && this.isInTransition ) {
-				pos = this.getComputedPosition();
-	
-				this._translate(Math.round(pos.x), Math.round(pos.y));
-				this.isInTransition = false;
-			}
-	
-			this.keyAcceleration = now - prevTime < 200 ? Math.min(this.keyAcceleration + acceleration, 50) : 0;
-	
-			switch ( e.keyCode ) {
-				case this.options.keyBindings.pageUp:
-					if ( this.hasHorizontalScroll && !this.hasVerticalScroll ) {
-						newX += snap ? 1 : this.wrapperWidth;
-					} else {
-						newY += snap ? 1 : this.wrapperHeight;
-					}
-					break;
-				case this.options.keyBindings.pageDown:
-					if ( this.hasHorizontalScroll && !this.hasVerticalScroll ) {
-						newX -= snap ? 1 : this.wrapperWidth;
-					} else {
-						newY -= snap ? 1 : this.wrapperHeight;
-					}
-					break;
-				case this.options.keyBindings.end:
-					newX = snap ? this.pages.length-1 : this.maxScrollX;
-					newY = snap ? this.pages[0].length-1 : this.maxScrollY;
-					break;
-				case this.options.keyBindings.home:
-					newX = 0;
-					newY = 0;
-					break;
-				case this.options.keyBindings.left:
-					newX += snap ? -1 : 5 + this.keyAcceleration>>0;
-					break;
-				case this.options.keyBindings.up:
-					newY += snap ? 1 : 5 + this.keyAcceleration>>0;
-					break;
-				case this.options.keyBindings.right:
-					newX -= snap ? -1 : 5 + this.keyAcceleration>>0;
-					break;
-				case this.options.keyBindings.down:
-					newY -= snap ? 1 : 5 + this.keyAcceleration>>0;
-					break;
-				default:
-					return;
-			}
-	
-			if ( snap ) {
-				this.goToPage(newX, newY);
-				return;
-			}
-	
-			if ( newX > 0 ) {
-				newX = 0;
-				this.keyAcceleration = 0;
-			} else if ( newX < this.maxScrollX ) {
-				newX = this.maxScrollX;
-				this.keyAcceleration = 0;
-			}
-	
-			if ( newY > 0 ) {
-				newY = 0;
-				this.keyAcceleration = 0;
-			} else if ( newY < this.maxScrollY ) {
-				newY = this.maxScrollY;
-				this.keyAcceleration = 0;
-			}
-	
-			this.scrollTo(newX, newY, 0);
-	
-			this.keyTime = now;
-		},
-	
-		_animate: function (destX, destY, duration, easingFn) {
-			var that = this,
-				startX = this.x,
-				startY = this.y,
-				startTime = utils.getTime(),
-				destTime = startTime + duration;
-	
-			function step () {
-				var now = utils.getTime(),
-					newX, newY,
-					easing;
-	
-				if ( now >= destTime ) {
-					that.isAnimating = false;
-					that._translate(destX, destY);
-					
-					if ( !that.resetPosition(that.options.bounceTime) ) {
-						that._execEvent('scrollEnd');
-					}
-	
-					return;
-				}
-	
-				now = ( now - startTime ) / duration;
-				easing = easingFn(now);
-				newX = ( destX - startX ) * easing + startX;
-				newY = ( destY - startY ) * easing + startY;
-				that._translate(newX, newY);
-	
-				if ( that.isAnimating ) {
-					rAF(step);
-				}
-	
-				if ( that.options.probeType == 3 ) {
-					that._execEvent('scroll');
-				}
-			}
-	
-			this.isAnimating = true;
-			step();
-		},
-	
-		handleEvent: function (e) {
-			switch ( e.type ) {
-				case 'touchstart':
-				case 'pointerdown':
-				case 'MSPointerDown':
-				case 'mousedown':
-					this._start(e);
-					break;
-				case 'touchmove':
-				case 'pointermove':
-				case 'MSPointerMove':
-				case 'mousemove':
-					this._move(e);
-					break;
-				case 'touchend':
-				case 'pointerup':
-				case 'MSPointerUp':
-				case 'mouseup':
-				case 'touchcancel':
-				case 'pointercancel':
-				case 'MSPointerCancel':
-				case 'mousecancel':
-					this._end(e);
-					break;
-				case 'orientationchange':
-				case 'resize':
-					this._resize();
-					break;
-				case 'transitionend':
-				case 'webkitTransitionEnd':
-				case 'oTransitionEnd':
-				case 'MSTransitionEnd':
-					this._transitionEnd(e);
-					break;
-				case 'wheel':
-				case 'DOMMouseScroll':
-				case 'mousewheel':
-					this._wheel(e);
-					break;
-				case 'keydown':
-					this._key(e);
-					break;
-				case 'click':
-					if ( this.enabled && !e._constructed ) {
-						e.preventDefault();
-						e.stopPropagation();
-					}
-					break;
-			}
-		}
-	};
-	function createDefaultScrollbar (direction, interactive, type) {
-		var scrollbar = document.createElement('div'),
-			indicator = document.createElement('div');
-	
-		if ( type === true ) {
-			scrollbar.style.cssText = 'position:absolute;z-index:9999';
-			indicator.style.cssText = '-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;position:absolute;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.9);border-radius:3px';
-		}
-	
-		indicator.className = 'iScrollIndicator';
-	
-		if ( direction == 'h' ) {
-			if ( type === true ) {
-				scrollbar.style.cssText += ';height:7px;left:2px;right:2px;bottom:0';
-				indicator.style.height = '100%';
-			}
-			scrollbar.className = 'iScrollHorizontalScrollbar';
-		} else {
-			if ( type === true ) {
-				scrollbar.style.cssText += ';width:7px;bottom:2px;top:2px;right:1px';
-				indicator.style.width = '100%';
-			}
-			scrollbar.className = 'iScrollVerticalScrollbar';
-		}
-	
-		scrollbar.style.cssText += ';overflow:hidden';
-	
-		if ( !interactive ) {
-			scrollbar.style.pointerEvents = 'none';
-		}
-	
-		scrollbar.appendChild(indicator);
-	
-		return scrollbar;
-	}
-	
-	function Indicator (scroller, options) {
-		this.wrapper = typeof options.el == 'string' ? document.querySelector(options.el) : options.el;
-		this.wrapperStyle = this.wrapper.style;
-		this.indicator = this.wrapper.children[0];
-		this.indicatorStyle = this.indicator.style;
-		this.scroller = scroller;
-	
-		this.options = {
-			listenX: true,
-			listenY: true,
-			interactive: false,
-			resize: true,
-			defaultScrollbars: false,
-			shrink: false,
-			fade: false,
-			speedRatioX: 0,
-			speedRatioY: 0
-		};
-	
-		for ( var i in options ) {
-			this.options[i] = options[i];
-		}
-	
-		this.sizeRatioX = 1;
-		this.sizeRatioY = 1;
-		this.maxPosX = 0;
-		this.maxPosY = 0;
-	
-		if ( this.options.interactive ) {
-			if ( !this.options.disableTouch ) {
-				utils.addEvent(this.indicator, 'touchstart', this);
-				utils.addEvent(window, 'touchend', this);
-			}
-			if ( !this.options.disablePointer ) {
-				utils.addEvent(this.indicator, utils.prefixPointerEvent('pointerdown'), this);
-				utils.addEvent(window, utils.prefixPointerEvent('pointerup'), this);
-			}
-			if ( !this.options.disableMouse ) {
-				utils.addEvent(this.indicator, 'mousedown', this);
-				utils.addEvent(window, 'mouseup', this);
-			}
-		}
-	
-		if ( this.options.fade ) {
-			this.wrapperStyle[utils.style.transform] = this.scroller.translateZ;
-			var durationProp = utils.style.transitionDuration;
-			this.wrapperStyle[durationProp] = utils.isBadAndroid ? '0.0001ms' : '0ms';
-			// remove 0.0001ms
-			var self = this;
-			if(utils.isBadAndroid) {
-				rAF(function() {
-					if(self.wrapperStyle[durationProp] === '0.0001ms') {
-						self.wrapperStyle[durationProp] = '0s';
-					}
-				});
-			}
-			this.wrapperStyle.opacity = '0';
-		}
-	}
-	
-	Indicator.prototype = {
-		handleEvent: function (e) {
-			switch ( e.type ) {
-				case 'touchstart':
-				case 'pointerdown':
-				case 'MSPointerDown':
-				case 'mousedown':
-					this._start(e);
-					break;
-				case 'touchmove':
-				case 'pointermove':
-				case 'MSPointerMove':
-				case 'mousemove':
-					this._move(e);
-					break;
-				case 'touchend':
-				case 'pointerup':
-				case 'MSPointerUp':
-				case 'mouseup':
-				case 'touchcancel':
-				case 'pointercancel':
-				case 'MSPointerCancel':
-				case 'mousecancel':
-					this._end(e);
-					break;
-			}
-		},
-	
-		destroy: function () {
-			if ( this.options.fadeScrollbars ) {
-				clearTimeout(this.fadeTimeout);
-				this.fadeTimeout = null;
-			}
-			if ( this.options.interactive ) {
-				utils.removeEvent(this.indicator, 'touchstart', this);
-				utils.removeEvent(this.indicator, utils.prefixPointerEvent('pointerdown'), this);
-				utils.removeEvent(this.indicator, 'mousedown', this);
-	
-				utils.removeEvent(window, 'touchmove', this);
-				utils.removeEvent(window, utils.prefixPointerEvent('pointermove'), this);
-				utils.removeEvent(window, 'mousemove', this);
-	
-				utils.removeEvent(window, 'touchend', this);
-				utils.removeEvent(window, utils.prefixPointerEvent('pointerup'), this);
-				utils.removeEvent(window, 'mouseup', this);
-			}
-	
-			if ( this.options.defaultScrollbars ) {
-				this.wrapper.parentNode.removeChild(this.wrapper);
-			}
-		},
-	
-		_start: function (e) {
-			var point = e.touches ? e.touches[0] : e;
-	
-			e.preventDefault();
-			e.stopPropagation();
-	
-			this.transitionTime();
-	
-			this.initiated = true;
-			this.moved = false;
-			this.lastPointX	= point.pageX;
-			this.lastPointY	= point.pageY;
-	
-			this.startTime	= utils.getTime();
-	
-			if ( !this.options.disableTouch ) {
-				utils.addEvent(window, 'touchmove', this);
-			}
-			if ( !this.options.disablePointer ) {
-				utils.addEvent(window, utils.prefixPointerEvent('pointermove'), this);
-			}
-			if ( !this.options.disableMouse ) {
-				utils.addEvent(window, 'mousemove', this);
-			}
-	
-			this.scroller._execEvent('beforeScrollStart');
-		},
-	
-		_move: function (e) {
-			var point = e.touches ? e.touches[0] : e,
-				deltaX, deltaY,
-				newX, newY,
-				timestamp = utils.getTime();
-	
-			if ( !this.moved ) {
-				this.scroller._execEvent('scrollStart');
-			}
-	
-			this.moved = true;
-	
-			deltaX = point.pageX - this.lastPointX;
-			this.lastPointX = point.pageX;
-	
-			deltaY = point.pageY - this.lastPointY;
-			this.lastPointY = point.pageY;
-	
-			newX = this.x + deltaX;
-			newY = this.y + deltaY;
-	
-			this._pos(newX, newY);
-	
-	
-			if ( this.scroller.options.probeType == 1 && timestamp - this.startTime > 300 ) {
-				this.startTime = timestamp;
-				this.scroller._execEvent('scroll');
-			} else if ( this.scroller.options.probeType > 1 ) {
-				this.scroller._execEvent('scroll');
-			}
-	
-	
-	// INSERT POINT: indicator._move
-	
-			e.preventDefault();
-			e.stopPropagation();
-		},
-	
-		_end: function (e) {
-			if ( !this.initiated ) {
-				return;
-			}
-	
-			this.initiated = false;
-	
-			e.preventDefault();
-			e.stopPropagation();
-	
-			utils.removeEvent(window, 'touchmove', this);
-			utils.removeEvent(window, utils.prefixPointerEvent('pointermove'), this);
-			utils.removeEvent(window, 'mousemove', this);
-	
-			if ( this.scroller.options.snap ) {
-				var snap = this.scroller._nearestSnap(this.scroller.x, this.scroller.y);
-	
-				var time = this.options.snapSpeed || Math.max(
-						Math.max(
-							Math.min(Math.abs(this.scroller.x - snap.x), 1000),
-							Math.min(Math.abs(this.scroller.y - snap.y), 1000)
-						), 300);
-	
-				if ( this.scroller.x != snap.x || this.scroller.y != snap.y ) {
-					this.scroller.directionX = 0;
-					this.scroller.directionY = 0;
-					this.scroller.currentPage = snap;
-					this.scroller.scrollTo(snap.x, snap.y, time, this.scroller.options.bounceEasing);
-				}
-			}
-	
-			if ( this.moved ) {
-				this.scroller._execEvent('scrollEnd');
-			}
-		},
-	
-		transitionTime: function (time) {
-			time = time || 0;
-			var durationProp = utils.style.transitionDuration;
-			this.indicatorStyle[durationProp] = time + 'ms';
-	
-			if ( !time && utils.isBadAndroid ) {
-				this.indicatorStyle[durationProp] = '0.0001ms';
-				// remove 0.0001ms
-				var self = this;
-				rAF(function() {
-					if(self.indicatorStyle[durationProp] === '0.0001ms') {
-						self.indicatorStyle[durationProp] = '0s';
-					}
-				});
-			}
-		},
-	
-		transitionTimingFunction: function (easing) {
-			this.indicatorStyle[utils.style.transitionTimingFunction] = easing;
-		},
-	
-		refresh: function () {
-			this.transitionTime();
-	
-			if ( this.options.listenX && !this.options.listenY ) {
-				this.indicatorStyle.display = this.scroller.hasHorizontalScroll ? 'block' : 'none';
-			} else if ( this.options.listenY && !this.options.listenX ) {
-				this.indicatorStyle.display = this.scroller.hasVerticalScroll ? 'block' : 'none';
-			} else {
-				this.indicatorStyle.display = this.scroller.hasHorizontalScroll || this.scroller.hasVerticalScroll ? 'block' : 'none';
-			}
-	
-			if ( this.scroller.hasHorizontalScroll && this.scroller.hasVerticalScroll ) {
-				utils.addClass(this.wrapper, 'iScrollBothScrollbars');
-				utils.removeClass(this.wrapper, 'iScrollLoneScrollbar');
-	
-				if ( this.options.defaultScrollbars && this.options.customStyle ) {
-					if ( this.options.listenX ) {
-						this.wrapper.style.right = '8px';
-					} else {
-						this.wrapper.style.bottom = '8px';
-					}
-				}
-			} else {
-				utils.removeClass(this.wrapper, 'iScrollBothScrollbars');
-				utils.addClass(this.wrapper, 'iScrollLoneScrollbar');
-	
-				if ( this.options.defaultScrollbars && this.options.customStyle ) {
-					if ( this.options.listenX ) {
-						this.wrapper.style.right = '2px';
-					} else {
-						this.wrapper.style.bottom = '2px';
-					}
-				}
-			}
-	
-			var r = this.wrapper.offsetHeight;	// force refresh
-	
-			if ( this.options.listenX ) {
-				this.wrapperWidth = this.wrapper.clientWidth;
-				if ( this.options.resize ) {
-					this.indicatorWidth = Math.max(Math.round(this.wrapperWidth * this.wrapperWidth / (this.scroller.scrollerWidth || this.wrapperWidth || 1)), 8);
-					this.indicatorStyle.width = this.indicatorWidth + 'px';
-				} else {
-					this.indicatorWidth = this.indicator.clientWidth;
-				}
-	
-				this.maxPosX = this.wrapperWidth - this.indicatorWidth;
-	
-				if ( this.options.shrink == 'clip' ) {
-					this.minBoundaryX = -this.indicatorWidth + 8;
-					this.maxBoundaryX = this.wrapperWidth - 8;
-				} else {
-					this.minBoundaryX = 0;
-					this.maxBoundaryX = this.maxPosX;
-				}
-	
-				this.sizeRatioX = this.options.speedRatioX || (this.scroller.maxScrollX && (this.maxPosX / this.scroller.maxScrollX));
-			}
-	
-			if ( this.options.listenY ) {
-				this.wrapperHeight = this.wrapper.clientHeight;
-				if ( this.options.resize ) {
-					this.indicatorHeight = Math.max(Math.round(this.wrapperHeight * this.wrapperHeight / (this.scroller.scrollerHeight || this.wrapperHeight || 1)), 8);
-					this.indicatorStyle.height = this.indicatorHeight + 'px';
-				} else {
-					this.indicatorHeight = this.indicator.clientHeight;
-				}
-	
-				this.maxPosY = this.wrapperHeight - this.indicatorHeight;
-	
-				if ( this.options.shrink == 'clip' ) {
-					this.minBoundaryY = -this.indicatorHeight + 8;
-					this.maxBoundaryY = this.wrapperHeight - 8;
-				} else {
-					this.minBoundaryY = 0;
-					this.maxBoundaryY = this.maxPosY;
-				}
-	
-				this.maxPosY = this.wrapperHeight - this.indicatorHeight;
-				this.sizeRatioY = this.options.speedRatioY || (this.scroller.maxScrollY && (this.maxPosY / this.scroller.maxScrollY));
-			}
-	
-			this.updatePosition();
-		},
-	
-		updatePosition: function () {
-			var x = this.options.listenX && Math.round(this.sizeRatioX * this.scroller.x) || 0,
-				y = this.options.listenY && Math.round(this.sizeRatioY * this.scroller.y) || 0;
-	
-			if ( !this.options.ignoreBoundaries ) {
-				if ( x < this.minBoundaryX ) {
-					if ( this.options.shrink == 'scale' ) {
-						this.width = Math.max(this.indicatorWidth + x, 8);
-						this.indicatorStyle.width = this.width + 'px';
-					}
-					x = this.minBoundaryX;
-				} else if ( x > this.maxBoundaryX ) {
-					if ( this.options.shrink == 'scale' ) {
-						this.width = Math.max(this.indicatorWidth - (x - this.maxPosX), 8);
-						this.indicatorStyle.width = this.width + 'px';
-						x = this.maxPosX + this.indicatorWidth - this.width;
-					} else {
-						x = this.maxBoundaryX;
-					}
-				} else if ( this.options.shrink == 'scale' && this.width != this.indicatorWidth ) {
-					this.width = this.indicatorWidth;
-					this.indicatorStyle.width = this.width + 'px';
-				}
-	
-				if ( y < this.minBoundaryY ) {
-					if ( this.options.shrink == 'scale' ) {
-						this.height = Math.max(this.indicatorHeight + y * 3, 8);
-						this.indicatorStyle.height = this.height + 'px';
-					}
-					y = this.minBoundaryY;
-				} else if ( y > this.maxBoundaryY ) {
-					if ( this.options.shrink == 'scale' ) {
-						this.height = Math.max(this.indicatorHeight - (y - this.maxPosY) * 3, 8);
-						this.indicatorStyle.height = this.height + 'px';
-						y = this.maxPosY + this.indicatorHeight - this.height;
-					} else {
-						y = this.maxBoundaryY;
-					}
-				} else if ( this.options.shrink == 'scale' && this.height != this.indicatorHeight ) {
-					this.height = this.indicatorHeight;
-					this.indicatorStyle.height = this.height + 'px';
-				}
-			}
-	
-			this.x = x;
-			this.y = y;
-	
-			if ( this.scroller.options.useTransform ) {
-				this.indicatorStyle[utils.style.transform] = 'translate(' + x + 'px,' + y + 'px)' + this.scroller.translateZ;
-			} else {
-				this.indicatorStyle.left = x + 'px';
-				this.indicatorStyle.top = y + 'px';
-			}
-		},
-	
-		_pos: function (x, y) {
-			if ( x < 0 ) {
-				x = 0;
-			} else if ( x > this.maxPosX ) {
-				x = this.maxPosX;
-			}
-	
-			if ( y < 0 ) {
-				y = 0;
-			} else if ( y > this.maxPosY ) {
-				y = this.maxPosY;
-			}
-	
-			x = this.options.listenX ? Math.round(x / this.sizeRatioX) : this.scroller.x;
-			y = this.options.listenY ? Math.round(y / this.sizeRatioY) : this.scroller.y;
-	
-			this.scroller.scrollTo(x, y);
-		},
-	
-		fade: function (val, hold) {
-			if ( hold && !this.visible ) {
-				return;
-			}
-	
-			clearTimeout(this.fadeTimeout);
-			this.fadeTimeout = null;
-	
-			var time = val ? 250 : 500,
-				delay = val ? 0 : 300;
-	
-			val = val ? '1' : '0';
-	
-			this.wrapperStyle[utils.style.transitionDuration] = time + 'ms';
-	
-			this.fadeTimeout = setTimeout((function (val) {
-				this.wrapperStyle.opacity = val;
-				this.visible = +val;
-			}).bind(this, val), delay);
-		}
-	};
-	
-	IScroll.utils = utils;
-	
-	if ( typeof module != 'undefined' && module.exports ) {
-		module.exports = IScroll;
-	} else if ( true ) {
-	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () { return IScroll; }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	} else {
-		window.IScroll = IScroll;
-	}
-	
-	})(window, document, Math);
-
 
 /***/ },
 /* 123 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(4)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "#stage {\n    width: 100%;\n    height: 100%;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 124 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.CanvasRender = exports.CanvasImage = undefined;
+	
+	var _classCallCheck2 = __webpack_require__(66);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _util = __webpack_require__(6);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var CanvasImage = exports.CanvasImage = function () {
+	    function CanvasImage(width, height) {
+	        (0, _classCallCheck3.default)(this, CanvasImage);
+	
+	        this.canvas = _util.doc.createElement('canvas');
+	        this.canvas.width = width;
+	        this.canvas.height = height;
+	        this.render = this.canvas.getContext('2d');
+	    }
+	
+	    (0, _createClass3.default)(CanvasImage, [{
+	        key: 'draw',
+	        value: function draw(images) {
+	            var _this = this;
+	
+	            var loaded = images.map(function (image) {
+	                var deferred = (0, _util.defer)();
+	                var img = new Image();
+	                image.img = img;
+	                img.onload = function () {
+	                    return deferred.resolve(image);
+	                };
+	                img.src = image.src;
+	                return deferred.promise;
+	            });
+	
+	            return _util.Promise.all(loaded).then(function (images) {
+	                images.forEach(function (image) {
+	                    var _render;
+	
+	                    var params = [image.img, image.x, image.y];
+	
+	                    if (image.width != null) {
+	                        params.push(image.width);
+	                    }
+	                    if (image.height != null) {
+	                        params.push(image.height);
+	                    }
+	
+	                    if (image.sx != null) {
+	                        params.push(image.sx);
+	                    }
+	                    if (image.sx != null) {
+	                        params.push(image.sx);
+	                    }
+	                    if (image.sw != null) {
+	                        params.push(image.sw);
+	                    }
+	                    if (image.sh != null) {
+	                        params.push(image.sh);
+	                    }
+	
+	                    (_render = _this.render).drawImage.apply(_render, params);
+	                });
+	            });
+	        }
+	    }]);
+	    return CanvasImage;
+	}();
+	
+	var CanvasRender = exports.CanvasRender = function () {
+	    function CanvasRender(canvas, width, height) {
+	        (0, _classCallCheck3.default)(this, CanvasRender);
+	
+	        this._canvas = canvas;
+	        this._canvas.width = width;
+	        this._canvas.height = height;
+	        this._render = this._canvas.getContext('2d');
+	
+	        this._offscreenCanvas = _util.doc.createElement('canvas');
+	        this._offscreenCanvas.width = width;
+	        this._offscreenCanvas.height = height;
+	        this._offscreenRender = this._offscreenCanvas.getContext('2d');
+	
+	        this._isOffscreen = false;
+	    }
+	
+	    (0, _createClass3.default)(CanvasRender, [{
+	        key: 'transferControlToOffscreen',
+	        value: function transferControlToOffscreen() {
+	            this._isOffscreen = true;
+	        }
+	    }, {
+	        key: 'commit',
+	        value: function commit() {
+	            this._render.drawImage(this._offscreenCanvas, 0, 0);
+	        }
+	    }, {
+	        key: 'canvas',
+	        get: function get() {
+	            return this._isOffscreen ? this._offscreenCanvas : this._canvas;
+	        }
+	    }, {
+	        key: 'render',
+	        get: function get() {
+	            return this._isOffscreen ? this._offscreenRender : this._render;
+	        }
+	    }]);
+	    return CanvasRender;
+	}();
+
+/***/ },
+/* 125 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.ElementCount = exports.StaticElements = undefined;
+	
+	var _getPrototypeOf = __webpack_require__(62);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
+	var _classCallCheck2 = __webpack_require__(66);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(71);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(96);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
+	
+	__webpack_require__(126);
+	
+	var _util = __webpack_require__(6);
+	
+	var _event = __webpack_require__(105);
+	
+	var _event2 = _interopRequireDefault(_event);
+	
+	var _canvas = __webpack_require__(124);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var StaticElements = exports.StaticElements = function (_CanvasImage) {
+	    (0, _inherits3.default)(StaticElements, _CanvasImage);
+	
+	    function StaticElements(stage, items) {
+	        (0, _classCallCheck3.default)(this, StaticElements);
+	
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (StaticElements.__proto__ || (0, _getPrototypeOf2.default)(StaticElements)).call(this, stage.width, stage.height));
+	
+	        _this.width = stage.width;
+	        _this.height = stage.height;
+	        _this.items = items;
+	        return _this;
+	    }
+	
+	    (0, _createClass3.default)(StaticElements, [{
+	        key: 'ready',
+	        value: function ready() {
+	            return this.draw([{
+	                src: this.items['elements-top'].src,
+	                x: 0,
+	                y: 0,
+	                width: this.width,
+	                height: this.height * 0.2
+	            }, {
+	                src: this.items['elements-mid'].src,
+	                x: 0,
+	                y: this.height * 0.2,
+	                width: this.width,
+	                height: this.height * 0.4
+	            }, {
+	                src: this.items['elements-bottom'].src,
+	                x: 0,
+	                y: this.height * 0.6,
+	                width: this.width,
+	                height: this.height * 0.4
+	            }]);
+	        }
+	    }]);
+	    return StaticElements;
+	}(_canvas.CanvasImage);
+	
+	var ElementCount = exports.ElementCount = function () {
+	    function ElementCount(viewport) {
+	        (0, _classCallCheck3.default)(this, ElementCount);
+	
+	        this.countEl = (0, _util.query)(viewport, '#elements-count');
+	        this.elementAmout = 50;
+	        this.findedCount = 0;
+	    }
+	
+	    (0, _createClass3.default)(ElementCount, [{
+	        key: 'update',
+	        value: function update() {
+	            this.countEl.textContent = this.findedCount + '/' + this.elementAmout;
+	        }
+	    }, {
+	        key: 'ready',
+	        value: function ready() {
+	            var _this2 = this;
+	
+	            return new _util.Promise(function (resolve, reject) {
+	                _this2.update();
+	                resolve(_this2);
+	            });
+	        }
+	    }]);
+	    return ElementCount;
+	}();
+
+/***/ },
+/* 126 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(127);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(5)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./elements.css", function() {
+				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./elements.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 127 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(4)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "#elements-count {\n    position: absolute;\n    right: 0.73rem;\n    top: 0.3rem;\n    color: #00cbe3;\n    font-size: 0.7rem;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 128 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5098,11 +3892,223 @@
 	
 	var _inherits3 = _interopRequireDefault(_inherits2);
 	
-	__webpack_require__(124);
+	var _util = __webpack_require__(6);
+	
+	var _canvas = __webpack_require__(124);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Galaxy = function (_CanvasImage) {
+	    (0, _inherits3.default)(Galaxy, _CanvasImage);
+	
+	    function Galaxy(stage, items) {
+	        (0, _classCallCheck3.default)(this, Galaxy);
+	
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Galaxy.__proto__ || (0, _getPrototypeOf2.default)(Galaxy)).call(this, stage.width, stage.height));
+	
+	        _this.width = stage.width;
+	        _this.height = stage.height;
+	        _this.items = items;
+	        return _this;
+	    }
+	
+	    (0, _createClass3.default)(Galaxy, [{
+	        key: 'ready',
+	        value: function ready() {
+	            return this.draw([{
+	                src: this.items['galaxy-top'].src,
+	                x: 0,
+	                y: 0,
+	                width: this.width,
+	                height: this.height * 0.2
+	            }, {
+	                src: this.items['galaxy-mid'].src,
+	                x: 0,
+	                y: this.height * 0.2,
+	                width: this.width,
+	                height: this.height * 0.4
+	            }, {
+	                src: this.items['galaxy-bottom'].src,
+	                x: 0,
+	                y: this.height * 0.6,
+	                width: this.width,
+	                height: this.height * 0.4
+	            }]);
+	        }
+	    }]);
+	    return Galaxy;
+	}(_canvas.CanvasImage);
+	
+	exports.default = Galaxy;
+
+/***/ },
+/* 129 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = undefined;
+	
+	var _getPrototypeOf = __webpack_require__(62);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
+	var _classCallCheck2 = __webpack_require__(66);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(71);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(96);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
 	
 	var _util = __webpack_require__(6);
 	
-	var _event = __webpack_require__(106);
+	var _canvas = __webpack_require__(124);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Cloud = function (_CanvasImage) {
+	    (0, _inherits3.default)(Cloud, _CanvasImage);
+	
+	    function Cloud(stage, items) {
+	        (0, _classCallCheck3.default)(this, Cloud);
+	
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Cloud.__proto__ || (0, _getPrototypeOf2.default)(Cloud)).call(this, stage.width, stage.height));
+	
+	        _this.width = stage.width;
+	        _this.height = stage.height;
+	        _this.hSlice = stage.hSlice;
+	        _this.vSlice = stage.vSlice;
+	        _this.vw = stage.vw;
+	        _this.vh = stage.vh;
+	        _this.items = items;
+	        return _this;
+	    }
+	
+	    (0, _createClass3.default)(Cloud, [{
+	        key: 'clear',
+	        value: function clear(x, y) {
+	            var _this2 = this;
+	
+	            var cx = x + this.vw / 2;
+	            var cy = y + this.vh / 2;
+	
+	            var steps = new Array(20);
+	            var radius = this.vh * 0.5 / steps.length;
+	
+	            for (var i = 0; i < steps.length; i++) {
+	                steps[i] = {
+	                    cx: cx,
+	                    cy: cy,
+	                    r: radius * (i + 1)
+	                };
+	            }
+	
+	            return function (_ref, ticker) {
+	                var id = _ref.id,
+	                    start = _ref.start,
+	                    delta = _ref.delta,
+	                    elapsed = _ref.elapsed;
+	
+	                if (steps.length) {
+	                    var _steps$shift = steps.shift(),
+	                        _cx = _steps$shift.cx,
+	                        _cy = _steps$shift.cy,
+	                        r = _steps$shift.r;
+	
+	                    var gradient = _this2.render.createRadialGradient(_cx, _cy, 0, _cx, _cy, r);
+	                    gradient.addColorStop(0, 'rgba(0, 0, 0, 255)');
+	                    gradient.addColorStop(0.8, 'rgba(0, 0, 0, 100)');
+	                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+	
+	                    _this2.render.fillStyle = gradient;
+	                    _this2.render.beginPath();
+	                    _this2.render.arc(_cx, _cy, r, 0, Math.PI * 2);
+	                    _this2.render.fill();
+	                    _this2.render.closePath();
+	                } else {
+	                    return true;
+	                }
+	            };
+	        }
+	    }, {
+	        key: 'ready',
+	        value: function ready() {
+	            var _this3 = this;
+	
+	            this.sliceWidth = this.width / this.hSlice;
+	            this.sliceHeight = this.height / this.vSlice;
+	
+	            var images = [];
+	            for (var i = 0; i < this.hSlice; i++) {
+	                for (var j = 0; j < this.vSlice; j++) {
+	                    images.push({
+	                        src: this.items.cloud.src,
+	                        x: i * this.sliceWidth,
+	                        y: j * this.sliceHeight,
+	                        width: this.sliceWidth,
+	                        height: this.sliceHeight
+	                    });
+	                }
+	            }
+	
+	            return this.draw(images).then(function () {
+	                _this3.render.globalCompositeOperation = 'destination-out';
+	            });
+	        }
+	    }]);
+	    return Cloud;
+	}(_canvas.CanvasImage);
+	
+	exports.default = Cloud;
+
+/***/ },
+/* 130 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = undefined;
+	
+	var _getPrototypeOf = __webpack_require__(62);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
+	var _classCallCheck2 = __webpack_require__(66);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(71);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(96);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
+	
+	__webpack_require__(131);
+	
+	var _util = __webpack_require__(6);
+	
+	var _event = __webpack_require__(105);
 	
 	var _event2 = _interopRequireDefault(_event);
 	
@@ -5180,7 +4186,8 @@
 	                this.emit('open');
 	            } else {
 	                this.viewport.className = this.viewport.className.replace('open', '');
-	                this.wrapEl.style.cssText = '';
+	                this.wrapEl.style.width = '';
+	                this.wrapEl.style.height = '';
 	                this.opened = false;
 	                this.emit('close');
 	            }
@@ -5203,7 +4210,7 @@
 	                _this2.canvasEl.width = width;
 	                _this2.canvasEl.height = height;
 	                _this2.render.clearRect(0, 0, width, height);
-	                _this2.render.fillStyle = '#01c1b7';
+	                _this2.render.fillStyle = '#016fa0';
 	                _this2.render.fillRect(0, 0, width, height);
 	                _this2.render.fillStyle = 'rgba(0, 0, 0, 1)';
 	                _this2.render.globalCompositeOperation = 'destination-out';
@@ -5222,13 +4229,13 @@
 	exports.default = Map;
 
 /***/ },
-/* 124 */
+/* 131 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(125);
+	var content = __webpack_require__(132);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -5248,7 +4255,7 @@
 	}
 
 /***/ },
-/* 125 */
+/* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -5256,13 +4263,13 @@
 	
 	
 	// module
-	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background-position: 0.8rem 1rem;\n    background-repeat: no-repeat;\n    background-size: 0.62rem 0.68rem;\n    padding-left: 1.61rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map::before {\n    content: '\\70B9\\51FB\\67E5\\770B\\5168\\5B87\\5B99';\n    color: #01c1b7;\n    font-size: 12px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.2rem;\n    top: 1.8rem;\n}\n\n#stage-map.open::before {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #01c1b7;\n    box-sizing: border-box;\n    width: 25px;\n    height: 88.9px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
+	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background-position: 0.8rem 1rem;\n    background-repeat: no-repeat;\n    background-size: 0.62rem 0.68rem;\n    padding-left: 1.61rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map::before {\n    content: '\\70B9\\51FB\\67E5\\770B\\5168\\5B87\\5B99';\n    color: #016fa0;\n    font-size: 12px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.2rem;\n    top: 1.8rem;\n}\n\n#stage-map.open::before {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #016fa0;\n    box-sizing: border-box;\n    width: 25px;\n    height: 84px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    background-color: #000;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 126 */
+/* 133 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5271,6 +4278,14 @@
 	    value: true
 	});
 	exports.default = undefined;
+	
+	var _toConsumableArray2 = __webpack_require__(7);
+	
+	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+	
+	var _map = __webpack_require__(134);
+	
+	var _map2 = _interopRequireDefault(_map);
 	
 	var _getPrototypeOf = __webpack_require__(62);
 	
@@ -5292,185 +4307,588 @@
 	
 	var _inherits3 = _interopRequireDefault(_inherits2);
 	
-	__webpack_require__(127);
-	
 	var _util = __webpack_require__(6);
 	
-	var _event = __webpack_require__(106);
+	var _event = __webpack_require__(105);
 	
 	var _event2 = _interopRequireDefault(_event);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Cloud = function (_Event) {
-	    (0, _inherits3.default)(Cloud, _Event);
+	var Ticker = function (_Event) {
+	    (0, _inherits3.default)(Ticker, _Event);
 	
-	    function Cloud(viewport, image, sWidth, sHeight, hSlice, vSlice) {
-	        (0, _classCallCheck3.default)(this, Cloud);
+	    function Ticker() {
+	        var _ref;
 	
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (Cloud.__proto__ || (0, _getPrototypeOf2.default)(Cloud)).call(this));
+	        (0, _classCallCheck3.default)(this, Ticker);
 	
-	        _this.image = image;
-	        _this.canvasEl = (0, _util.query)(viewport, '#stage-cloud');
-	        _this.render = _this.canvasEl.getContext('2d');
-	        _this.cachedCanvasEl = _util.doc.createElement('canvas');
-	        _this.cachedRender = _this.cachedCanvasEl.getContext('2d');
-	        _this.sWidth = sWidth;
-	        _this.sHeight = sHeight;
-	        _this.hSlice = hSlice;
-	        _this.vSlice = vSlice;
+	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	            args[_key] = arguments[_key];
+	        }
+	
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (_ref = Ticker.__proto__ || (0, _getPrototypeOf2.default)(Ticker)).call.apply(_ref, [this].concat(args)));
+	
+	        _this._id = 0;
+	        _this._mapF = new _map2.default();
+	        _this._mapC = new _map2.default();
 	        return _this;
 	    }
 	
-	    (0, _createClass3.default)(Cloud, [{
-	        key: 'update',
-	        value: function update(xp, yp) {
-	            var _getRect = (0, _util.getRect)(this.canvasEl),
-	                width = _getRect.width,
-	                height = _getRect.height;
-	
-	            var x = this.sWidth * xp;
-	            var y = this.sHeight * yp;
-	
-	            this.render.clearRect(0, 0, width, height);
-	            this.render.drawImage(this.cachedCanvasEl, -x, -y, this.sWidth, this.sHeight);
-	        }
-	    }, {
-	        key: 'clear',
-	        value: function clear(xp, yp) {
-	            var _this2 = this;
-	
-	            var _getRect2 = (0, _util.getRect)(this.canvasEl),
-	                width = _getRect2.width,
-	                height = _getRect2.height;
-	
-	            var x = this.sWidth * xp;
-	            var y = this.sHeight * yp;
-	            var cx = x + width / 2;
-	            var cy = y + height / 2;
-	
-	            var steps = new Array(10);
-	            var radius = height * 0.5 / steps.length;
-	
-	            for (var i = 0; i < steps.length; i++) {
-	                steps[i] = {
-	                    cx: cx,
-	                    cy: cy,
-	                    r: radius * (i + 1)
-	                };
+	    (0, _createClass3.default)(Ticker, [{
+	        key: 'add',
+	        value: function add(f) {
+	            if (!this._mapC.has(f)) {
+	                var id = this._id++;
+	                this._mapF.set(id, f);
+	                this._mapC.set(f, {
+	                    id: id,
+	                    cancel: false,
+	                    start: 0,
+	                    elapsed: 0,
+	                    delta: 0
+	                });
+	                return id;
 	            }
-	
-	            var id = void 0;
-	            var tick = function tick() {
-	                if (steps.length) {
-	                    id = (0, _util.raf)(tick);
-	
-	                    var _steps$shift = steps.shift(),
-	                        _cx = _steps$shift.cx,
-	                        _cy = _steps$shift.cy,
-	                        r = _steps$shift.r;
-	
-	                    var gradient = _this2.cachedRender.createRadialGradient(_cx, _cy, 0, _cx, _cy, r);
-	                    gradient.addColorStop(0, 'rgba(0, 0, 0, 255)');
-	                    gradient.addColorStop(0.8, 'rgba(0, 0, 0, 100)');
-	                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-	
-	                    _this2.cachedRender.fillStyle = gradient;
-	                    _this2.cachedRender.beginPath();
-	                    _this2.cachedRender.arc(_cx, _cy, r, 0, Math.PI * 2);
-	                    _this2.cachedRender.fill();
-	                    _this2.cachedRender.closePath();
-	
-	                    _this2.update(xp, yp);
-	                } else {
-	                    id = null;
-	                }
-	            };
-	            id = (0, _util.raf)(tick);
-	
-	            return function () {
-	                if (id) {
-	                    (0, _util.caf)(tick);
-	                }
-	            };
 	        }
 	    }, {
-	        key: 'ready',
-	        value: function ready() {
-	            var _this3 = this;
+	        key: 'delete',
+	        value: function _delete(id) {
+	            if (this._mapF.has(id)) {
+	                var f = this._mapF.get(id);
+	                var c = this._mapC.get(f);
+	                c.cancel = true;
+	                this._mapF.delete(id);
+	                this._mapC.delete(f);
+	            }
+	        }
+	    }, {
+	        key: 'has',
+	        value: function has(id) {
+	            return this._mapF.has(id);
+	        }
+	    }, {
+	        key: 'run',
+	        value: function run() {
+	            var _this2 = this;
 	
-	            return new _util.Promise(function (resolve, reject) {
-	                _this3.sliceWidth = _this3.sWidth / _this3.hSlice;
-	                _this3.sliceHeight = _this3.sHeight / _this3.vSlice;
+	            this.start = Date.now();
+	            this.elapsed = 0;
+	            this.delta = 0;
 	
-	                _this3.cachedCanvasEl.width = _this3.sWidth;
-	                _this3.cachedCanvasEl.height = _this3.sHeight;
-	                _this3.cachedRender.clearRect(0, 0, _this3.sWidth, _this3.sHeight);
+	            var tick = function tick() {
+	                (0, _util.raf)(tick);
 	
-	                for (var i = 0; i < _this3.hSlice; i++) {
-	                    for (var j = 0; j < _this3.vSlice; j++) {
-	                        _this3.cachedRender.drawImage(_this3.image, i * _this3.sliceWidth, j * _this3.sliceHeight, _this3.sliceWidth, _this3.sliceHeight);
+	                var now = Date.now();
+	                var elapsed = now - _this2.start;
+	
+	                _this2.delta = elapsed - _this2.elapsed;
+	                _this2.elapsed = elapsed;
+	
+	                _this2.emit('beforetick', {
+	                    start: _this2.start,
+	                    delta: _this2.delta,
+	                    elapsed: _this2.elapsed
+	                });
+	
+	                var keys = [].concat((0, _toConsumableArray3.default)(_this2._mapC.keys()));
+	
+	                keys.forEach(function (f) {
+	                    var c = _this2._mapC.get(f);
+	
+	                    if (!c.cancel) {
+	                        var _now = Date.now();
+	                        c.start = c.start || (c.start = _now);
+	
+	                        var _elapsed = _now - c.start;
+	                        c.delta = _elapsed - c.elapsed;
+	                        c.elapsed = _elapsed;
+	
+	                        if (f(c, _this2)) {
+	                            _this2.delete(c.id);
+	                        }
 	                    }
-	                }
-	                _this3.cachedRender.globalCompositeOperation = 'destination-out';
+	                });
 	
-	                var _getRect3 = (0, _util.getRect)(_this3.canvasEl),
-	                    width = _getRect3.width,
-	                    height = _getRect3.height;
+	                now = Date.now();
+	                elapsed = now - _this2.start;
 	
-	                _this3.canvasEl.width = width;
-	                _this3.canvasEl.height = height;
-	                resolve(_this3);
-	            });
+	                _this2.delta = elapsed - _this2.elapsed;
+	                _this2.elapsed = elapsed;
+	
+	                _this2.emit('aftertick', {
+	                    start: _this2.start,
+	                    delta: _this2.delta,
+	                    elapsed: _this2.elapsed
+	                });
+	            };
+	            (0, _util.raf)(tick);
+	
+	            return true;
 	        }
 	    }]);
-	    return Cloud;
+	    return Ticker;
 	}(_event2.default);
 	
-	exports.default = Cloud;
+	exports.default = Ticker;
 
 /***/ },
-/* 127 */
+/* 134 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(128);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(5)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./cloud.css", function() {
-				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./cloud.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
+	module.exports = { "default": __webpack_require__(135), __esModule: true };
 
 /***/ },
-/* 128 */
+/* 135 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(4)();
-	// imports
+	__webpack_require__(93);
+	__webpack_require__(10);
+	__webpack_require__(75);
+	__webpack_require__(136);
+	__webpack_require__(146);
+	module.exports = __webpack_require__(18).Map;
+
+/***/ },
+/* 136 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var strong = __webpack_require__(137);
 	
+	// 23.1 Map Objects
+	module.exports = __webpack_require__(142)('Map', function(get){
+	  return function Map(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+	}, {
+	  // 23.1.3.6 Map.prototype.get(key)
+	  get: function get(key){
+	    var entry = strong.getEntry(this, key);
+	    return entry && entry.v;
+	  },
+	  // 23.1.3.9 Map.prototype.set(key, value)
+	  set: function set(key, value){
+	    return strong.def(this, key === 0 ? 0 : key, value);
+	  }
+	}, strong, true);
+
+/***/ },
+/* 137 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var dP          = __webpack_require__(22).f
+	  , create      = __webpack_require__(35)
+	  , redefineAll = __webpack_require__(138)
+	  , ctx         = __webpack_require__(19)
+	  , anInstance  = __webpack_require__(139)
+	  , defined     = __webpack_require__(13)
+	  , forOf       = __webpack_require__(140)
+	  , $iterDefine = __webpack_require__(14)
+	  , step        = __webpack_require__(78)
+	  , setSpecies  = __webpack_require__(141)
+	  , DESCRIPTORS = __webpack_require__(26)
+	  , fastKey     = __webpack_require__(83).fastKey
+	  , SIZE        = DESCRIPTORS ? '_s' : 'size';
 	
-	// module
-	exports.push([module.id, "#stage-cloud {\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    position: absolute;\n    -webkit-transform: translateZ(19px);\n}", ""]);
+	var getEntry = function(that, key){
+	  // fast case
+	  var index = fastKey(key), entry;
+	  if(index !== 'F')return that._i[index];
+	  // frozen object case
+	  for(entry = that._f; entry; entry = entry.n){
+	    if(entry.k == key)return entry;
+	  }
+	};
 	
-	// exports
+	module.exports = {
+	  getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
+	    var C = wrapper(function(that, iterable){
+	      anInstance(that, C, NAME, '_i');
+	      that._i = create(null); // index
+	      that._f = undefined;    // first entry
+	      that._l = undefined;    // last entry
+	      that[SIZE] = 0;         // size
+	      if(iterable != undefined)forOf(iterable, IS_MAP, that[ADDER], that);
+	    });
+	    redefineAll(C.prototype, {
+	      // 23.1.3.1 Map.prototype.clear()
+	      // 23.2.3.2 Set.prototype.clear()
+	      clear: function clear(){
+	        for(var that = this, data = that._i, entry = that._f; entry; entry = entry.n){
+	          entry.r = true;
+	          if(entry.p)entry.p = entry.p.n = undefined;
+	          delete data[entry.i];
+	        }
+	        that._f = that._l = undefined;
+	        that[SIZE] = 0;
+	      },
+	      // 23.1.3.3 Map.prototype.delete(key)
+	      // 23.2.3.4 Set.prototype.delete(value)
+	      'delete': function(key){
+	        var that  = this
+	          , entry = getEntry(that, key);
+	        if(entry){
+	          var next = entry.n
+	            , prev = entry.p;
+	          delete that._i[entry.i];
+	          entry.r = true;
+	          if(prev)prev.n = next;
+	          if(next)next.p = prev;
+	          if(that._f == entry)that._f = next;
+	          if(that._l == entry)that._l = prev;
+	          that[SIZE]--;
+	        } return !!entry;
+	      },
+	      // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
+	      // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
+	      forEach: function forEach(callbackfn /*, that = undefined */){
+	        anInstance(this, C, 'forEach');
+	        var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3)
+	          , entry;
+	        while(entry = entry ? entry.n : this._f){
+	          f(entry.v, entry.k, this);
+	          // revert to the last existing entry
+	          while(entry && entry.r)entry = entry.p;
+	        }
+	      },
+	      // 23.1.3.7 Map.prototype.has(key)
+	      // 23.2.3.7 Set.prototype.has(value)
+	      has: function has(key){
+	        return !!getEntry(this, key);
+	      }
+	    });
+	    if(DESCRIPTORS)dP(C.prototype, 'size', {
+	      get: function(){
+	        return defined(this[SIZE]);
+	      }
+	    });
+	    return C;
+	  },
+	  def: function(that, key, value){
+	    var entry = getEntry(that, key)
+	      , prev, index;
+	    // change existing entry
+	    if(entry){
+	      entry.v = value;
+	    // create new entry
+	    } else {
+	      that._l = entry = {
+	        i: index = fastKey(key, true), // <- index
+	        k: key,                        // <- key
+	        v: value,                      // <- value
+	        p: prev = that._l,             // <- previous entry
+	        n: undefined,                  // <- next entry
+	        r: false                       // <- removed
+	      };
+	      if(!that._f)that._f = entry;
+	      if(prev)prev.n = entry;
+	      that[SIZE]++;
+	      // add to index
+	      if(index !== 'F')that._i[index] = entry;
+	    } return that;
+	  },
+	  getEntry: getEntry,
+	  setStrong: function(C, NAME, IS_MAP){
+	    // add .keys, .values, .entries, [@@iterator]
+	    // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
+	    $iterDefine(C, NAME, function(iterated, kind){
+	      this._t = iterated;  // target
+	      this._k = kind;      // kind
+	      this._l = undefined; // previous
+	    }, function(){
+	      var that  = this
+	        , kind  = that._k
+	        , entry = that._l;
+	      // revert to the last existing entry
+	      while(entry && entry.r)entry = entry.p;
+	      // get next entry
+	      if(!that._t || !(that._l = entry = entry ? entry.n : that._t._f)){
+	        // or finish the iteration
+	        that._t = undefined;
+	        return step(1);
+	      }
+	      // return step by kind
+	      if(kind == 'keys'  )return step(0, entry.k);
+	      if(kind == 'values')return step(0, entry.v);
+	      return step(0, [entry.k, entry.v]);
+	    }, IS_MAP ? 'entries' : 'values' , !IS_MAP, true);
+	
+	    // add [@@species], 23.1.2.2, 23.2.2.2
+	    setSpecies(NAME);
+	  }
+	};
+
+/***/ },
+/* 138 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var hide = __webpack_require__(21);
+	module.exports = function(target, src, safe){
+	  for(var key in src){
+	    if(safe && target[key])target[key] = src[key];
+	    else hide(target, key, src[key]);
+	  } return target;
+	};
+
+/***/ },
+/* 139 */
+/***/ function(module, exports) {
+
+	module.exports = function(it, Constructor, name, forbiddenField){
+	  if(!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)){
+	    throw TypeError(name + ': incorrect invocation!');
+	  } return it;
+	};
+
+/***/ },
+/* 140 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ctx         = __webpack_require__(19)
+	  , call        = __webpack_require__(55)
+	  , isArrayIter = __webpack_require__(56)
+	  , anObject    = __webpack_require__(23)
+	  , toLength    = __webpack_require__(43)
+	  , getIterFn   = __webpack_require__(58)
+	  , BREAK       = {}
+	  , RETURN      = {};
+	var exports = module.exports = function(iterable, entries, fn, that, ITERATOR){
+	  var iterFn = ITERATOR ? function(){ return iterable; } : getIterFn(iterable)
+	    , f      = ctx(fn, that, entries ? 2 : 1)
+	    , index  = 0
+	    , length, step, iterator, result;
+	  if(typeof iterFn != 'function')throw TypeError(iterable + ' is not iterable!');
+	  // fast case for arrays with default iterator
+	  if(isArrayIter(iterFn))for(length = toLength(iterable.length); length > index; index++){
+	    result = entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
+	    if(result === BREAK || result === RETURN)return result;
+	  } else for(iterator = iterFn.call(iterable); !(step = iterator.next()).done; ){
+	    result = call(iterator, f, step.value, entries);
+	    if(result === BREAK || result === RETURN)return result;
+	  }
+	};
+	exports.BREAK  = BREAK;
+	exports.RETURN = RETURN;
+
+/***/ },
+/* 141 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var global      = __webpack_require__(17)
+	  , core        = __webpack_require__(18)
+	  , dP          = __webpack_require__(22)
+	  , DESCRIPTORS = __webpack_require__(26)
+	  , SPECIES     = __webpack_require__(51)('species');
+	
+	module.exports = function(KEY){
+	  var C = typeof core[KEY] == 'function' ? core[KEY] : global[KEY];
+	  if(DESCRIPTORS && C && !C[SPECIES])dP.f(C, SPECIES, {
+	    configurable: true,
+	    get: function(){ return this; }
+	  });
+	};
+
+/***/ },
+/* 142 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var global         = __webpack_require__(17)
+	  , $export        = __webpack_require__(16)
+	  , meta           = __webpack_require__(83)
+	  , fails          = __webpack_require__(27)
+	  , hide           = __webpack_require__(21)
+	  , redefineAll    = __webpack_require__(138)
+	  , forOf          = __webpack_require__(140)
+	  , anInstance     = __webpack_require__(139)
+	  , isObject       = __webpack_require__(24)
+	  , setToStringTag = __webpack_require__(50)
+	  , dP             = __webpack_require__(22).f
+	  , each           = __webpack_require__(143)(0)
+	  , DESCRIPTORS    = __webpack_require__(26);
+	
+	module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
+	  var Base  = global[NAME]
+	    , C     = Base
+	    , ADDER = IS_MAP ? 'set' : 'add'
+	    , proto = C && C.prototype
+	    , O     = {};
+	  if(!DESCRIPTORS || typeof C != 'function' || !(IS_WEAK || proto.forEach && !fails(function(){
+	    new C().entries().next();
+	  }))){
+	    // create collection constructor
+	    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+	    redefineAll(C.prototype, methods);
+	    meta.NEED = true;
+	  } else {
+	    C = wrapper(function(target, iterable){
+	      anInstance(target, C, NAME, '_c');
+	      target._c = new Base;
+	      if(iterable != undefined)forOf(iterable, IS_MAP, target[ADDER], target);
+	    });
+	    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','),function(KEY){
+	      var IS_ADDER = KEY == 'add' || KEY == 'set';
+	      if(KEY in proto && !(IS_WEAK && KEY == 'clear'))hide(C.prototype, KEY, function(a, b){
+	        anInstance(this, C, KEY);
+	        if(!IS_ADDER && IS_WEAK && !isObject(a))return KEY == 'get' ? undefined : false;
+	        var result = this._c[KEY](a === 0 ? 0 : a, b);
+	        return IS_ADDER ? this : result;
+	      });
+	    });
+	    if('size' in proto)dP(C.prototype, 'size', {
+	      get: function(){
+	        return this._c.size;
+	      }
+	    });
+	  }
+	
+	  setToStringTag(C, NAME);
+	
+	  O[NAME] = C;
+	  $export($export.G + $export.W + $export.F, O);
+	
+	  if(!IS_WEAK)common.setStrong(C, NAME, IS_MAP);
+	
+	  return C;
+	};
+
+/***/ },
+/* 143 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 0 -> Array#forEach
+	// 1 -> Array#map
+	// 2 -> Array#filter
+	// 3 -> Array#some
+	// 4 -> Array#every
+	// 5 -> Array#find
+	// 6 -> Array#findIndex
+	var ctx      = __webpack_require__(19)
+	  , IObject  = __webpack_require__(40)
+	  , toObject = __webpack_require__(53)
+	  , toLength = __webpack_require__(43)
+	  , asc      = __webpack_require__(144);
+	module.exports = function(TYPE, $create){
+	  var IS_MAP        = TYPE == 1
+	    , IS_FILTER     = TYPE == 2
+	    , IS_SOME       = TYPE == 3
+	    , IS_EVERY      = TYPE == 4
+	    , IS_FIND_INDEX = TYPE == 6
+	    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX
+	    , create        = $create || asc;
+	  return function($this, callbackfn, that){
+	    var O      = toObject($this)
+	      , self   = IObject(O)
+	      , f      = ctx(callbackfn, that, 3)
+	      , length = toLength(self.length)
+	      , index  = 0
+	      , result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined
+	      , val, res;
+	    for(;length > index; index++)if(NO_HOLES || index in self){
+	      val = self[index];
+	      res = f(val, index, O);
+	      if(TYPE){
+	        if(IS_MAP)result[index] = res;            // map
+	        else if(res)switch(TYPE){
+	          case 3: return true;                    // some
+	          case 5: return val;                     // find
+	          case 6: return index;                   // findIndex
+	          case 2: result.push(val);               // filter
+	        } else if(IS_EVERY)return false;          // every
+	      }
+	    }
+	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+	  };
+	};
+
+/***/ },
+/* 144 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+	var speciesConstructor = __webpack_require__(145);
+	
+	module.exports = function(original, length){
+	  return new (speciesConstructor(original))(length);
+	};
+
+/***/ },
+/* 145 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(24)
+	  , isArray  = __webpack_require__(89)
+	  , SPECIES  = __webpack_require__(51)('species');
+	
+	module.exports = function(original){
+	  var C;
+	  if(isArray(original)){
+	    C = original.constructor;
+	    // cross-realm fallback
+	    if(typeof C == 'function' && (C === Array || isArray(C.prototype)))C = undefined;
+	    if(isObject(C)){
+	      C = C[SPECIES];
+	      if(C === null)C = undefined;
+	    }
+	  } return C === undefined ? Array : C;
+	};
+
+/***/ },
+/* 146 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+	var $export  = __webpack_require__(16);
+	
+	$export($export.P + $export.R, 'Map', {toJSON: __webpack_require__(147)('Map')});
+
+/***/ },
+/* 147 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+	var classof = __webpack_require__(59)
+	  , from    = __webpack_require__(148);
+	module.exports = function(NAME){
+	  return function toJSON(){
+	    if(classof(this) != NAME)throw TypeError(NAME + "#toJSON isn't generic");
+	    return from(this);
+	  };
+	};
+
+/***/ },
+/* 148 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var forOf = __webpack_require__(140);
+	
+	module.exports = function(iter, ITERATOR){
+	  var result = [];
+	  forOf(iter, false, result.push, result, ITERATOR);
+	  return result;
+	};
 
 
 /***/ },
-/* 129 */
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5500,97 +4918,57 @@
 	
 	var _inherits3 = _interopRequireDefault(_inherits2);
 	
-	__webpack_require__(130);
-	
 	var _util = __webpack_require__(6);
 	
-	var _event = __webpack_require__(106);
-	
-	var _event2 = _interopRequireDefault(_event);
+	var _canvas = __webpack_require__(124);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Elements = function (_Event) {
-	    (0, _inherits3.default)(Elements, _Event);
+	var Star = function (_CanvasImage) {
+	    (0, _inherits3.default)(Star, _CanvasImage);
 	
-	    function Elements(viewport, sWidth, sHeight, hSlice, vSlice) {
-	        (0, _classCallCheck3.default)(this, Elements);
+	    function Star(stage, items) {
+	        (0, _classCallCheck3.default)(this, Star);
 	
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (Elements.__proto__ || (0, _getPrototypeOf2.default)(Elements)).call(this));
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Star.__proto__ || (0, _getPrototypeOf2.default)(Star)).call(this, stage.vw, stage.vh));
 	
-	        _this.countEl = (0, _util.query)(viewport, '#elements-count');
-	        _this.wrapEl = (0, _util.query)(viewport, '#stage-wrap .elements');
-	        _this.staticEl = (0, _util.query)(_this.wrapEl, '.static');
-	        _this.dynamicEl = (0, _util.query)(_this.wrapEl, '.dynamic');
-	        _this.sWidth = sWidth;
-	        _this.sHeight = sHeight;
-	        _this.hSlice = hSlice;
-	        _this.vSlice = _this.vSlice;
-	        _this.elementAmout = 50;
-	        _this.findedCount = 0;
+	        _this.width = stage.vw;
+	        _this.height = stage.vh;
+	        _this.items = items;
 	        return _this;
 	    }
 	
-	    (0, _createClass3.default)(Elements, [{
-	        key: 'update',
-	        value: function update() {
-	            this.countEl.textContent = this.findedCount + '/' + this.elementAmout;
+	    (0, _createClass3.default)(Star, [{
+	        key: 'roll',
+	        value: function roll() {
+	            var imageData = this.render.getImageData(0, 0, this.width, this.height);
+	            var y = 0;
+	
+	            return function (_ref) {
+	                var elapsed = _ref.elapsed,
+	                    delta = _ref.delta;
+	
+	                // this.render.putImageData(imageData, 0, 0, 0, y, this.width, y);
+	                // this.render.putImageData(imageData, 0, y, 0, 0, this.width, this.height - y);
+	                y++;
+	            };
 	        }
 	    }, {
 	        key: 'ready',
 	        value: function ready() {
-	            var _this2 = this;
-	
-	            return new _util.Promise(function (resolve, reject) {
-	                _this2.update();
-	                resolve(_this2);
-	            });
+	            return this.draw([{
+	                src: this.items['star'].src,
+	                x: 0,
+	                y: 0,
+	                width: this.width,
+	                height: this.height
+	            }]);
 	        }
 	    }]);
-	    return Elements;
-	}(_event2.default);
+	    return Star;
+	}(_canvas.CanvasImage);
 	
-	exports.default = Elements;
-
-/***/ },
-/* 130 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(131);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(5)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./elements.css", function() {
-				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./elements.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 131 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(4)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "#elements-count {\n    position: absolute;\n    right: 0.73rem;\n    top: 0.3rem;\n    color: #01c1b7;\n    font-size: 0.7rem;\n    /*font-weight: bold;*/\n}", ""]);
-	
-	// exports
-
+	exports.default = Star;
 
 /***/ }
 /******/ ]);

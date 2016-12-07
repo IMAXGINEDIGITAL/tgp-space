@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(132);
+	module.exports = __webpack_require__(149);
 
 
 /***/ },
@@ -1489,12 +1489,29 @@
 /* 129 */,
 /* 130 */,
 /* 131 */,
-/* 132 */
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _getIterator2 = __webpack_require__(133);
+	var _getIterator2 = __webpack_require__(150);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1502,13 +1519,13 @@
 	
 	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 	
-	var _slicedToArray2 = __webpack_require__(136);
+	var _slicedToArray2 = __webpack_require__(153);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
-	__webpack_require__(140);
+	__webpack_require__(157);
 	
-	var _amfeEnv = __webpack_require__(142);
+	var _amfeEnv = __webpack_require__(159);
 	
 	var _util = __webpack_require__(6);
 	
@@ -1516,19 +1533,19 @@
 	
 	var TEMPLATE_PRELOAD = '\n    <div class="bg-light" rol="image"></div>\n    <div class="logo" rol="image"></div>\n    <div class="light-lazer" rol="image"></div>\n    <div class="light-point" rol="image"></div>\n    <div class="human" rol="image"></div>\n    <div class="progress">\u5DF2\u52A0\u8F7D<b>20</b>%</div>\n';
 	
-	var TEMPLATE_GAME = '\n    <div id="stage-wrap">\n        <div class="stage">\n            <div class="galaxy-top" rol="image"></div>\n            <div class="galaxy-mid" rol="image"></div>\n            <div class="galaxy-bottom" rol="image"></div>\n        </div>\n        <div class="star" rol="image"></div>\n        <div class="elements">\n            <div class="static">\n                <div class="elements-top" rol="image"></div>\n                <div class="elements-mid" rol="image"></div>\n                <div class="elements-bottom" rol="image"></div> \n            </div>\n            <div class="dynamic"></div>\n        </div>\n    </div>\n    <canvas id="stage-cloud"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n';
+	var TEMPLATE_GAME = '\n    <canvas id="stage"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n';
 	
 	var items = {};
 	var ready = (0, _util.defer)();
 	window.preload = ready.promise;
 	
-	function updateImage(viewport, item) {
-	    var el = viewport.querySelector('.' + item.id + '[rol="image"]');
-	    if (!el && viewport.className.indexOf(item.id) > -1 && viewport.getAttribute('rol') === 'image') {
+	function setBackgrounImage(viewport, id, src) {
+	    var el = viewport.querySelector('.' + id + '[rol="image"]');
+	    if (!el && viewport.className.indexOf(id) > -1 && viewport.getAttribute('rol') === 'image') {
 	        el = viewport;
 	    }
 	    if (el) {
-	        el.style.backgroundImage = 'url(' + item.src + ')';
+	        el.style.backgroundImage = 'url(' + src + ')';
 	    }
 	}
 	
@@ -1548,7 +1565,7 @@
 	        var queue = new _util.createjs.LoadQueue(true);
 	
 	        queue.on('fileload', function (e) {
-	            return updateImage(viewport, e.item);
+	            return setBackgrounImage(viewport, e.item.id, e.item.src);
 	        });
 	
 	        queue.on('progress', function (e) {
@@ -1615,7 +1632,7 @@
 	            items[item.id] = item;
 	
 	            if (item.type === _util.createjs.AbstractLoader.IMAGE) {
-	                updateImage(viewport, item);
+	                setBackgrounImage(viewport, item.id, item.src);
 	            } else if (item.type === _util.createjs.AbstractLoader.TEXT) {
 	                (0, _util.appendStyle)('\n                @font-face {\n                    font-family: \'KuHei\';\n                    src: url(' + item.src + ') format(\'truetype\');\n                }\n\n                .kuhei {\n                    font-family: \'KuHei\';\n                    font-style:normal;\n                    -webkit-font-smoothing: antialiased;\n                    -webkit-text-stroke-width: 0.2px;\n                }\n            ');
 	            }
@@ -1712,21 +1729,21 @@
 	});
 
 /***/ },
-/* 133 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(134), __esModule: true };
+	module.exports = { "default": __webpack_require__(151), __esModule: true };
 
 /***/ },
-/* 134 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(135);
+	module.exports = __webpack_require__(152);
 
 /***/ },
-/* 135 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var anObject = __webpack_require__(23)
@@ -1738,18 +1755,18 @@
 	};
 
 /***/ },
-/* 136 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _isIterable2 = __webpack_require__(137);
+	var _isIterable2 = __webpack_require__(154);
 	
 	var _isIterable3 = _interopRequireDefault(_isIterable2);
 	
-	var _getIterator2 = __webpack_require__(133);
+	var _getIterator2 = __webpack_require__(150);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1794,21 +1811,21 @@
 	}();
 
 /***/ },
-/* 137 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(138), __esModule: true };
+	module.exports = { "default": __webpack_require__(155), __esModule: true };
 
 /***/ },
-/* 138 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(139);
+	module.exports = __webpack_require__(156);
 
 /***/ },
-/* 139 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classof   = __webpack_require__(59)
@@ -1822,13 +1839,13 @@
 	};
 
 /***/ },
-/* 140 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(141);
+	var content = __webpack_require__(158);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -1848,7 +1865,7 @@
 	}
 
 /***/ },
-/* 141 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -1862,7 +1879,7 @@
 
 
 /***/ },
-/* 142 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1872,27 +1889,27 @@
 	});
 	exports.Version = exports.params = exports.thirdapp = exports.aliapp = exports.os = exports.browser = undefined;
 	
-	var _aliapp = __webpack_require__(143);
+	var _aliapp = __webpack_require__(160);
 	
 	var _aliapp2 = _interopRequireDefault(_aliapp);
 	
-	var _browser = __webpack_require__(146);
+	var _browser = __webpack_require__(163);
 	
 	var _browser2 = _interopRequireDefault(_browser);
 	
-	var _os = __webpack_require__(145);
+	var _os = __webpack_require__(162);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
-	var _thirdapp = __webpack_require__(147);
+	var _thirdapp = __webpack_require__(164);
 	
 	var _thirdapp2 = _interopRequireDefault(_thirdapp);
 	
-	var _params = __webpack_require__(148);
+	var _params = __webpack_require__(165);
 	
 	var _params2 = _interopRequireDefault(_params);
 	
-	var _version = __webpack_require__(144);
+	var _version = __webpack_require__(161);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -1906,7 +1923,7 @@
 	exports.Version = _version2.default;
 
 /***/ },
-/* 143 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1915,11 +1932,11 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(144);
+	var _version = __webpack_require__(161);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
-	var _os = __webpack_require__(145);
+	var _os = __webpack_require__(162);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
@@ -1988,7 +2005,7 @@
 	exports.default = aliapp;
 
 /***/ },
-/* 144 */
+/* 161 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2079,7 +2096,7 @@
 	exports.default = Version;
 
 /***/ },
-/* 145 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2088,7 +2105,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(144);
+	var _version = __webpack_require__(161);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2140,7 +2157,7 @@
 	exports.default = os;
 
 /***/ },
-/* 146 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2149,7 +2166,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(144);
+	var _version = __webpack_require__(161);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2238,7 +2255,7 @@
 	exports.default = browser;
 
 /***/ },
-/* 147 */
+/* 164 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2276,7 +2293,7 @@
 	exports.default = thirdapp;
 
 /***/ },
-/* 148 */
+/* 165 */
 /***/ function(module, exports) {
 
 	'use strict';

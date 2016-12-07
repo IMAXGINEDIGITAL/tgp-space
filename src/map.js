@@ -55,7 +55,8 @@ export default class Map extends Event {
             this.emit('open');
         } else {
             this.viewport.className = this.viewport.className.replace('open', '');
-            this.wrapEl.style.cssText = '';
+            this.wrapEl.style.width = '';
+            this.wrapEl.style.height = '';
             this.opened = false;
             this.emit('close');
         }
@@ -72,7 +73,7 @@ export default class Map extends Event {
             this.canvasEl.width = width;
             this.canvasEl.height = height;
             this.render.clearRect(0, 0, width, height);
-            this.render.fillStyle = '#01c1b7';
+            this.render.fillStyle = '#016fa0';
             this.render.fillRect(0, 0, width, height);
             this.render.fillStyle = 'rgba(0, 0, 0, 1)';
             this.render.globalCompositeOperation = 'destination-out';

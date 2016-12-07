@@ -8,75 +8,123 @@ import {
     queryAll,
     getRect
 } from './util';
+import Scroller from './scroller';
 import Stage from './stage';
-import Map from './map';
+import Galaxy from './galaxy';
 import Cloud from './cloud';
-import Elements from './elements';
+import Star from './star';
+import {
+    StaticElements,
+    ElementCount
+} from './elements';
+import Map from './map';
+import Ticker from './ticker';
 
 const preload = win.preload;
 
 let items
 let viewport;
+let scroller;
+let ticker;
 let stage;
-let map;
+let galaxy;
 let cloud;
-let elements;
+let star;
+let staticElements;
+let elementCount;
+let map;
 
 preload
     .then(e => { // stage
         items = e;
-
         viewport = doc.body;
         viewport.addEventListener('touchmove', e => e.preventDefault());
-
+        ticker = new Ticker();
+    })
+    .then(() => {
         stage = new Stage(viewport);
         return stage.ready();
+    })
+    .then(() => {
+        scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, 0.3);
+        return scroller.ready();
+    })
+    .then(() => {
+        const promises = [];
+
+        galaxy = new Galaxy(stage, items);
+        promises.push(galaxy.ready());
+
+        staticElements = new StaticElements(stage, items);
+        promises.push(staticElements.ready());
+
+        cloud = new Cloud(stage, items);
+        promises.push(cloud.ready());
+
+        star = new Star(stage, items);
+        promises.push(star.ready());
+
+        return Promise.all(promises);
+    })
+    .then(() => { // render
+        let scrollX = 0;
+        let scrollY = 0;
+
+        scroller.on('scrolling', e => {
+            scrollX = e.x;
+            scrollY = e.y;
+        });
+
+        let clearId;
+        scroller.on('scrollend', e => {
+            const tick = cloud.clear(e.x, e.y);
+            clearId = ticker.add(tick);
+        });
+
+        // const starTick = star.roll();
+        // const starId = ticker.add(starTick);
+
+        ticker.on('aftertick', e => {
+            let updated = false;
+
+            if (scroller.isScrolling ||
+                    ticker.has(clearId)) {
+                stage.render.drawImage(galaxy.canvas, -scrollX, -scrollY);
+                stage.render.drawImage(star.canvas, 0, 0);
+                stage.render.drawImage(staticElements.canvas, -scrollX, -scrollY);
+                stage.render.drawImage(cloud.canvas, -scrollX, -scrollY);
+                updated = true;
+            }
+
+            updated && stage.commit();
+        });
     })
     .then(() => { // map
         map = new Map(viewport, stage.hSlice, stage.vSlice);
 
-        stage.on('scrolling', e => {
+        scroller.on('scrolling', e => {
             const xp = e.x / stage.width;
             const yp = e.y / stage.height;
             map.update(xp, yp);
         });
 
-        stage.on('scrollend', e => {
+        scroller.on('scrollend', e => {
             const xp = e.x / stage.width;
             const yp = e.y / stage.height;
-            map.update(xp, yp);
             map.clear(xp, yp);
         });
 
         return map.ready();
     })
-    .then(() => { // cloud
-        const image = new Image();
-        image.loaded = defer();
-        image.onload = () => image.loaded.resolve();
-        image.src = items.cloud.src;
-
-        cloud = new Cloud(viewport, image, stage.width, stage.height, stage.hSlice, stage.vSlice);
-
-        stage.on('scrolling', e => {
-            const xp = e.x / stage.width;
-            const yp = e.y / stage.height;
-            cloud.update(xp, yp);
-        });
-
-        stage.on('scrollend', e => {
-            const xp = e.x / stage.width;
-            const yp = e.y / stage.height;
-            cloud.clear(xp, yp);
-        });
-
-        return image.loaded.promise.then(() => cloud.ready());
+    .then(() => { // elements
+        elementCount = new ElementCount(viewport);
+        return elementCount.ready();
     })
     .then(() => { // bone
-        const {width: vw, height: vh} = getRect(viewport);
-        stage.scrollTo(stage.width / 2 - vw / 2, stage.height - vh);
+        const boneX = stage.width / 2 - stage.vw / 2;
+        const boneY = stage.height - stage.vh / 2;
+        scroller.scrollTo(boneX, boneY);
+        ticker.run();
     })
-    .then(() => { // elements
-        elements = new Elements(viewport, stage.width, stage.height, stage.hSlice, stage.vSlice);
-        return elements.ready();
-    })
+
+    

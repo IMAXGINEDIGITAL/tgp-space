@@ -1,4 +1,3 @@
-import './cloud.css';
 import {
     win,
     doc,
@@ -6,47 +5,32 @@ import {
     query,
     queryAll,
     getRect,
-    getDistance,
-    raf,
-    caf
+    getDistance
 } from './util';
-import Event from './event';
+import {
+    CanvasImage
+} from './canvas';
 
-export default class Cloud extends Event {
-    constructor(viewport, image, sWidth, sHeight, hSlice, vSlice) {
-        super();
+export default class Cloud extends CanvasImage {
+    constructor(stage, items) {
+        super(stage.width, stage.height);
 
-        this.image = image;
-        this.canvasEl = query(viewport, '#stage-cloud');
-        this.render = this.canvasEl.getContext('2d');
-        this.cachedCanvasEl = doc.createElement('canvas');
-        this.cachedRender = this.cachedCanvasEl.getContext('2d');
-        this.sWidth = sWidth;
-        this.sHeight = sHeight;
-        this.hSlice = hSlice;
-        this.vSlice = vSlice;
+        this.width = stage.width;
+        this.height = stage.height;
+        this.hSlice = stage.hSlice;
+        this.vSlice = stage.vSlice;
+        this.vw = stage.vw;
+        this.vh = stage.vh;
+        this.items = items;
     }
 
-    update(xp, yp) {
-        const {width, height} = getRect(this.canvasEl);
 
-        const x = this.sWidth * xp;
-        const y = this.sHeight * yp;
+    clear(x, y) {
+        const cx = x + this.vw / 2;
+        const cy = y + this.vh / 2;
 
-        this.render.clearRect(0, 0, width, height);
-        this.render.drawImage(this.cachedCanvasEl, -x, -y, this.sWidth, this.sHeight);
-    }
-
-    clear(xp, yp) {
-        const {width, height} = getRect(this.canvasEl);
-
-        const x = this.sWidth * xp;
-        const y = this.sHeight * yp;
-        const cx = x + width / 2;
-        const cy = y + height / 2;
-
-        const steps = new Array(10);
-        const radius = (height * 0.5) / steps.length;
+        const steps = new Array(20);
+        const radius = (this.vh * 0.5) / steps.length;
 
         for (let i = 0; i < steps.length; i++) {
             steps[i] = {
@@ -56,61 +40,55 @@ export default class Cloud extends Event {
             }
         }
 
-        let id;
-        const tick = () => {
+        return ({
+            id,
+            start,
+            delta,
+            elapsed
+        }, ticker) => {
             if (steps.length) {
-                id = raf(tick);
                 const {
                     cx,
                     cy,
                     r
                 } = steps.shift();
 
-                const gradient = this.cachedRender.createRadialGradient(cx, cy, 0, cx, cy, r);
+                const gradient = this.render.createRadialGradient(cx, cy, 0, cx, cy, r);
                 gradient.addColorStop(0, 'rgba(0, 0, 0, 255)');
                 gradient.addColorStop(0.8, 'rgba(0, 0, 0, 100)');
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-                this.cachedRender.fillStyle = gradient;
-                this.cachedRender.beginPath();
-                this.cachedRender.arc(cx, cy, r, 0, Math.PI * 2);
-                this.cachedRender.fill();
-                this.cachedRender.closePath();
-
-                this.update(xp, yp);
+                this.render.fillStyle = gradient;
+                this.render.beginPath();
+                this.render.arc(cx, cy, r, 0, Math.PI * 2);
+                this.render.fill();
+                this.render.closePath();
             } else {
-                id = null;
-            }
-        }
-        id = raf(tick);
-
-        return () => {
-            if (id) {
-                caf(tick);
+                return true;
             }
         }
     }
 
     ready() {
-        return new Promise((resolve, reject) => {
-            this.sliceWidth = this.sWidth / this.hSlice;
-            this.sliceHeight = this.sHeight / this.vSlice;
+        this.sliceWidth = this.width / this.hSlice;
+        this.sliceHeight = this.height / this.vSlice;
 
-            this.cachedCanvasEl.width = this.sWidth;
-            this.cachedCanvasEl.height = this.sHeight;
-            this.cachedRender.clearRect(0, 0, this.sWidth, this.sHeight);
-
-            for (let i = 0; i < this.hSlice; i++) {
-                for (let j = 0; j < this.vSlice; j++) {
-                    this.cachedRender.drawImage(this.image, i * this.sliceWidth, j * this.sliceHeight, this.sliceWidth, this.sliceHeight);
-                }
+        const images = [];
+        for (let i = 0; i < this.hSlice; i++) {
+            for (let j = 0; j < this.vSlice; j++) {
+                images.push({
+                    src: this.items.cloud.src,
+                    x: i * this.sliceWidth,
+                    y: j * this.sliceHeight,
+                    width: this.sliceWidth,
+                    height: this.sliceHeight
+                });
             }
-            this.cachedRender.globalCompositeOperation = 'destination-out';
+        }
 
-            const {width, height} = getRect(this.canvasEl);
-            this.canvasEl.width = width;
-            this.canvasEl.height = height;
-            resolve(this);
-        });
+        return this.draw(images)
+                .then(() => {
+                    this.render.globalCompositeOperation = 'destination-out';
+                });
     }
 }

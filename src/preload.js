@@ -21,23 +21,7 @@ const TEMPLATE_PRELOAD = `
 `;
 
 const TEMPLATE_GAME = `
-    <div id="stage-wrap">
-        <div class="stage">
-            <div class="galaxy-top" rol="image"></div>
-            <div class="galaxy-mid" rol="image"></div>
-            <div class="galaxy-bottom" rol="image"></div>
-        </div>
-        <div class="star" rol="image"></div>
-        <div class="elements">
-            <div class="static">
-                <div class="elements-top" rol="image"></div>
-                <div class="elements-mid" rol="image"></div>
-                <div class="elements-bottom" rol="image"></div> 
-            </div>
-            <div class="dynamic"></div>
-        </div>
-    </div>
-    <canvas id="stage-cloud"></canvas>
+    <canvas id="stage"></canvas>
     <div id="elements-count" class="kuhei"></div>
     <div id="stage-map" class="scope" rol="image">
         <div class="galaxy-map wrap" rol="image">
@@ -52,15 +36,15 @@ const items = {};
 const ready = defer();
 window.preload = ready.promise;
 
-function updateImage(viewport, item) {
-    let el = viewport.querySelector(`.${item.id}[rol="image"]`);
+function setBackgrounImage(viewport, id, src) {
+    let el = viewport.querySelector(`.${id}[rol="image"]`);
     if (!el
-           && viewport.className.indexOf(item.id) > -1
+           && viewport.className.indexOf(id) > -1
            && viewport.getAttribute('rol') === 'image') {
         el = viewport;
     }
     if (el) {
-        el.style.backgroundImage = `url(${item.src})`;
+        el.style.backgroundImage = `url(${src})`;
     }
 }
 
@@ -78,7 +62,7 @@ const assetsPrefix = os.isIOS ? '2x' : '1x'
 const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
     const queue = new createjs.LoadQueue(true);
 
-    queue.on('fileload', e => updateImage(viewport, e.item));
+    queue.on('fileload', e => setBackgrounImage(viewport, e.item.id, e.item.src));
 
     queue.on('progress', e => {
         const {
@@ -145,7 +129,7 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
         items[item.id] = item;
 
         if (item.type === createjs.AbstractLoader.IMAGE) {
-            updateImage(viewport, item);
+            setBackgrounImage(viewport, item.id, item.src);
         } else if (item.type === createjs.AbstractLoader.TEXT) {
             appendStyle(`
                 @font-face {
