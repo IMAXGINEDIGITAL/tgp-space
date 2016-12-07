@@ -69,7 +69,7 @@
 	
 	var _cloud2 = _interopRequireDefault(_cloud);
 	
-	var _elements = __webpack_require__(140);
+	var _elements = __webpack_require__(129);
 	
 	var _elements2 = _interopRequireDefault(_elements);
 	
@@ -1531,7 +1531,7 @@
 	
 	var _event2 = _interopRequireDefault(_event);
 	
-	var _iscrollProbe = __webpack_require__(139);
+	var _iscrollProbe = __webpack_require__(122);
 	
 	var _iscrollProbe2 = _interopRequireDefault(_iscrollProbe);
 	
@@ -1592,7 +1592,7 @@
 	            this.scroller = new _iscrollProbe2.default(this.viewport, {
 	                mouseWheel: false,
 	                preventDefault: true,
-	                deceleration: 0.01,
+	                deceleration: 0.1,
 	                tap: true,
 	                probeType: 3,
 	                scrollX: true,
@@ -2944,420 +2944,7 @@
 
 
 /***/ },
-/* 122 */,
-/* 123 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.default = undefined;
-	
-	var _getPrototypeOf = __webpack_require__(62);
-	
-	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-	
-	var _classCallCheck2 = __webpack_require__(66);
-	
-	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-	
-	var _createClass2 = __webpack_require__(67);
-	
-	var _createClass3 = _interopRequireDefault(_createClass2);
-	
-	var _possibleConstructorReturn2 = __webpack_require__(71);
-	
-	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-	
-	var _inherits2 = __webpack_require__(96);
-	
-	var _inherits3 = _interopRequireDefault(_inherits2);
-	
-	__webpack_require__(124);
-	
-	var _util = __webpack_require__(6);
-	
-	var _event = __webpack_require__(106);
-	
-	var _event2 = _interopRequireDefault(_event);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var Map = function (_Event) {
-	    (0, _inherits3.default)(Map, _Event);
-	
-	    function Map(viewport, hSlice, vSlice) {
-	        (0, _classCallCheck3.default)(this, Map);
-	
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (Map.__proto__ || (0, _getPrototypeOf2.default)(Map)).call(this));
-	
-	        _this.viewport = (0, _util.query)(viewport, '#stage-map');
-	        _this.wrapEl = (0, _util.query)(_this.viewport, '.wrap');
-	        _this.canvasEl = (0, _util.query)(_this.viewport, 'canvas');
-	        _this.render = _this.canvasEl.getContext('2d');
-	        _this.indicatorEl = (0, _util.query)(_this.viewport, '.indicator');
-	        _this.hSlice = hSlice;
-	        _this.vSlice = vSlice;
-	        _this.opened = false;
-	        return _this;
-	    }
-	
-	    (0, _createClass3.default)(Map, [{
-	        key: 'update',
-	        value: function update(xp, yp) {
-	            var _getRect = (0, _util.getRect)(this.canvasEl),
-	                cWidth = _getRect.width,
-	                cHeight = _getRect.height;
-	
-	            var _getRect2 = (0, _util.getRect)(this.indicatorEl),
-	                iWidth = _getRect2.width,
-	                iHeight = _getRect2.height;
-	
-	            var sWidth = this.sliceWidth,
-	                sHeight = this.sliceHeight;
-	
-	
-	            this.indicatorEl.style.webkitTransform = 'translate3d(' + (cWidth * xp + sWidth / 2 - iWidth / 2) + 'px, ' + (cHeight * yp + sHeight / 2 - iHeight / 2) + 'px, 0)';
-	        }
-	    }, {
-	        key: 'clear',
-	        value: function clear(xp, yp) {
-	            var _getRect3 = (0, _util.getRect)(this.canvasEl),
-	                cWidth = _getRect3.width,
-	                cHeight = _getRect3.height;
-	
-	            var sWidth = this.sliceWidth,
-	                sHeight = this.sliceHeight;
-	
-	
-	            this.render.fillRect(cWidth * xp, cHeight * yp, sWidth, sHeight);
-	        }
-	    }, {
-	        key: 'toggleOpen',
-	        value: function toggleOpen() {
-	            if (!this.opened) {
-	                this.wrapEl.rects = null;
-	                this.viewport.rects = null;
-	
-	                var _getRect4 = (0, _util.getRect)(this.wrapEl),
-	                    width = _getRect4.width,
-	                    height = _getRect4.height;
-	
-	                this.viewport.className += ' open';
-	
-	                var _getRect5 = (0, _util.getRect)(this.viewport),
-	                    vh = _getRect5.height;
-	
-	                this.wrapEl.style.width = width * vh / height + 'px';
-	                this.wrapEl.style.height = vh + 'px';
-	
-	                this.opened = true;
-	                this.emit('open');
-	            } else {
-	                this.viewport.className = this.viewport.className.replace('open', '');
-	                this.wrapEl.style.cssText = '';
-	                this.opened = false;
-	                this.emit('close');
-	            }
-	        }
-	    }, {
-	        key: 'ready',
-	        value: function ready() {
-	            var _this2 = this;
-	
-	            return new _util.Promise(function (resolve, reject) {
-	                var _getRect6 = (0, _util.getRect)(_this2.canvasEl),
-	                    width = _getRect6.width,
-	                    height = _getRect6.height;
-	
-	                _this2.width = width;
-	                _this2.height = height;
-	                _this2.sliceWidth = width / _this2.hSlice;
-	                _this2.sliceHeight = height / _this2.vSlice;
-	
-	                _this2.canvasEl.width = width;
-	                _this2.canvasEl.height = height;
-	                _this2.render.clearRect(0, 0, width, height);
-	                _this2.render.fillStyle = '#01c1b7';
-	                _this2.render.fillRect(0, 0, width, height);
-	                _this2.render.fillStyle = 'rgba(0, 0, 0, 1)';
-	                _this2.render.globalCompositeOperation = 'destination-out';
-	
-	                _this2.viewport.addEventListener('tap', function () {
-	                    return _this2.toggleOpen();
-	                }, false);
-	
-	                resolve(_this2);
-	            });
-	        }
-	    }]);
-	    return Map;
-	}(_event2.default);
-	
-	exports.default = Map;
-
-/***/ },
-/* 124 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(125);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(5)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./map.css", function() {
-				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./map.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 125 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(4)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background-position: 0.8rem 1rem;\n    background-repeat: no-repeat;\n    background-size: 0.62rem 0.68rem;\n    padding-left: 1.61rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map::before {\n    content: '\\70B9\\51FB\\67E5\\770B\\5168\\5B87\\5B99';\n    color: #01c1b7;\n    font-size: 12px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.2rem;\n    top: 1.8rem;\n}\n\n#stage-map.open::before {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #01c1b7;\n    box-sizing: border-box;\n    width: 25px;\n    height: 88.9px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 126 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.default = undefined;
-	
-	var _getPrototypeOf = __webpack_require__(62);
-	
-	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-	
-	var _classCallCheck2 = __webpack_require__(66);
-	
-	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-	
-	var _createClass2 = __webpack_require__(67);
-	
-	var _createClass3 = _interopRequireDefault(_createClass2);
-	
-	var _possibleConstructorReturn2 = __webpack_require__(71);
-	
-	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-	
-	var _inherits2 = __webpack_require__(96);
-	
-	var _inherits3 = _interopRequireDefault(_inherits2);
-	
-	__webpack_require__(127);
-	
-	var _util = __webpack_require__(6);
-	
-	var _event = __webpack_require__(106);
-	
-	var _event2 = _interopRequireDefault(_event);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var Cloud = function (_Event) {
-	    (0, _inherits3.default)(Cloud, _Event);
-	
-	    function Cloud(viewport, image, sWidth, sHeight, hSlice, vSlice) {
-	        (0, _classCallCheck3.default)(this, Cloud);
-	
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (Cloud.__proto__ || (0, _getPrototypeOf2.default)(Cloud)).call(this));
-	
-	        _this.image = image;
-	        _this.canvasEl = (0, _util.query)(viewport, '#stage-cloud');
-	        _this.render = _this.canvasEl.getContext('2d');
-	        _this.cachedCanvasEl = _util.doc.createElement('canvas');
-	        _this.cachedRender = _this.cachedCanvasEl.getContext('2d');
-	        _this.sWidth = sWidth;
-	        _this.sHeight = sHeight;
-	        _this.hSlice = hSlice;
-	        _this.vSlice = vSlice;
-	        return _this;
-	    }
-	
-	    (0, _createClass3.default)(Cloud, [{
-	        key: 'update',
-	        value: function update(xp, yp) {
-	            var _getRect = (0, _util.getRect)(this.canvasEl),
-	                width = _getRect.width,
-	                height = _getRect.height;
-	
-	            var x = this.sWidth * xp;
-	            var y = this.sHeight * yp;
-	
-	            this.render.clearRect(0, 0, width, height);
-	            this.render.drawImage(this.cachedCanvasEl, -x, -y, this.sWidth, this.sHeight);
-	        }
-	    }, {
-	        key: 'clear',
-	        value: function clear(xp, yp) {
-	            var _this2 = this;
-	
-	            var _getRect2 = (0, _util.getRect)(this.canvasEl),
-	                width = _getRect2.width,
-	                height = _getRect2.height;
-	
-	            var x = this.sWidth * xp;
-	            var y = this.sHeight * yp;
-	            var cx = x + width / 2;
-	            var cy = y + height / 2;
-	
-	            var steps = new Array(10);
-	            var radius = height * 0.5 / steps.length;
-	
-	            for (var i = 0; i < steps.length; i++) {
-	                steps[i] = {
-	                    cx: cx,
-	                    cy: cy,
-	                    r: radius * (i + 1)
-	                };
-	            }
-	
-	            var id = void 0;
-	            var tick = function tick() {
-	                if (steps.length) {
-	                    id = (0, _util.raf)(tick);
-	
-	                    var _steps$shift = steps.shift(),
-	                        _cx = _steps$shift.cx,
-	                        _cy = _steps$shift.cy,
-	                        r = _steps$shift.r;
-	
-	                    var gradient = _this2.cachedRender.createRadialGradient(_cx, _cy, 0, _cx, _cy, r);
-	                    gradient.addColorStop(0, 'rgba(0, 0, 0, 255)');
-	                    gradient.addColorStop(0.8, 'rgba(0, 0, 0, 100)');
-	                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-	
-	                    _this2.cachedRender.fillStyle = gradient;
-	                    _this2.cachedRender.beginPath();
-	                    _this2.cachedRender.arc(_cx, _cy, r, 0, Math.PI * 2);
-	                    _this2.cachedRender.fill();
-	                    _this2.cachedRender.closePath();
-	
-	                    _this2.update(xp, yp);
-	                } else {
-	                    id = null;
-	                }
-	            };
-	            id = (0, _util.raf)(tick);
-	
-	            return function () {
-	                if (id) {
-	                    (0, _util.caf)(tick);
-	                }
-	            };
-	        }
-	    }, {
-	        key: 'ready',
-	        value: function ready() {
-	            var _this3 = this;
-	
-	            return new _util.Promise(function (resolve, reject) {
-	                _this3.sliceWidth = _this3.sWidth / _this3.hSlice;
-	                _this3.sliceHeight = _this3.sHeight / _this3.vSlice;
-	
-	                _this3.cachedCanvasEl.width = _this3.sWidth;
-	                _this3.cachedCanvasEl.height = _this3.sHeight;
-	                _this3.cachedRender.clearRect(0, 0, _this3.sWidth, _this3.sHeight);
-	
-	                for (var i = 0; i < _this3.hSlice; i++) {
-	                    for (var j = 0; j < _this3.vSlice; j++) {
-	                        _this3.cachedRender.drawImage(_this3.image, i * _this3.sliceWidth, j * _this3.sliceHeight, _this3.sliceWidth, _this3.sliceHeight);
-	                    }
-	                }
-	                _this3.cachedRender.globalCompositeOperation = 'destination-out';
-	
-	                var _getRect3 = (0, _util.getRect)(_this3.canvasEl),
-	                    width = _getRect3.width,
-	                    height = _getRect3.height;
-	
-	                _this3.canvasEl.width = width;
-	                _this3.canvasEl.height = height;
-	                resolve(_this3);
-	            });
-	        }
-	    }]);
-	    return Cloud;
-	}(_event2.default);
-	
-	exports.default = Cloud;
-
-/***/ },
-/* 127 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(128);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(5)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./cloud.css", function() {
-				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./cloud.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 128 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(4)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "#stage-cloud {\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    position: absolute;\n    -webkit-transform: translateZ(19px);\n}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 129 */,
-/* 130 */,
-/* 131 */,
-/* 132 */,
-/* 133 */,
-/* 134 */,
-/* 135 */,
-/* 136 */,
-/* 137 */,
-/* 138 */,
-/* 139 */
+/* 122 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! iScroll v5.2.0 ~ (c) 2008-2016 Matteo Spinelli ~ http://cubiq.org/license */
@@ -5481,7 +5068,7 @@
 
 
 /***/ },
-/* 140 */
+/* 123 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5511,7 +5098,409 @@
 	
 	var _inherits3 = _interopRequireDefault(_inherits2);
 	
-	__webpack_require__(143);
+	__webpack_require__(124);
+	
+	var _util = __webpack_require__(6);
+	
+	var _event = __webpack_require__(106);
+	
+	var _event2 = _interopRequireDefault(_event);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Map = function (_Event) {
+	    (0, _inherits3.default)(Map, _Event);
+	
+	    function Map(viewport, hSlice, vSlice) {
+	        (0, _classCallCheck3.default)(this, Map);
+	
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Map.__proto__ || (0, _getPrototypeOf2.default)(Map)).call(this));
+	
+	        _this.viewport = (0, _util.query)(viewport, '#stage-map');
+	        _this.wrapEl = (0, _util.query)(_this.viewport, '.wrap');
+	        _this.canvasEl = (0, _util.query)(_this.viewport, 'canvas');
+	        _this.render = _this.canvasEl.getContext('2d');
+	        _this.indicatorEl = (0, _util.query)(_this.viewport, '.indicator');
+	        _this.hSlice = hSlice;
+	        _this.vSlice = vSlice;
+	        _this.opened = false;
+	        return _this;
+	    }
+	
+	    (0, _createClass3.default)(Map, [{
+	        key: 'update',
+	        value: function update(xp, yp) {
+	            var _getRect = (0, _util.getRect)(this.canvasEl),
+	                cWidth = _getRect.width,
+	                cHeight = _getRect.height;
+	
+	            var _getRect2 = (0, _util.getRect)(this.indicatorEl),
+	                iWidth = _getRect2.width,
+	                iHeight = _getRect2.height;
+	
+	            var sWidth = this.sliceWidth,
+	                sHeight = this.sliceHeight;
+	
+	
+	            this.indicatorEl.style.webkitTransform = 'translate3d(' + (cWidth * xp + sWidth / 2 - iWidth / 2) + 'px, ' + (cHeight * yp + sHeight / 2 - iHeight / 2) + 'px, 0)';
+	        }
+	    }, {
+	        key: 'clear',
+	        value: function clear(xp, yp) {
+	            var _getRect3 = (0, _util.getRect)(this.canvasEl),
+	                cWidth = _getRect3.width,
+	                cHeight = _getRect3.height;
+	
+	            var sWidth = this.sliceWidth,
+	                sHeight = this.sliceHeight;
+	
+	
+	            this.render.fillRect(cWidth * xp, cHeight * yp, sWidth, sHeight);
+	        }
+	    }, {
+	        key: 'toggleOpen',
+	        value: function toggleOpen() {
+	            if (!this.opened) {
+	                this.wrapEl.rects = null;
+	                this.viewport.rects = null;
+	
+	                var _getRect4 = (0, _util.getRect)(this.wrapEl),
+	                    width = _getRect4.width,
+	                    height = _getRect4.height;
+	
+	                this.viewport.className += ' open';
+	
+	                var _getRect5 = (0, _util.getRect)(this.viewport),
+	                    vh = _getRect5.height;
+	
+	                this.wrapEl.style.width = width * vh / height + 'px';
+	                this.wrapEl.style.height = vh + 'px';
+	
+	                this.opened = true;
+	                this.emit('open');
+	            } else {
+	                this.viewport.className = this.viewport.className.replace('open', '');
+	                this.wrapEl.style.cssText = '';
+	                this.opened = false;
+	                this.emit('close');
+	            }
+	        }
+	    }, {
+	        key: 'ready',
+	        value: function ready() {
+	            var _this2 = this;
+	
+	            return new _util.Promise(function (resolve, reject) {
+	                var _getRect6 = (0, _util.getRect)(_this2.canvasEl),
+	                    width = _getRect6.width,
+	                    height = _getRect6.height;
+	
+	                _this2.width = width;
+	                _this2.height = height;
+	                _this2.sliceWidth = width / _this2.hSlice;
+	                _this2.sliceHeight = height / _this2.vSlice;
+	
+	                _this2.canvasEl.width = width;
+	                _this2.canvasEl.height = height;
+	                _this2.render.clearRect(0, 0, width, height);
+	                _this2.render.fillStyle = '#01c1b7';
+	                _this2.render.fillRect(0, 0, width, height);
+	                _this2.render.fillStyle = 'rgba(0, 0, 0, 1)';
+	                _this2.render.globalCompositeOperation = 'destination-out';
+	
+	                _this2.viewport.addEventListener('tap', function () {
+	                    return _this2.toggleOpen();
+	                }, false);
+	
+	                resolve(_this2);
+	            });
+	        }
+	    }]);
+	    return Map;
+	}(_event2.default);
+	
+	exports.default = Map;
+
+/***/ },
+/* 124 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(125);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(5)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./map.css", function() {
+				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./map.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 125 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(4)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background-position: 0.8rem 1rem;\n    background-repeat: no-repeat;\n    background-size: 0.62rem 0.68rem;\n    padding-left: 1.61rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map::before {\n    content: '\\70B9\\51FB\\67E5\\770B\\5168\\5B87\\5B99';\n    color: #01c1b7;\n    font-size: 12px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.2rem;\n    top: 1.8rem;\n}\n\n#stage-map.open::before {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #01c1b7;\n    box-sizing: border-box;\n    width: 25px;\n    height: 88.9px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 126 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = undefined;
+	
+	var _getPrototypeOf = __webpack_require__(62);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
+	var _classCallCheck2 = __webpack_require__(66);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(71);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(96);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
+	
+	__webpack_require__(127);
+	
+	var _util = __webpack_require__(6);
+	
+	var _event = __webpack_require__(106);
+	
+	var _event2 = _interopRequireDefault(_event);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Cloud = function (_Event) {
+	    (0, _inherits3.default)(Cloud, _Event);
+	
+	    function Cloud(viewport, image, sWidth, sHeight, hSlice, vSlice) {
+	        (0, _classCallCheck3.default)(this, Cloud);
+	
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Cloud.__proto__ || (0, _getPrototypeOf2.default)(Cloud)).call(this));
+	
+	        _this.image = image;
+	        _this.canvasEl = (0, _util.query)(viewport, '#stage-cloud');
+	        _this.render = _this.canvasEl.getContext('2d');
+	        _this.cachedCanvasEl = _util.doc.createElement('canvas');
+	        _this.cachedRender = _this.cachedCanvasEl.getContext('2d');
+	        _this.sWidth = sWidth;
+	        _this.sHeight = sHeight;
+	        _this.hSlice = hSlice;
+	        _this.vSlice = vSlice;
+	        return _this;
+	    }
+	
+	    (0, _createClass3.default)(Cloud, [{
+	        key: 'update',
+	        value: function update(xp, yp) {
+	            var _getRect = (0, _util.getRect)(this.canvasEl),
+	                width = _getRect.width,
+	                height = _getRect.height;
+	
+	            var x = this.sWidth * xp;
+	            var y = this.sHeight * yp;
+	
+	            this.render.clearRect(0, 0, width, height);
+	            this.render.drawImage(this.cachedCanvasEl, -x, -y, this.sWidth, this.sHeight);
+	        }
+	    }, {
+	        key: 'clear',
+	        value: function clear(xp, yp) {
+	            var _this2 = this;
+	
+	            var _getRect2 = (0, _util.getRect)(this.canvasEl),
+	                width = _getRect2.width,
+	                height = _getRect2.height;
+	
+	            var x = this.sWidth * xp;
+	            var y = this.sHeight * yp;
+	            var cx = x + width / 2;
+	            var cy = y + height / 2;
+	
+	            var steps = new Array(10);
+	            var radius = height * 0.5 / steps.length;
+	
+	            for (var i = 0; i < steps.length; i++) {
+	                steps[i] = {
+	                    cx: cx,
+	                    cy: cy,
+	                    r: radius * (i + 1)
+	                };
+	            }
+	
+	            var id = void 0;
+	            var tick = function tick() {
+	                if (steps.length) {
+	                    id = (0, _util.raf)(tick);
+	
+	                    var _steps$shift = steps.shift(),
+	                        _cx = _steps$shift.cx,
+	                        _cy = _steps$shift.cy,
+	                        r = _steps$shift.r;
+	
+	                    var gradient = _this2.cachedRender.createRadialGradient(_cx, _cy, 0, _cx, _cy, r);
+	                    gradient.addColorStop(0, 'rgba(0, 0, 0, 255)');
+	                    gradient.addColorStop(0.8, 'rgba(0, 0, 0, 100)');
+	                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+	
+	                    _this2.cachedRender.fillStyle = gradient;
+	                    _this2.cachedRender.beginPath();
+	                    _this2.cachedRender.arc(_cx, _cy, r, 0, Math.PI * 2);
+	                    _this2.cachedRender.fill();
+	                    _this2.cachedRender.closePath();
+	
+	                    _this2.update(xp, yp);
+	                } else {
+	                    id = null;
+	                }
+	            };
+	            id = (0, _util.raf)(tick);
+	
+	            return function () {
+	                if (id) {
+	                    (0, _util.caf)(tick);
+	                }
+	            };
+	        }
+	    }, {
+	        key: 'ready',
+	        value: function ready() {
+	            var _this3 = this;
+	
+	            return new _util.Promise(function (resolve, reject) {
+	                _this3.sliceWidth = _this3.sWidth / _this3.hSlice;
+	                _this3.sliceHeight = _this3.sHeight / _this3.vSlice;
+	
+	                _this3.cachedCanvasEl.width = _this3.sWidth;
+	                _this3.cachedCanvasEl.height = _this3.sHeight;
+	                _this3.cachedRender.clearRect(0, 0, _this3.sWidth, _this3.sHeight);
+	
+	                for (var i = 0; i < _this3.hSlice; i++) {
+	                    for (var j = 0; j < _this3.vSlice; j++) {
+	                        _this3.cachedRender.drawImage(_this3.image, i * _this3.sliceWidth, j * _this3.sliceHeight, _this3.sliceWidth, _this3.sliceHeight);
+	                    }
+	                }
+	                _this3.cachedRender.globalCompositeOperation = 'destination-out';
+	
+	                var _getRect3 = (0, _util.getRect)(_this3.canvasEl),
+	                    width = _getRect3.width,
+	                    height = _getRect3.height;
+	
+	                _this3.canvasEl.width = width;
+	                _this3.canvasEl.height = height;
+	                resolve(_this3);
+	            });
+	        }
+	    }]);
+	    return Cloud;
+	}(_event2.default);
+	
+	exports.default = Cloud;
+
+/***/ },
+/* 127 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(128);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(5)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../node_modules/.0.25.0@css-loader/index.js!./cloud.css", function() {
+				var newContent = require("!!./../node_modules/.0.25.0@css-loader/index.js!./cloud.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 128 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(4)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "#stage-cloud {\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    position: absolute;\n    -webkit-transform: translateZ(19px);\n}", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 129 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = undefined;
+	
+	var _getPrototypeOf = __webpack_require__(62);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
+	var _classCallCheck2 = __webpack_require__(66);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(71);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(96);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
+	
+	__webpack_require__(130);
 	
 	var _util = __webpack_require__(6);
 	
@@ -5564,15 +5553,13 @@
 	exports.default = Elements;
 
 /***/ },
-/* 141 */,
-/* 142 */,
-/* 143 */
+/* 130 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(144);
+	var content = __webpack_require__(131);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -5592,7 +5579,7 @@
 	}
 
 /***/ },
-/* 144 */
+/* 131 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();

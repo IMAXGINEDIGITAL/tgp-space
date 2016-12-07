@@ -54,7 +54,7 @@ export default class Stage extends Event{
         this.scroller = new IScroll(this.viewport, {
             mouseWheel: false,
             preventDefault: true,
-            deceleration: 0.01,
+            deceleration: 0.1,
             tap: true,
             probeType: 3,
             scrollX: true,
