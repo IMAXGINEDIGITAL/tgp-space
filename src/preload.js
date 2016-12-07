@@ -26,7 +26,7 @@ const TEMPLATE_GAME = `
             <div class="galaxy-mid" rol="image"></div>
             <div class="galaxy-bottom" rol="image"></div>
         </div>
-        <!--div class="star" rol="image"></div-->
+        <div class="star" rol="image"></div>
         <div class="elements">
             <div class="static">
                 <div class="elements-top" rol="image"></div>
