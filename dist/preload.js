@@ -1508,6 +1508,8 @@
 	
 	__webpack_require__(140);
 	
+	var _amfeEnv = __webpack_require__(142);
+	
 	var _util = __webpack_require__(6);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -1540,6 +1542,7 @@
 	    return [percent, val];
 	}
 	
+	var assetsPrefix = _amfeEnv.os.isIOS ? '2x' : '1x';
 	var loadPreloadManifest = function loadPreloadManifest(viewport) {
 	    return new _util.Promise(function (resolve, reject) {
 	        var queue = new _util.createjs.LoadQueue(true);
@@ -1565,7 +1568,7 @@
 	        });
 	
 	        queue.loadManifest({
-	            path: 'assets/preload/',
+	            path: 'assets/' + assetsPrefix + '/preload/',
 	            manifest: [{ id: 'bg-dark', src: 'bg-1.jpg' }, { id: 'bg-light', src: 'bg-2.jpg' }, { id: 'human', src: 'human.png' }, { id: 'light-point', src: 'light-1.png' }, { id: 'light-lazer', src: 'light-2.png' }, { id: 'logo', src: 'logo.jpg' }]
 	        });
 	    });
@@ -1641,7 +1644,7 @@
 	        });
 	
 	        queue.loadManifest({
-	            path: 'assets/game/',
+	            path: 'assets/' + assetsPrefix + '/game/',
 	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'pop', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }, { id: 'font', src: 'font.ttf' }]
 	        });
 	
@@ -1704,8 +1707,8 @@
 	    _util.doc.body.appendChild(fragment);
 	
 	    ready.resolve(items);
-	}).catch(function () {
-	    return ready.reject();
+	}).catch(function (e) {
+	    return ready.reject(e);
 	});
 
 /***/ },
@@ -1857,6 +1860,448 @@
 	
 	// exports
 
+
+/***/ },
+/* 142 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Version = exports.params = exports.thirdapp = exports.aliapp = exports.os = exports.browser = undefined;
+	
+	var _aliapp = __webpack_require__(143);
+	
+	var _aliapp2 = _interopRequireDefault(_aliapp);
+	
+	var _browser = __webpack_require__(146);
+	
+	var _browser2 = _interopRequireDefault(_browser);
+	
+	var _os = __webpack_require__(145);
+	
+	var _os2 = _interopRequireDefault(_os);
+	
+	var _thirdapp = __webpack_require__(147);
+	
+	var _thirdapp2 = _interopRequireDefault(_thirdapp);
+	
+	var _params = __webpack_require__(148);
+	
+	var _params2 = _interopRequireDefault(_params);
+	
+	var _version = __webpack_require__(144);
+	
+	var _version2 = _interopRequireDefault(_version);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.browser = _browser2.default;
+	exports.os = _os2.default;
+	exports.aliapp = _aliapp2.default;
+	exports.thirdapp = _thirdapp2.default;
+	exports.params = _params2.default;
+	exports.Version = _version2.default;
+
+/***/ },
+/* 143 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _version = __webpack_require__(144);
+	
+	var _version2 = _interopRequireDefault(_version);
+	
+	var _os = __webpack_require__(145);
+	
+	var _os2 = _interopRequireDefault(_os);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var ua = window.navigator.userAgent;
+	var aliapp = false;
+	
+	var windvane;
+	var matched;
+	var appname = '';
+	var platform = '';
+	var version = '';
+	
+	if (matched = ua.match(/WindVane[\/\s]([\d\.\_]+)/i)) {
+	    windvane = matched[1];
+	}
+	
+	if (matched = ua.match(/AliApp\(([A-Z\-]+)\/([\d\.]+)\)/i)) {
+	    aliapp = true;
+	    appname = matched[1];
+	    version = matched[2];
+	    /* istanbul ignore next */
+	    if (appname.indexOf('-PD') > 0) {
+	        /* istanbul ignore if */
+	        if (_os2.default.isIOS) {
+	            platform = 'iPad';
+	        } else if (_os2.default.isAndroid) {
+	            platform = 'AndroidPad';
+	        } else {
+	            platform = _os2.default.name;
+	        }
+	    } else {
+	        platform = _os2.default.name;
+	    }
+	}
+	
+	// 兼容手淘的一个bug，在webview初始化异常时，在ua中只包含TBIOS字样，也认为是手淘webview。
+	/* istanbul ignore if */
+	if (!appname && ua.indexOf('TBIOS') > 0) {
+	    appname = 'TB';
+	}
+	
+	// 判断poplayer
+	// poplayer相关信息，在poplayer会有该字段，形如 window._ua_popLayer = 'PopLayer/1.3.4'
+	// poplayer信息不在ua中是因为在IOS下，修改poplayer层的ua会导致所有webview的ua改变，所以只能写在全局变量中
+	var poplayerInfo = window._ua_popLayer || '';
+	var poplayer = false;
+	var poplayerVersion = '';
+	if (poplayerInfo && (matched = poplayerInfo.match(/PopLayer\/([\d\.]+)/i))) {
+	    poplayer = true;
+	    poplayerVersion = matched[1];
+	}
+	
+	if (aliapp) {
+	    aliapp = {
+	        windvane: new _version2.default(windvane || '0.0.0'),
+	        appname: appname || 'unkown',
+	        version: new _version2.default(version || '0.0.0'),
+	        platform: platform || _os2.default.name,
+	        poplayer: poplayer || false,
+	        poplayerVersion: new _version2.default(poplayerVersion || '0.0.0')
+	    };
+	}
+	
+	exports.default = aliapp;
+
+/***/ },
+/* 144 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Version = function () {
+	    _createClass(Version, null, [{
+	        key: 'compare',
+	        value: function compare(v1, v2) {
+	            v1 = v1.toString().split('.');
+	            v2 = v2.toString().split('.');
+	
+	            for (var i = 0; i < v1.length || i < v2.length; i++) {
+	                var n1 = parseInt(v1[i], 10);
+	                var n2 = parseInt(v2[i], 10);
+	
+	                /* istanbul ignore if */
+	                if (isNaN(n1)) {
+	                    n1 = 0;
+	                }
+	
+	                /* istanbul ignore if */
+	                if (isNaN(n2)) {
+	                    n2 = 0;
+	                }
+	                if (n1 < n2) {
+	                    return -1;
+	                } else if (n1 > n2) {
+	                    return 1;
+	                }
+	            }
+	            return 0;
+	        }
+	    }]);
+	
+	    function Version(v) {
+	        _classCallCheck(this, Version);
+	
+	        if (v) {
+	            this.val = v.toString();
+	        } else {
+	            this.val = '';
+	        }
+	    }
+	
+	    _createClass(Version, [{
+	        key: 'gt',
+	        value: function gt(v) {
+	            return Version.compare(this, v) > 0;
+	        }
+	    }, {
+	        key: 'gte',
+	        value: function gte(v) {
+	            return Version.compare(this, v) >= 0;
+	        }
+	    }, {
+	        key: 'lt',
+	        value: function lt(v) {
+	            return Version.compare(this, v) < 0;
+	        }
+	    }, {
+	        key: 'lte',
+	        value: function lte(v) {
+	            return Version.compare(this, v) <= 0;
+	        }
+	    }, {
+	        key: 'eq',
+	        value: function eq(v) {
+	            return Version.compare(this, v) === 0;
+	        }
+	    }, {
+	        key: 'toString',
+	        value: function toString() {
+	            return this.val.toString();
+	        }
+	    }]);
+	
+	    return Version;
+	}();
+	
+	exports.default = Version;
+
+/***/ },
+/* 145 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _version = __webpack_require__(144);
+	
+	var _version2 = _interopRequireDefault(_version);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var ua = window.navigator.userAgent;
+	var os;
+	var matched;
+	
+	if (matched = ua.match(/Windows\sPhone\s(?:OS\s)?([\d\.]+)/)) {
+	    os = {
+	        name: 'Windows Phone',
+	        isWindowsPhone: true,
+	        version: new _version2.default(matched[1])
+	    };
+	} else if (!!ua.match(/Safari/) && (matched = ua.match(/Android[\s\/]([\d\.]+)/))) {
+	    os = {
+	        version: new _version2.default(matched[1])
+	    };
+	
+	    if (ua.match(/Mobile\s+Safari/)) {
+	        os.name = 'Android';
+	        os.isAndroid = true;
+	    } else {
+	        os.name = 'AndroidPad';
+	        os.isAndroidPad = true;
+	    }
+	} else if (matched = ua.match(/(iPhone|iPad|iPod)/)) {
+	    var name = matched[1];
+	
+	    if (matched = ua.match(/OS ([\d_\.]+) like Mac OS X/)) {
+	        os = {
+	            name: name,
+	            isIPhone: name === 'iPhone' || name === 'iPod',
+	            isIPad: name === 'iPad',
+	            isIOS: true,
+	            version: new _version2.default(matched[1].split('_').join('.'))
+	        };
+	    }
+	}
+	
+	if (!os) {
+	    os = {
+	        name: 'unknown',
+	        version: new _version2.default('0.0.0')
+	    };
+	}
+	
+	exports.default = os;
+
+/***/ },
+/* 146 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _version = __webpack_require__(144);
+	
+	var _version2 = _interopRequireDefault(_version);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var ua = window.navigator.userAgent;
+	var browser;
+	var matched;
+	
+	if (matched = ua.match(/(?:UCWEB|UCBrowser\/)([\d\.]+)/)) {
+	    browser = {
+	        name: 'UC',
+	        isUC: true,
+	        version: new _version2.default(matched[1])
+	    };
+	} else if (matched = ua.match(/MQQBrowser\/([\d\.]+)/)) {
+	    browser = {
+	        name: 'QQ',
+	        isQQ: true,
+	        version: new _version2.default(matched[1])
+	    };
+	} else if (matched = ua.match(/(?:Firefox|FxiOS)\/([\d\.]+)/)) {
+	    browser = {
+	        name: 'Firefox',
+	        isFirefox: true,
+	        version: new _version2.default(matched[1])
+	    };
+	} else if ((matched = ua.match(/MSIE\s([\d\.]+)/)) || (matched = ua.match(/IEMobile\/([\d\.]+)/))) {
+	
+	    browser = {
+	        version: new _version2.default(matched[1])
+	    };
+	
+	    if (ua.match(/IEMobile/)) {
+	        browser.name = 'IEMobile';
+	        browser.isIEMobile = true;
+	    } else {
+	        browser.name = 'IE';
+	        browser.isIE = true;
+	    }
+	
+	    if (ua.match(/Android|iPhone/)) {
+	        browser.isIELikeWebkit = true;
+	    }
+	} else if (matched = ua.match(/(?:Chrome|CriOS)\/([\d\.]+)/)) {
+	    browser = {
+	        name: 'Chrome',
+	        isChrome: true,
+	        version: new _version2.default(matched[1])
+	    };
+	
+	    if (ua.match(/Version\/[\d+\.]+\s*Chrome/)) {
+	        browser.name = 'Chrome Webview';
+	        browser.isWebview = true;
+	    }
+	} else if (!!ua.match(/Safari/) && (matched = ua.match(/Android[\s\/]([\d\.]+)/))) {
+	    browser = {
+	        name: 'Android',
+	        isAndroid: true,
+	        version: new _version2.default(matched[1])
+	    };
+	} else if (ua.match(/iPhone|iPad|iPod/)) {
+	    if (ua.match(/Safari/) && (matched = ua.match(/Version\/([\d\.]+)/))) {
+	        browser = {
+	            name: 'Safari',
+	            isSafari: true,
+	            version: new _version2.default(matched[1])
+	        };
+	    } else if (matched = ua.match(/OS ([\d_\.]+) like Mac OS X/)) {
+	        browser = {
+	            name: 'iOS Webview',
+	            isWebview: true,
+	            version: new _version2.default(matched[1].replace(/\_/g, '.'))
+	        };
+	    }
+	}
+	
+	/* istanbul ignore if */
+	if (!browser) {
+	    browser = {
+	        name: 'unknown',
+	        version: new _version2.default('0.0.0')
+	    };
+	}
+	
+	exports.default = browser;
+
+/***/ },
+/* 147 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var ua = window.navigator.userAgent;
+	
+	var thirdapp;
+	
+	if (ua.match(/Weibo/i)) {
+	    /**
+	     * @type {Object}
+	     * @memberof lib.env
+	     * @property {String} appname - 操作系统名称，比如Weibo/Weixin/unknown等
+	     * @property {Boolean} isWeibo - 是否是微博
+	     * @property {Boolean} isWeixin - 是否是微信
+	     */
+	    thirdapp = {
+	        appname: 'Weibo',
+	        isWeibo: true
+	    };
+	} else if (ua.match(/MicroMessenger/i)) {
+	    thirdapp = {
+	        appname: 'Weixin',
+	        isWeixin: true
+	    };
+	    /* istanbul ignore next */
+	} else {
+	        /* istanbul ignore next */
+	        thirdapp = false;
+	    }
+	
+	exports.default = thirdapp;
+
+/***/ },
+/* 148 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var params = {};
+	var search = window.location.search.replace(/^\?/, '');
+	
+	if (search) {
+	    var splits = search.split('&');
+	    for (var i = 0; i < splits.length; i++) {
+	        splits[i] = splits[i].split('=');
+	        try {
+	            params[splits[i][0]] = decodeURIComponent(splits[i][1]);
+	            /* istanbul ignore next */
+	        } catch (e) {
+	            /* istanbul ignore next */
+	            params[splits[i][0]] = splits[i][1];
+	        }
+	    }
+	}
+	
+	exports.default = params;
 
 /***/ }
 /******/ ]);

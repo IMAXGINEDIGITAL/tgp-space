@@ -1,4 +1,5 @@
 import './preload.css';
+import {os} from 'amfe-env';
 import {
     win,
     doc,
@@ -73,6 +74,7 @@ function setProgress(sVal, eVal, loaded, total) {
     return [percent, val];
 }
 
+const assetsPrefix = os.isIOS ? '2x' : '1x'
 const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
     const queue = new createjs.LoadQueue(true);
 
@@ -92,7 +94,7 @@ const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
     queue.on('complete', () => resolve(viewport));
 
     queue.loadManifest({
-        path: 'assets/preload/',
+        path: `assets/${assetsPrefix}/preload/`,
         manifest: [
             {id: 'bg-dark', src: 'bg-1.jpg'},
             {id: 'bg-light', src: 'bg-2.jpg'},
@@ -178,7 +180,7 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
     queue.on('complete', () => resolve(viewport));
 
     queue.loadManifest({
-        path: 'assets/game/',
+        path: `assets/${assetsPrefix}/game/`,
         manifest: [
             {id: 'galaxy-top', src: 'galaxy-1.jpg'},
             {id: 'galaxy-mid', src: 'galaxy-2.jpg'},
@@ -236,4 +238,4 @@ domready()
 
         ready.resolve(items);
     })
-    .catch(() => ready.reject());
+    .catch(e => ready.reject(e));
