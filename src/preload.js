@@ -26,12 +26,16 @@ const TEMPLATE_GAME = `
             <div class="galaxy-mid" rol="image"></div>
             <div class="galaxy-bottom" rol="image"></div>
         </div>
+        <!--div class="star" rol="image"></div-->
         <div class="elements">
-            <div class="static"></div>
+            <div class="static">
+                <div class="elements-top" rol="image"></div>
+                <div class="elements-mid" rol="image"></div>
+                <div class="elements-bottom" rol="image"></div> 
+            </div>
             <div class="dynamic"></div>
         </div>
     </div>
-    <div id="stage-star" class="star" rol="image"></div>
     <canvas id="stage-cloud"></canvas>
     <div id="elements-count" class="kuhei"></div>
     <div id="stage-map" class="scope" rol="image">
@@ -179,6 +183,9 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
             {id: 'galaxy-top', src: 'galaxy-1.jpg'},
             {id: 'galaxy-mid', src: 'galaxy-2.jpg'},
             {id: 'galaxy-bottom', src: 'galaxy-3.jpg'},
+            {id: 'elements-top', src: 'elements-1.png'},
+            {id: 'elements-mid', src: 'elements-2.png'},
+            {id: 'elements-bottom', src: 'elements-3.png'},
             {id: 'galaxy-map', src: 'map.jpg'},
             {id: 'cloud', src: 'cloud.png'},
             {id: 'star', src: 'star.png'},

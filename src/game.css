@@ -25,17 +25,3 @@
         -webkit-transform: translateY(0) translateZ(9px);
     }
 }
-
-#stage-star {
-    position: absolute;
-    width: 100%;
-    height: 200%;
-    left: 0;
-    top: 0;
-    opacity: 0.5;
-    -webkit-transform: translateY(-50%) translateZ(9px);
-    -webkit-animation: infiroll 5s linear 0s infinite;
-    background-position: center 0;
-    background-repeat: repeat-y;
-    background-size: contain;
-}

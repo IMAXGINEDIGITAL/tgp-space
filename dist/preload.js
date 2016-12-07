@@ -1514,7 +1514,7 @@
 	
 	var TEMPLATE_PRELOAD = '\n    <div class="bg-light" rol="image"></div>\n    <div class="logo" rol="image"></div>\n    <div class="light-lazer" rol="image"></div>\n    <div class="light-point" rol="image"></div>\n    <div class="human" rol="image"></div>\n    <div class="progress">\u5DF2\u52A0\u8F7D<b>20</b>%</div>\n';
 	
-	var TEMPLATE_GAME = '\n    <div id="stage-wrap">\n        <div class="stage">\n            <div class="galaxy-top" rol="image"></div>\n            <div class="galaxy-mid" rol="image"></div>\n            <div class="galaxy-bottom" rol="image"></div>\n        </div>\n        <div class="elements">\n            <div class="static"></div>\n            <div class="dynamic"></div>\n        </div>\n    </div>\n    <div id="stage-star" class="star" rol="image"></div>\n    <canvas id="stage-cloud"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n';
+	var TEMPLATE_GAME = '\n    <div id="stage-wrap">\n        <div class="stage">\n            <div class="galaxy-top" rol="image"></div>\n            <div class="galaxy-mid" rol="image"></div>\n            <div class="galaxy-bottom" rol="image"></div>\n        </div>\n        <!--div class="star" rol="image"></div-->\n        <div class="elements">\n            <div class="static">\n                <div class="elements-top" rol="image"></div>\n                <div class="elements-mid" rol="image"></div>\n                <div class="elements-bottom" rol="image"></div> \n            </div>\n            <div class="dynamic"></div>\n        </div>\n    </div>\n    <canvas id="stage-cloud"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n';
 	
 	var items = {};
 	var ready = (0, _util.defer)();
@@ -1642,7 +1642,7 @@
 	
 	        queue.loadManifest({
 	            path: 'assets/game/',
-	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'pop', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }, { id: 'font', src: 'font.ttf' }]
+	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'pop', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }, { id: 'font', src: 'font.ttf' }]
 	        });
 	
 	        queue.loadManifest({

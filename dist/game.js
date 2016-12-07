@@ -187,7 +187,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#game {\n    width: 100%;\n    height: 100%;\n    padding: 0;\n    margin: 0;\n    position: relative;\n}\n\n@-webkit-keyframes flash {\n    0% {\n        opacity: 0;\n    }\n\n    100% {\n        opacity: 1;\n    }\n}\n\n@-webkit-keyframes infiroll {\n    0% {\n        -webkit-transform: translateY(-50%) translateZ(9px);\n    }\n\n    100% {\n        -webkit-transform: translateY(0) translateZ(9px);\n    }\n}\n\n#stage-star {\n    position: absolute;\n    width: 100%;\n    height: 200%;\n    left: 0;\n    top: 0;\n    opacity: 0.5;\n    -webkit-transform: translateY(-50%) translateZ(9px);\n    -webkit-animation: infiroll 5s linear 0s infinite;\n    background-position: center 0;\n    background-repeat: repeat-y;\n    background-size: contain;\n}\n", ""]);
+	exports.push([module.id, "#game {\n    width: 100%;\n    height: 100%;\n    padding: 0;\n    margin: 0;\n    position: relative;\n}\n\n@-webkit-keyframes flash {\n    0% {\n        opacity: 0;\n    }\n\n    100% {\n        opacity: 1;\n    }\n}\n\n@-webkit-keyframes infiroll {\n    0% {\n        -webkit-transform: translateY(-50%) translateZ(9px);\n    }\n\n    100% {\n        -webkit-transform: translateY(0) translateZ(9px);\n    }\n}\n", ""]);
 	
 	// exports
 
@@ -1592,7 +1592,7 @@
 	            this.scroller = new _iscrollProbe2.default(this.viewport, {
 	                mouseWheel: false,
 	                preventDefault: true,
-	                deceleration: 0.1,
+	                deceleration: 0.05,
 	                tap: true,
 	                probeType: 3,
 	                scrollX: true,
@@ -2514,7 +2514,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#stage-wrap {\n    display: none;\n}\n\n#stage-wrap .stage {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-wrap .stage div {\n    width: 100%;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-wrap .stage .galaxy-top {\n    height: 20%;\n}\n\n#stage-wrap .stage .galaxy-mid, \n    #stage-wrap .galaxy-bottom {\n    height: 40%;\n}", ""]);
+	exports.push([module.id, "#stage-wrap {\n    display: none;\n}\n\n#stage-wrap .stage {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-wrap .stage div {\n    width: 100%;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-wrap .stage .galaxy-top {\n    height: 20%;\n}\n\n#stage-wrap .stage .galaxy-mid, \n    #stage-wrap .galaxy-bottom {\n    height: 40%;\n}\n\n#stage-wrap .star {\n    position: absolute;\n    width: 100%;\n    height: 200%;\n    left: 0;\n    top: 0;\n    opacity: 0.5;\n    -webkit-transform: translateY(-50%) translateZ(9px);\n    -webkit-animation: infiroll 360s linear 0s infinite;\n    background-position: center center;\n    background-repeat: repeat;\n}\n\n#stage-wrap .elements {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n}\n\n#stage-wrap .elements > div {\n    position: absolute;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n}\n\n#stage-wrap .elements .static div {\n    width: 100%;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-wrap .elements-top {\n    height: 20%;\n}\n\n#stage-wrap .elements-mid,\n    #stage-wrap .elements-bottom {\n    height: 40%;\n}\n\n\n", ""]);
 	
 	// exports
 
