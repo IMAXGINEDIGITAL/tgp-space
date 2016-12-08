@@ -17,7 +17,7 @@ const TEMPLATE_PRELOAD = `
     <div class="light-lazer" rol="image"></div>
     <div class="light-point" rol="image"></div>
     <div class="human" rol="image"></div>
-    <div class="progress">已加载<b>20</b>%</div>
+    <div class="progress"><p class="kuhei">TGP世界正在生成，即将带您开启探索之旅请耐心等候<br><b>20</b>%</p></div>
 `;
 
 const TEMPLATE_GAME = `
@@ -29,6 +29,17 @@ const TEMPLATE_GAME = `
             <div class="indicator"></div>
         </div>
         <div class="close" rol="image"></div>
+    </div>
+    <div id="pop">
+        <div class="window">
+            <h3>标题标题标题</h3>
+            <div class="content">
+                <h2>发现游戏梗</h2>
+                <p>内容内容内容内容内容内容内容内容内容内容内容内容</p>
+            </div>
+            <div class="close"></div>
+            <div class="btn"></div>
+        </div>
     </div>
 `;
 
@@ -58,11 +69,34 @@ function setProgress(sVal, eVal, loaded, total) {
     return [percent, val];
 }
 
+function fileload(e, viewport) {
+    const {item} = e;
+    items[item.id] = item;
+
+    if (item.type === createjs.AbstractLoader.IMAGE) {
+        setBackgrounImage(viewport, item.id, item.src);
+    } else if (item.type === createjs.AbstractLoader.TEXT) {
+        appendStyle(`
+            @font-face {
+                font-family: 'KuHei';
+                src: url(${item.src}) format('truetype');
+            }
+
+            .kuhei {
+                font-family: 'KuHei';
+                font-style:normal;
+                -webkit-font-smoothing: antialiased;
+                -webkit-text-stroke-width: 0.2px;
+            }
+        `);
+    }
+}
+
 const assetsPrefix = os.isIOS ? '2x' : '1x'
 const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
     const queue = new createjs.LoadQueue(true);
 
-    queue.on('fileload', e => setBackgrounImage(viewport, e.item.id, e.item.src));
+    queue.on('fileload', e => fileload(e, viewport));
 
     queue.on('progress', e => {
         const {
@@ -124,28 +158,7 @@ function processLogo(percent) {
 const loadGameManifest = viewport => new Promise((resolve, reject) => {
     const queue = new createjs.LoadQueue(true);
 
-    queue.on('fileload', e => {
-        const {item} = e;
-        items[item.id] = item;
-
-        if (item.type === createjs.AbstractLoader.IMAGE) {
-            setBackgrounImage(viewport, item.id, item.src);
-        } else if (item.type === createjs.AbstractLoader.TEXT) {
-            appendStyle(`
-                @font-face {
-                    font-family: 'KuHei';
-                    src: url(${item.src}) format('truetype');
-                }
-
-                .kuhei {
-                    font-family: 'KuHei';
-                    font-style:normal;
-                    -webkit-font-smoothing: antialiased;
-                    -webkit-text-stroke-width: 0.2px;
-                }
-            `);
-        }
-    });
+    queue.on('fileload',  e => fileload(e, viewport));
 
     queue.on('progress', e => {
         const {
@@ -177,8 +190,7 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
             {id: 'star', src: 'star.png'},
             {id: 'pop', src: 'pop.png'},
             {id: 'scope', src: 'scope.png'},
-            {id: 'close', src: 'close.png'},
-            {id: 'font', src: 'font.ttf'}
+            {id: 'close', src: 'close.png'}
         ]
     });
 

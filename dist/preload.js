@@ -1532,9 +1532,9 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var TEMPLATE_PRELOAD = '\n    <div class="bg-light" rol="image"></div>\n    <div class="logo" rol="image"></div>\n    <div class="light-lazer" rol="image"></div>\n    <div class="light-point" rol="image"></div>\n    <div class="human" rol="image"></div>\n    <div class="progress">\u5DF2\u52A0\u8F7D<b>20</b>%</div>\n';
+	var TEMPLATE_PRELOAD = '\n    <div class="bg-light" rol="image"></div>\n    <div class="logo" rol="image"></div>\n    <div class="light-lazer" rol="image"></div>\n    <div class="light-point" rol="image"></div>\n    <div class="human" rol="image"></div>\n    <div class="progress"><p class="kuhei">TGP\u4E16\u754C\u6B63\u5728\u751F\u6210\uFF0C\u5373\u5C06\u5E26\u60A8\u5F00\u542F\u63A2\u7D22\u4E4B\u65C5\u8BF7\u8010\u5FC3\u7B49\u5019<br><b>20</b>%</p></div>\n';
 	
-	var TEMPLATE_GAME = '\n    <canvas id="stage"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n';
+	var TEMPLATE_GAME = '\n    <canvas id="stage"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n    <div id="pop">\n        <div class="window">\n            <h3>\u6807\u9898\u6807\u9898\u6807\u9898</h3>\n            <div class="content">\n                <h2>\u53D1\u73B0\u6E38\u620F\u6897</h2>\n                <p>\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9</p>\n            </div>\n            <div class="close"></div>\n            <div class="btn"></div>\n        </div>\n    </div>\n';
 	
 	var items = {};
 	var ready = (0, _util.defer)();
@@ -1560,13 +1560,25 @@
 	    return [percent, val];
 	}
 	
+	function fileload(e, viewport) {
+	    var item = e.item;
+	
+	    items[item.id] = item;
+	
+	    if (item.type === _util.createjs.AbstractLoader.IMAGE) {
+	        setBackgrounImage(viewport, item.id, item.src);
+	    } else if (item.type === _util.createjs.AbstractLoader.TEXT) {
+	        (0, _util.appendStyle)('\n            @font-face {\n                font-family: \'KuHei\';\n                src: url(' + item.src + ') format(\'truetype\');\n            }\n\n            .kuhei {\n                font-family: \'KuHei\';\n                font-style:normal;\n                -webkit-font-smoothing: antialiased;\n                -webkit-text-stroke-width: 0.2px;\n            }\n        ');
+	    }
+	}
+	
 	var assetsPrefix = _amfeEnv.os.isIOS ? '2x' : '1x';
 	var loadPreloadManifest = function loadPreloadManifest(viewport) {
 	    return new _util.Promise(function (resolve, reject) {
 	        var queue = new _util.createjs.LoadQueue(true);
 	
 	        queue.on('fileload', function (e) {
-	            return setBackgrounImage(viewport, e.item.id, e.item.src);
+	            return fileload(e, viewport);
 	        });
 	
 	        queue.on('progress', function (e) {
@@ -1628,15 +1640,7 @@
 	        var queue = new _util.createjs.LoadQueue(true);
 	
 	        queue.on('fileload', function (e) {
-	            var item = e.item;
-	
-	            items[item.id] = item;
-	
-	            if (item.type === _util.createjs.AbstractLoader.IMAGE) {
-	                setBackgrounImage(viewport, item.id, item.src);
-	            } else if (item.type === _util.createjs.AbstractLoader.TEXT) {
-	                (0, _util.appendStyle)('\n                @font-face {\n                    font-family: \'KuHei\';\n                    src: url(' + item.src + ') format(\'truetype\');\n                }\n\n                .kuhei {\n                    font-family: \'KuHei\';\n                    font-style:normal;\n                    -webkit-font-smoothing: antialiased;\n                    -webkit-text-stroke-width: 0.2px;\n                }\n            ');
-	            }
+	            return fileload(e, viewport);
 	        });
 	
 	        queue.on('progress', function (e) {
@@ -1663,7 +1667,7 @@
 	
 	        queue.loadManifest({
 	            path: 'assets/' + assetsPrefix + '/game/',
-	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'pop', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }, { id: 'font', src: 'font.ttf' }]
+	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'pop', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }]
 	        });
 	
 	        queue.loadManifest({
@@ -1874,7 +1878,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#preload {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    position: relative;\n}\n\n#preload .bg-light {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    -webkit-transition: opacity 0.4s linear 0s;\n    position: relative;\n}\n\n#preload .human {\n    position: absolute;\n    width: 1.68rem;\n    height: 3.36rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0.53rem;\n    bottom: 0.133rem;\n}\n\n#preload .light-point {\n    position: absolute;\n    width: 2.2rem;\n    height: 2.2rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    left: 1.05rem;\n    bottom: 2.35rem;\n}\n\n#preload .light-point.anime {\n    -webkit-transition: opacity 0.4s linear 0s;\n    opacity: 1;\n}\n\n#preload .light-point.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .light-lazer {\n    position: absolute;\n    width: 7.36rem;\n    height: 10.33rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 2rem;\n    bottom: 3.4rem;\n    opacity: 0;\n    -webkit-transform: rotate(0deg);\n    -webkit-transform-origin: 0 bottom;\n}\n\n#preload .light-lazer.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    -webkit-animation: lazer-swing 1s linear 0.6s infinite alternate;\n    opacity: 1;\n}\n\n#preload .light-lazer.anime.end {\n    -webkit-transition: none;\n    -webkit-animation: none;\n    opacity: 1;\n}\n\n@-webkit-keyframes lazer-swing {\n    0% {\n        -webkit-transform: rotate(-15deg);\n    }\n\n    100% {\n        -webkit-transform: rotate(15deg);\n    }\n}\n\n#preload .logo {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0;\n    bottom: 0;\n    opacity: 0;\n}\n\n#preload .logo.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    opacity: 1;\n}\n\n#preload .logo.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .progress {\n    position: absolute;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    color: #FFF;\n    font-size: 20px;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}", ""]);
+	exports.push([module.id, "#preload {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    position: relative;\n}\n\n#preload .bg-light {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    -webkit-transition: opacity 0.4s linear 0s;\n    position: relative;\n}\n\n#preload .human {\n    position: absolute;\n    width: 1.68rem;\n    height: 3.36rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0.53rem;\n    bottom: 0.133rem;\n}\n\n#preload .light-point {\n    position: absolute;\n    width: 2.2rem;\n    height: 2.2rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    left: 1.05rem;\n    bottom: 2.35rem;\n}\n\n#preload .light-point.anime {\n    -webkit-transition: opacity 0.4s linear 0s;\n    opacity: 1;\n}\n\n#preload .light-point.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .light-lazer {\n    position: absolute;\n    width: 7.36rem;\n    height: 10.33rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 2rem;\n    bottom: 3.4rem;\n    opacity: 0;\n    -webkit-transform: rotate(0deg);\n    -webkit-transform-origin: 0 bottom;\n}\n\n#preload .light-lazer.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    -webkit-animation: lazer-swing 1s linear 0.6s infinite alternate;\n    opacity: 1;\n}\n\n#preload .light-lazer.anime.end {\n    -webkit-transition: none;\n    -webkit-animation: none;\n    opacity: 1;\n}\n\n@-webkit-keyframes lazer-swing {\n    0% {\n        -webkit-transform: rotate(-15deg);\n    }\n\n    100% {\n        -webkit-transform: rotate(15deg);\n    }\n}\n\n#preload .logo {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0;\n    bottom: 0;\n    opacity: 0;\n}\n\n#preload .logo.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    opacity: 1;\n}\n\n#preload .logo.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .progress {\n    position: absolute;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#preload .progress p {\n    text-align: center;\n    line-height: 1.5em;\n    font-size: 16px;\n    color: #00cbe3;\n    display: block;\n    width: 70%;\n}", ""]);
 	
 	// exports
 
