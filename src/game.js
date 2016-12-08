@@ -97,7 +97,7 @@ preload
                     ticker.has(clearId) ||
                     ticker.has(starId)) {
                 stage.render.drawImage(galaxy.canvas, -scrollX, -scrollY);
-                stage.render.drawImage(star.canvas, 0, starYRoll);
+                // stage.render.drawImage(star.canvas, 0, starYRoll);
                 stage.render.drawImage(staticElements.canvas, -scrollX, -scrollY);
                 stage.render.drawImage(cloud.canvas, -scrollX, -scrollY);
                 updated = true;
