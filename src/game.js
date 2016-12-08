@@ -38,7 +38,9 @@ preload
     .then(e => { // stage
         items = e;
         viewport = doc.body;
+        viewport.addEventListener('touchstart', e => e.preventDefault());
         viewport.addEventListener('touchmove', e => e.preventDefault());
+        viewport.addEventListener('touchend', e => e.preventDefault());
         ticker = new Ticker();
     })
     .then(() => {
@@ -52,8 +54,8 @@ preload
     .then(() => {
         const promises = [];
 
-        galaxy = new Galaxy(stage, items);
-        promises.push(galaxy.ready());
+        // galaxy = new Galaxy(stage, items);
+        // promises.push(galaxy.ready());
 
         staticElements = new StaticElements(stage, items);
         promises.push(staticElements.ready());
@@ -81,11 +83,11 @@ preload
             clearId = ticker.add(tick);
         });
 
-        let starYRoll = -star.vh;
+        let starYRoll = stage.vh;
         const starTick = () => {
-            starYRoll++;
-            if (starYRoll > 0) {
-                starYRoll = -star.vh;
+            starYRoll--;
+            if (starYRoll < 0) {
+                starYRoll = stage.vh;
             }
         }
         const starId = ticker.add(starTick);
@@ -96,10 +98,11 @@ preload
             if (scroller.isScrolling ||
                     ticker.has(clearId) ||
                     ticker.has(starId)) {
-                stage.render.drawImage(galaxy.canvas, -scrollX, -scrollY);
-                // stage.render.drawImage(star.canvas, 0, starYRoll);
-                stage.render.drawImage(staticElements.canvas, -scrollX, -scrollY);
-                stage.render.drawImage(cloud.canvas, -scrollX, -scrollY);
+                stage.render.clearRect(0, 0, stage.vw, stage.vh);
+                // stage.render.drawImage(galaxy.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                stage.render.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
                 updated = true;
             }
 

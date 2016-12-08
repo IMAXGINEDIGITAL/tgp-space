@@ -107,7 +107,13 @@
 	    // stage
 	    items = e;
 	    viewport = _util.doc.body;
+	    viewport.addEventListener('touchstart', function (e) {
+	        return e.preventDefault();
+	    });
 	    viewport.addEventListener('touchmove', function (e) {
+	        return e.preventDefault();
+	    });
+	    viewport.addEventListener('touchend', function (e) {
 	        return e.preventDefault();
 	    });
 	    ticker = new _ticker2.default();
@@ -120,8 +126,8 @@
 	}).then(function () {
 	    var promises = [];
 	
-	    galaxy = new _galaxy2.default(stage, items);
-	    promises.push(galaxy.ready());
+	    // galaxy = new Galaxy(stage, items);
+	    // promises.push(galaxy.ready());
 	
 	    staticElements = new _elements.StaticElements(stage, items);
 	    promises.push(staticElements.ready());
@@ -149,11 +155,11 @@
 	        clearId = ticker.add(tick);
 	    });
 	
-	    var starYRoll = -star.vh;
+	    var starYRoll = stage.vh;
 	    var starTick = function starTick() {
-	        starYRoll++;
-	        if (starYRoll > 0) {
-	            starYRoll = -star.vh;
+	        starYRoll--;
+	        if (starYRoll < 0) {
+	            starYRoll = stage.vh;
 	        }
 	    };
 	    var starId = ticker.add(starTick);
@@ -162,10 +168,11 @@
 	        var updated = false;
 	
 	        if (scroller.isScrolling || ticker.has(clearId) || ticker.has(starId)) {
-	            stage.render.drawImage(galaxy.canvas, -scrollX, -scrollY);
-	            // stage.render.drawImage(star.canvas, 0, starYRoll);
-	            stage.render.drawImage(staticElements.canvas, -scrollX, -scrollY);
-	            stage.render.drawImage(cloud.canvas, -scrollX, -scrollY);
+	            stage.render.clearRect(0, 0, stage.vw, stage.vh);
+	            // stage.render.drawImage(galaxy.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	            stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	            stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	            stage.render.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
 	            updated = true;
 	        }
 	
@@ -3482,6 +3489,10 @@
 	});
 	exports.default = undefined;
 	
+	var _getPrototypeOf = __webpack_require__(62);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
 	var _classCallCheck2 = __webpack_require__(66);
 	
 	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -3489,6 +3500,14 @@
 	var _createClass2 = __webpack_require__(67);
 	
 	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(71);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(96);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
 	
 	__webpack_require__(122);
 	
@@ -3498,56 +3517,43 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Stage = function () {
+	var width = 3750;
+	var height = 13340;
+	var hSlice = 5;
+	var vSlice = 10;
+	
+	var Stage = function (_CanvasRender) {
+	    (0, _inherits3.default)(Stage, _CanvasRender);
+	
 	    function Stage(viewport) {
 	        (0, _classCallCheck3.default)(this, Stage);
 	
-	        this.viewport = viewport;
-	        this.canvasEl = (0, _util.query)(viewport, '#stage');
-	        this.width = 3750;
-	        this.height = 13340;
-	        this.hSlice = 5;
-	        this.vSlice = 10;
+	        var _getRect = (0, _util.getRect)(viewport),
+	            vw = _getRect.width,
+	            vh = _getRect.height;
+	
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Stage.__proto__ || (0, _getPrototypeOf2.default)(Stage)).call(this, (0, _util.query)(viewport, '#stage'), vw, vh));
+	
+	        _this.hSlice = hSlice;
+	        _this.vSlice = vSlice;
+	        _this.vw = vw;
+	        _this.vh = vh;
+	        _this.height = vw / (width / hSlice) * height;
+	        _this.width = vw * hSlice;
+	        return _this;
 	    }
 	
 	    (0, _createClass3.default)(Stage, [{
 	        key: 'ready',
 	        value: function ready() {
-	            var _this = this;
-	
 	            return new _util.Promise(function (resolve, reject) {
-	                var _getRect = (0, _util.getRect)(_this.viewport),
-	                    vw = _getRect.width,
-	                    vh = _getRect.height;
-	
-	                _this.vw = vw;
-	                _this.vh = vh;
-	                _this.height = vw / (_this.width / _this.hSlice) * _this.height;
-	                _this.width = vw * _this.hSlice;
-	
-	                _this.canvasRender = new _canvas.CanvasRender(_this.canvasEl, vw, vh);
-	                _this.canvasRender.transferControlToOffscreen();
+	                // this.transferControlToOffscreen();
 	                resolve();
 	            });
 	        }
-	    }, {
-	        key: 'commit',
-	        value: function commit() {
-	            this.canvasRender.commit();
-	        }
-	    }, {
-	        key: 'canvas',
-	        get: function get() {
-	            return this.canvasRender.canvas;
-	        }
-	    }, {
-	        key: 'render',
-	        get: function get() {
-	            return this.canvasRender.render;
-	        }
 	    }]);
 	    return Stage;
-	}();
+	}(_canvas.CanvasRender);
 	
 	exports.default = Stage;
 
@@ -3586,7 +3592,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#stage {\n    width: 100%;\n    height: 100%;\n}", ""]);
+	exports.push([module.id, "#stage {\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    left: 0;\n    top: 0;\n    -webkit-tranform: translateZ(9px);\n}", ""]);
 	
 	// exports
 
@@ -3615,13 +3621,22 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var CanvasImage = exports.CanvasImage = function () {
-	    function CanvasImage(width, height) {
+	    function CanvasImage(canvas, width, height) {
 	        (0, _classCallCheck3.default)(this, CanvasImage);
 	
-	        this.canvas = _util.doc.createElement('canvas');
+	        if (!(canvas instanceof HTMLCanvasElement)) {
+	            height = width;
+	            width = canvas;
+	            canvas = null;
+	        }
+	
+	        this.width = width;
+	        this.height = height;
+	        this.canvas = canvas || _util.doc.createElement('canvas');
 	        this.canvas.width = width;
 	        this.canvas.height = height;
 	        this.render = this.canvas.getContext('2d');
+	        this._image;
 	    }
 	
 	    (0, _createClass3.default)(CanvasImage, [{
@@ -3641,6 +3656,8 @@
 	            });
 	
 	            return _util.Promise.all(loaded).then(function (images) {
+	                _this.render.clearRect(0, 0, _this.width, _this.height);
+	
 	                images.forEach(function (image) {
 	                    var _render;
 	
@@ -3670,6 +3687,15 @@
 	                });
 	            });
 	        }
+	    }, {
+	        key: 'image',
+	        get: function get() {
+	            if (!this._image) {
+	                this._image = new Image();
+	                this._image.src = this.canvas.toDataURL();
+	            }
+	            return this._image;
+	        }
 	    }]);
 	    return CanvasImage;
 	}();
@@ -3678,16 +3704,10 @@
 	    function CanvasRender(canvas, width, height) {
 	        (0, _classCallCheck3.default)(this, CanvasRender);
 	
-	        this._canvas = canvas;
-	        this._canvas.width = width;
-	        this._canvas.height = height;
-	        this._render = this._canvas.getContext('2d');
-	
-	        this._offscreenCanvas = _util.doc.createElement('canvas');
-	        this._offscreenCanvas.width = width;
-	        this._offscreenCanvas.height = height;
-	        this._offscreenRender = this._offscreenCanvas.getContext('2d');
-	
+	        this.width = width;
+	        this.height = height;
+	        this._visible = new CanvasImage(canvas, width, height);
+	        this._offscreen = new CanvasImage(width, height);
 	        this._isOffscreen = false;
 	    }
 	
@@ -3699,17 +3719,25 @@
 	    }, {
 	        key: 'commit',
 	        value: function commit() {
-	            this._render.drawImage(this._offscreenCanvas, 0, 0);
+	            if (this._isOffscreen) {
+	                this._visible.render.clearRect(0, 0, this.width, this.height);
+	                this._visible.render.drawImage(this._offscreen.canvas, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
+	            }
 	        }
 	    }, {
 	        key: 'canvas',
 	        get: function get() {
-	            return this._isOffscreen ? this._offscreenCanvas : this._canvas;
+	            return this._isOffscreen ? this._offscreen.canvas : this._visible.canvas;
 	        }
 	    }, {
 	        key: 'render',
 	        get: function get() {
-	            return this._isOffscreen ? this._offscreenRender : this._render;
+	            return this._isOffscreen ? this._offscreen.render : this._visible.render;
+	        }
+	    }, {
+	        key: 'image',
+	        get: function get() {
+	            return this._isOffscreen ? this._offscreen.image : this._visible.image;
 	        }
 	    }]);
 	    return CanvasRender;

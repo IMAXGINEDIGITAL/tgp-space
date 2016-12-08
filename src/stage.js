@@ -11,39 +11,29 @@ import {
     CanvasRender
 } from './canvas';
 
-export default class Stage {
+const width = 3750;
+const height = 13340;
+const hSlice = 5;
+const vSlice = 10;
+
+export default class Stage extends CanvasRender{
     constructor(viewport) {
-        this.viewport = viewport;
-        this.canvasEl = query(viewport, '#stage');
-        this.width = 3750;
-        this.height = 13340;
-        this.hSlice = 5;
-        this.vSlice = 10;
+        const {width: vw, height: vh} = getRect(viewport);
+
+        super(query(viewport, '#stage'), vw, vh);
+
+        this.hSlice = hSlice;
+        this.vSlice = vSlice;
+        this.vw = vw;
+        this.vh = vh;
+        this.height = vw / (width / hSlice) * height;
+        this.width = vw * hSlice;
     }
 
     ready() {
         return new Promise((resolve, reject) => {
-            const {width: vw, height: vh} = getRect(this.viewport);
-            this.vw = vw;
-            this.vh = vh;
-            this.height = vw / (this.width / this.hSlice) * this.height;
-            this.width = vw * this.hSlice;
-
-            this.canvasRender = new CanvasRender(this.canvasEl, vw, vh);
-            this.canvasRender.transferControlToOffscreen();
+            // this.transferControlToOffscreen();
             resolve();
         });
-    }
-
-    get canvas() {
-        return this.canvasRender.canvas;
-    }
-
-    get render() {
-        return this.canvasRender.render;
-    }
-
-    commit() {
-        this.canvasRender.commit();
     }
 }
