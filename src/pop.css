@@ -10,3 +10,11 @@
     -webkit-box-pack: center;
     -webkit-box-align: center;
 }
+
+.popWin {
+    width: 8.29rem;
+    height: 6.2rem;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: contain;
+}

@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(150);
+	module.exports = __webpack_require__(151);
 
 
 /***/ },
@@ -1507,12 +1507,13 @@
 /* 147 */,
 /* 148 */,
 /* 149 */,
-/* 150 */
+/* 150 */,
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _getIterator2 = __webpack_require__(151);
+	var _getIterator2 = __webpack_require__(152);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1520,13 +1521,13 @@
 	
 	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 	
-	var _slicedToArray2 = __webpack_require__(154);
+	var _slicedToArray2 = __webpack_require__(155);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
-	__webpack_require__(158);
+	__webpack_require__(159);
 	
-	var _amfeEnv = __webpack_require__(160);
+	var _amfeEnv = __webpack_require__(161);
 	
 	var _util = __webpack_require__(6);
 	
@@ -1534,7 +1535,7 @@
 	
 	var TEMPLATE_PRELOAD = '\n    <div class="bg-light" rol="image"></div>\n    <div class="logo" rol="image"></div>\n    <div class="light-lazer" rol="image"></div>\n    <div class="light-point" rol="image"></div>\n    <div class="human" rol="image"></div>\n    <div class="progress"><p class="kuhei">TGP\u4E16\u754C\u6B63\u5728\u751F\u6210\uFF0C\u5373\u5C06\u5E26\u60A8\u5F00\u542F\u63A2\u7D22\u4E4B\u65C5\u8BF7\u8010\u5FC3\u7B49\u5019<br><b>20</b>%</p></div>\n';
 	
-	var TEMPLATE_GAME = '\n    <canvas id="stage"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n    <div id="pop">\n        <div class="window">\n            <h3>\u6807\u9898\u6807\u9898\u6807\u9898</h3>\n            <div class="content">\n                <h2>\u53D1\u73B0\u6E38\u620F\u6897</h2>\n                <p>\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9</p>\n            </div>\n            <div class="close"></div>\n            <div class="btn"></div>\n        </div>\n    </div>\n';
+	var TEMPLATE_GAME = '\n    <canvas id="stage"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n    <div id="pop">\n        <div class="popWin" rol="image">\n            <h3>\u6807\u9898\u6807\u9898\u6807\u9898</h3>\n            <div class="content">\n                <h2>\u53D1\u73B0\u6E38\u620F\u6897</h2>\n                <p>\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9</p>\n            </div>\n            <div class="close"></div>\n            <div class="btn"></div>\n        </div>\n    </div>\n';
 	
 	var items = {};
 	var ready = (0, _util.defer)();
@@ -1667,7 +1668,7 @@
 	
 	        queue.loadManifest({
 	            path: 'assets/' + assetsPrefix + '/game/',
-	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'pop', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }]
+	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'popWin', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }]
 	        });
 	
 	        queue.loadManifest({
@@ -1734,21 +1735,21 @@
 	});
 
 /***/ },
-/* 151 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(152), __esModule: true };
+	module.exports = { "default": __webpack_require__(153), __esModule: true };
 
 /***/ },
-/* 152 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(153);
+	module.exports = __webpack_require__(154);
 
 /***/ },
-/* 153 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var anObject = __webpack_require__(23)
@@ -1760,18 +1761,18 @@
 	};
 
 /***/ },
-/* 154 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _isIterable2 = __webpack_require__(155);
+	var _isIterable2 = __webpack_require__(156);
 	
 	var _isIterable3 = _interopRequireDefault(_isIterable2);
 	
-	var _getIterator2 = __webpack_require__(151);
+	var _getIterator2 = __webpack_require__(152);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1816,21 +1817,21 @@
 	}();
 
 /***/ },
-/* 155 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(156), __esModule: true };
+	module.exports = { "default": __webpack_require__(157), __esModule: true };
 
 /***/ },
-/* 156 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(157);
+	module.exports = __webpack_require__(158);
 
 /***/ },
-/* 157 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classof   = __webpack_require__(59)
@@ -1844,13 +1845,13 @@
 	};
 
 /***/ },
-/* 158 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(159);
+	var content = __webpack_require__(160);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -1870,7 +1871,7 @@
 	}
 
 /***/ },
-/* 159 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -1884,7 +1885,7 @@
 
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1894,27 +1895,27 @@
 	});
 	exports.Version = exports.params = exports.thirdapp = exports.aliapp = exports.os = exports.browser = undefined;
 	
-	var _aliapp = __webpack_require__(161);
+	var _aliapp = __webpack_require__(162);
 	
 	var _aliapp2 = _interopRequireDefault(_aliapp);
 	
-	var _browser = __webpack_require__(164);
+	var _browser = __webpack_require__(165);
 	
 	var _browser2 = _interopRequireDefault(_browser);
 	
-	var _os = __webpack_require__(163);
+	var _os = __webpack_require__(164);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
-	var _thirdapp = __webpack_require__(165);
+	var _thirdapp = __webpack_require__(166);
 	
 	var _thirdapp2 = _interopRequireDefault(_thirdapp);
 	
-	var _params = __webpack_require__(166);
+	var _params = __webpack_require__(167);
 	
 	var _params2 = _interopRequireDefault(_params);
 	
-	var _version = __webpack_require__(162);
+	var _version = __webpack_require__(163);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -1928,7 +1929,7 @@
 	exports.Version = _version2.default;
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1937,11 +1938,11 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(162);
+	var _version = __webpack_require__(163);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
-	var _os = __webpack_require__(163);
+	var _os = __webpack_require__(164);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
@@ -2010,7 +2011,7 @@
 	exports.default = aliapp;
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2101,7 +2102,7 @@
 	exports.default = Version;
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2110,7 +2111,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(162);
+	var _version = __webpack_require__(163);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2162,7 +2163,7 @@
 	exports.default = os;
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2171,7 +2172,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(162);
+	var _version = __webpack_require__(163);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2260,7 +2261,7 @@
 	exports.default = browser;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2298,7 +2299,7 @@
 	exports.default = thirdapp;
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports) {
 
 	'use strict';

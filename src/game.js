@@ -19,6 +19,7 @@ import {
 } from './elements';
 import Map from './map';
 import Ticker from './ticker';
+import Pop from './pop';
 
 const preload = win.preload;
 

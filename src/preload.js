@@ -31,7 +31,7 @@ const TEMPLATE_GAME = `
         <div class="close" rol="image"></div>
     </div>
     <div id="pop">
-        <div class="window">
+        <div class="popWin" rol="image">
             <h3>标题标题标题</h3>
             <div class="content">
                 <h2>发现游戏梗</h2>
@@ -188,7 +188,7 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
             {id: 'galaxy-map', src: 'map.jpg'},
             {id: 'cloud', src: 'cloud.png'},
             {id: 'star', src: 'star.png'},
-            {id: 'pop', src: 'pop.png'},
+            {id: 'popWin', src: 'pop.png'},
             {id: 'scope', src: 'scope.png'},
             {id: 'close', src: 'close.png'}
         ]

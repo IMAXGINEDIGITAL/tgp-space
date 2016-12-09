@@ -1,1 +1,5 @@
-import 'pop.css';
+import './pop.css';
+
+export default class pop {
+    
+}
