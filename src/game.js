@@ -34,6 +34,8 @@ let star;
 let staticElements;
 let elementCount;
 let map;
+let pop;
+let popStartDefer;
 
 preload
     .then(e => { // stage
@@ -45,6 +47,18 @@ preload
         ticker = new Ticker();
     })
     .then(() => {
+        pop = new Pop(viewport);
+        return pop.ready();
+    })
+    .then(() => {
+        popStartDefer = defer();
+        return pop.popup({
+            message: '浩瀚的宇宙之旅即将开始，让我们来一场说走就走的旅行！',
+            btnText: '开始旅行',
+            onclick: () => popStartDefer.resolve()
+        });
+    })
+    .then(() => {
         stage = new Stage(viewport);
         return stage.ready();
     })
@@ -54,9 +68,6 @@ preload
     })
     .then(() => {
         const promises = [];
-
-        // galaxy = new Galaxy(stage, items);
-        // promises.push(galaxy.ready());
 
         staticElements = new StaticElements(stage, items);
         promises.push(staticElements.ready());
@@ -100,7 +111,6 @@ preload
                     ticker.has(clearId) ||
                     ticker.has(starId)) {
                 stage.render.clearRect(0, 0, stage.vw, stage.vh);
-                // stage.render.drawImage(galaxy.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
@@ -131,11 +141,16 @@ preload
         elementCount = new ElementCount(viewport);
         return elementCount.ready();
     })
+    .then(() => { // run
+        ticker.run();
+    })
+    .then(() => {
+        return popStartDefer.promise;
+    })
     .then(() => { // bone
         const boneX = stage.width / 2 - stage.vw / 2;
         const boneY = stage.height - stage.vh / 2;
         scroller.scrollTo(boneX, boneY);
-        ticker.run();
     })
 
     

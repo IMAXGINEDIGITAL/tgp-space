@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(151);
+	module.exports = __webpack_require__(153);
 
 
 /***/ },
@@ -1508,47 +1508,51 @@
 /* 148 */,
 /* 149 */,
 /* 150 */,
-/* 151 */
+/* 151 */,
+/* 152 */,
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _getIterator2 = __webpack_require__(152);
+	var _getIterator2 = __webpack_require__(154);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
+	
+	var _slicedToArray2 = __webpack_require__(157);
+	
+	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
 	var _toConsumableArray2 = __webpack_require__(7);
 	
 	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 	
-	var _slicedToArray2 = __webpack_require__(155);
+	__webpack_require__(161);
 	
-	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
-	
-	__webpack_require__(159);
-	
-	var _amfeEnv = __webpack_require__(161);
+	var _amfeEnv = __webpack_require__(163);
 	
 	var _util = __webpack_require__(6);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var TEMPLATE_PRELOAD = '\n    <div class="bg-light" rol="image"></div>\n    <div class="logo" rol="image"></div>\n    <div class="light-lazer" rol="image"></div>\n    <div class="light-point" rol="image"></div>\n    <div class="human" rol="image"></div>\n    <div class="progress"><p class="kuhei">TGP\u4E16\u754C\u6B63\u5728\u751F\u6210\uFF0C\u5373\u5C06\u5E26\u60A8\u5F00\u542F\u63A2\u7D22\u4E4B\u65C5\u8BF7\u8010\u5FC3\u7B49\u5019<br><b>20</b>%</p></div>\n';
+	var TEMPLATE_PRELOAD = '\n    <div class="bg-light" rol="image"></div>\n    <div class="logo" rol="image"></div>\n    <div class="light-lazer" rol="image"></div>\n    <div class="light-point" rol="image"></div>\n    <div class="human" rol="image"></div>\n    <div class="progress">\n        <p>\n            <label>TGP\u4E16\u754C\u6B63\u5728\u751F\u6210</label>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <span></span>\n            <b>20</b>\n            <label>%</label>\n        </p>\n        <p>\u5373\u5C06\u5E26\u60A8\u5F00\u542F\u63A2\u7D22\u4E4B\u65C5\u8BF7\u8010\u5FC3\u7B49\u5019</p>\n    </div>\n';
 	
-	var TEMPLATE_GAME = '\n    <canvas id="stage"></canvas>\n    <div id="elements-count" class="kuhei"></div>\n    <div id="stage-map" class="scope" rol="image">\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n    <div id="pop">\n        <div class="popWin" rol="image">\n            <h3>\u6807\u9898\u6807\u9898\u6807\u9898</h3>\n            <div class="content">\n                <h2>\u53D1\u73B0\u6E38\u620F\u6897</h2>\n                <p>\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9\u5185\u5BB9</p>\n            </div>\n            <div class="close"></div>\n            <div class="btn"></div>\n        </div>\n    </div>\n';
+	var TEMPLATE_GAME = '\n    <canvas id="stage"></canvas>\n    <div id="elements-count" class="ventouse"></div>\n    <div id="stage-map" class="ball" rol="image">\n        <div class="text">\u70B9\u51FB\u67E5\u770B<br><b>\u5168\u5B87\u5B99</b></div>\n        <div class="galaxy-map wrap" rol="image">\n            <canvas class="map"></canvas>\n            <div class="indicator"></div>\n        </div>\n        <div class="close" rol="image"></div>\n    </div>\n    <div id="pop" style="display:none;">\n        <div class="wrap">\n            <div class="popWin left" rol="image"></div>\n            <div class="popWin right"  rol="image"></div>\n            <div class="scope" rol="image"></div>\n            <div class="content"></div>\n            <div class="close1" rol="image"></div>\n            <div class="btn"></div>\n        </div>\n    </div>\n';
 	
 	var items = {};
 	var ready = (0, _util.defer)();
 	window.preload = ready.promise;
 	
 	function setBackgrounImage(viewport, id, src) {
-	    var el = viewport.querySelector('.' + id + '[rol="image"]');
-	    if (!el && viewport.className.indexOf(id) > -1 && viewport.getAttribute('rol') === 'image') {
-	        el = viewport;
+	    var els = viewport.querySelectorAll('.' + id + '[rol="image"]');
+	    if (!els.length && viewport.className.indexOf(id) > -1 && viewport.getAttribute('rol') === 'image') {
+	        els = [viewport];
 	    }
-	    if (el) {
-	        el.style.backgroundImage = 'url(' + src + ')';
-	    }
+	    [].concat((0, _toConsumableArray3.default)(els)).forEach(function (el) {
+	        if (el) {
+	            el.style.backgroundImage = 'url(' + src + ')';
+	        }
+	    });
 	}
 	
 	var progressTextEl = void 0;
@@ -1556,7 +1560,40 @@
 	    var percent = (loaded / total).toFixed(2);
 	    var val = Math.round(sVal + (eVal - sVal) * percent);
 	
-	    progressTextEl = progressTextEl || _util.doc.querySelector('.progress b');
+	    var progressEls = (0, _util.queryAll)(_util.doc, '.progress span');
+	    for (var i = 0; i < progressEls.length; i++) {
+	        var el = progressEls[i];
+	        var n = i * 4;
+	        var opacity = void 0;
+	        var display = void 0;
+	
+	        if (n + 1 <= val) {
+	            display = 'block';
+	            opacity = '0.25';
+	        }
+	
+	        if (n + 2 <= val) {
+	            opacity = '0.5';
+	        }
+	
+	        if (n + 3 <= val) {
+	            opacity = '0.75';
+	        }
+	
+	        if (n + 4 <= val) {
+	            opacity = '1';
+	        }
+	
+	        if (el.style.display !== display) {
+	            el.style.display = display;
+	        }
+	
+	        if (el.style.opacity !== opacity) {
+	            el.style.opacity = opacity;
+	        }
+	    }
+	
+	    progressTextEl = progressTextEl || (0, _util.query)(_util.doc, '.progress b');
 	    progressTextEl.textContent = String(val);
 	    return [percent, val];
 	}
@@ -1569,7 +1606,7 @@
 	    if (item.type === _util.createjs.AbstractLoader.IMAGE) {
 	        setBackgrounImage(viewport, item.id, item.src);
 	    } else if (item.type === _util.createjs.AbstractLoader.TEXT) {
-	        (0, _util.appendStyle)('\n            @font-face {\n                font-family: \'KuHei\';\n                src: url(' + item.src + ') format(\'truetype\');\n            }\n\n            .kuhei {\n                font-family: \'KuHei\';\n                font-style:normal;\n                -webkit-font-smoothing: antialiased;\n                -webkit-text-stroke-width: 0.2px;\n            }\n        ');
+	        (0, _util.appendStyle)('\n            @font-face {\n                font-family: \'ventouse\';\n                src: url(' + item.src + ') format(\'truetype\');\n            }\n\n            .ventouse {\n                font-family: \'ventouse\';\n                font-style: normal;\n                -webkit-font-smoothing: antialiased;\n                -webkit-text-stroke-width: 0.2px;\n            }\n        ');
 	    }
 	}
 	
@@ -1668,7 +1705,12 @@
 	
 	        queue.loadManifest({
 	            path: 'assets/' + assetsPrefix + '/game/',
-	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'popWin', src: 'pop.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }]
+	            manifest: [{ id: 'galaxy-top', src: 'galaxy-1.jpg' }, { id: 'galaxy-mid', src: 'galaxy-2.jpg' }, { id: 'galaxy-bottom', src: 'galaxy-3.jpg' }, { id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'popWin', src: 'pop.png' }, { id: 'ball', src: 'ball.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }, { id: 'close1', src: 'close1.png' }]
+	        });
+	
+	        queue.loadManifest({
+	            path: 'assets/',
+	            manifest: ['font.ttf']
 	        });
 	
 	        queue.loadManifest({
@@ -1692,9 +1734,7 @@
 	    body.innerHTML = TEMPLATE_GAME;
 	
 	    return loadGameManifest(body);
-	})
-	// .then(gameBody => delay(1500).then(() => gameBody))
-	.then(function (gameBody) {
+	}).then(function (gameBody) {
 	    var fragment = document.createDocumentFragment();
 	    var children = [].concat((0, _toConsumableArray3.default)(gameBody.children));
 	    var _iteratorNormalCompletion = true;
@@ -1735,21 +1775,21 @@
 	});
 
 /***/ },
-/* 152 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(153), __esModule: true };
+	module.exports = { "default": __webpack_require__(155), __esModule: true };
 
 /***/ },
-/* 153 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(154);
+	module.exports = __webpack_require__(156);
 
 /***/ },
-/* 154 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var anObject = __webpack_require__(23)
@@ -1761,18 +1801,18 @@
 	};
 
 /***/ },
-/* 155 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _isIterable2 = __webpack_require__(156);
+	var _isIterable2 = __webpack_require__(158);
 	
 	var _isIterable3 = _interopRequireDefault(_isIterable2);
 	
-	var _getIterator2 = __webpack_require__(152);
+	var _getIterator2 = __webpack_require__(154);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1817,21 +1857,21 @@
 	}();
 
 /***/ },
-/* 156 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(157), __esModule: true };
+	module.exports = { "default": __webpack_require__(159), __esModule: true };
 
 /***/ },
-/* 157 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(75);
 	__webpack_require__(10);
-	module.exports = __webpack_require__(158);
+	module.exports = __webpack_require__(160);
 
 /***/ },
-/* 158 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classof   = __webpack_require__(59)
@@ -1845,13 +1885,13 @@
 	};
 
 /***/ },
-/* 159 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(160);
+	var content = __webpack_require__(162);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -1871,7 +1911,7 @@
 	}
 
 /***/ },
-/* 160 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -1879,13 +1919,13 @@
 	
 	
 	// module
-	exports.push([module.id, "#preload {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    position: relative;\n}\n\n#preload .bg-light {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    -webkit-transition: opacity 0.4s linear 0s;\n    position: relative;\n}\n\n#preload .human {\n    position: absolute;\n    width: 1.68rem;\n    height: 3.36rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0.53rem;\n    bottom: 0.133rem;\n}\n\n#preload .light-point {\n    position: absolute;\n    width: 2.2rem;\n    height: 2.2rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    left: 1.05rem;\n    bottom: 2.35rem;\n}\n\n#preload .light-point.anime {\n    -webkit-transition: opacity 0.4s linear 0s;\n    opacity: 1;\n}\n\n#preload .light-point.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .light-lazer {\n    position: absolute;\n    width: 7.36rem;\n    height: 10.33rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 2rem;\n    bottom: 3.4rem;\n    opacity: 0;\n    -webkit-transform: rotate(0deg);\n    -webkit-transform-origin: 0 bottom;\n}\n\n#preload .light-lazer.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    -webkit-animation: lazer-swing 1s linear 0.6s infinite alternate;\n    opacity: 1;\n}\n\n#preload .light-lazer.anime.end {\n    -webkit-transition: none;\n    -webkit-animation: none;\n    opacity: 1;\n}\n\n@-webkit-keyframes lazer-swing {\n    0% {\n        -webkit-transform: rotate(-15deg);\n    }\n\n    100% {\n        -webkit-transform: rotate(15deg);\n    }\n}\n\n#preload .logo {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0;\n    bottom: 0;\n    opacity: 0;\n}\n\n#preload .logo.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    opacity: 1;\n}\n\n#preload .logo.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .progress {\n    position: absolute;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#preload .progress p {\n    text-align: center;\n    line-height: 1.5em;\n    font-size: 16px;\n    color: #00cbe3;\n    display: block;\n    width: 70%;\n}", ""]);
+	exports.push([module.id, "#preload {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    position: relative;\n}\n\n#preload .bg-light {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    -webkit-transition: opacity 0.4s linear 0s;\n    position: relative;\n}\n\n#preload .human {\n    position: absolute;\n    width: 1.68rem;\n    height: 3.36rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0.53rem;\n    bottom: 0.133rem;\n}\n\n#preload .light-point {\n    position: absolute;\n    width: 2.2rem;\n    height: 2.2rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    left: 1.05rem;\n    bottom: 2.35rem;\n}\n\n#preload .light-point.anime {\n    -webkit-transition: opacity 0.4s linear 0s;\n    opacity: 1;\n}\n\n#preload .light-point.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .light-lazer {\n    position: absolute;\n    width: 7.36rem;\n    height: 10.33rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 2rem;\n    bottom: 3.4rem;\n    opacity: 0;\n    -webkit-transform: rotate(0deg);\n    -webkit-transform-origin: 0 bottom;\n}\n\n#preload .light-lazer.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    -webkit-animation: lazer-swing 1s linear 0.6s infinite alternate;\n    opacity: 1;\n}\n\n#preload .light-lazer.anime.end {\n    -webkit-transition: none;\n    -webkit-animation: none;\n    opacity: 1;\n}\n\n@-webkit-keyframes lazer-swing {\n    0% {\n        -webkit-transform: rotate(-15deg);\n    }\n\n    100% {\n        -webkit-transform: rotate(15deg);\n    }\n}\n\n#preload .logo {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0;\n    bottom: 0;\n    opacity: 0;\n}\n\n#preload .logo.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    opacity: 1;\n}\n\n#preload .logo.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .progress {\n    position: absolute;\n    left: 2.4rem;\n    bottom: 2.133rem;\n    width: 100%;\n}\n\n#preload .progress p {\n    text-align: left;\n    padding: 0;\n    margin: 0;\n    line-height: 22px;\n    height: 22px;\n    font-size: 12px;\n    color: #00bed5;\n    display: block;\n    width: 70%;\n    display: -webkit-box;\n    -webkit-box-align: center;\n    text-shadow:\n        4px 0 2px rgba(0, 203, 227,0.3),\n        0 4px 2px rgba(0, 203, 227,0.3), \n        0 -4px 2px rgba(0, 203, 227,0.3),\n        -4px 0 2px rgba(0, 203, 227,0.3);\n}\n\n#preload .progress p * {\n    display: block;\n}\n\n#preload .progress p span {\n    display: none;\n    width: 3px;\n    height: 10px;\n    margin: 0 1px;\n    background-color: #00bed5;\n    box-shadow:\n        4px 0 2px rgba(0, 203, 227,0.3),\n        0 4px 2px rgba(0, 203, 227,0.3), \n        0 -4px 2px rgba(0, 203, 227,0.3),\n        -4px 0 2px rgba(0, 203, 227,0.3);\n}\n\n#preload .progress p label,\n    #preload .progress p b {\n    margin: 0 2px;\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 161 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1895,27 +1935,27 @@
 	});
 	exports.Version = exports.params = exports.thirdapp = exports.aliapp = exports.os = exports.browser = undefined;
 	
-	var _aliapp = __webpack_require__(162);
+	var _aliapp = __webpack_require__(164);
 	
 	var _aliapp2 = _interopRequireDefault(_aliapp);
 	
-	var _browser = __webpack_require__(165);
+	var _browser = __webpack_require__(167);
 	
 	var _browser2 = _interopRequireDefault(_browser);
 	
-	var _os = __webpack_require__(164);
+	var _os = __webpack_require__(166);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
-	var _thirdapp = __webpack_require__(166);
+	var _thirdapp = __webpack_require__(168);
 	
 	var _thirdapp2 = _interopRequireDefault(_thirdapp);
 	
-	var _params = __webpack_require__(167);
+	var _params = __webpack_require__(169);
 	
 	var _params2 = _interopRequireDefault(_params);
 	
-	var _version = __webpack_require__(163);
+	var _version = __webpack_require__(165);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -1929,7 +1969,7 @@
 	exports.Version = _version2.default;
 
 /***/ },
-/* 162 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1938,11 +1978,11 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(163);
+	var _version = __webpack_require__(165);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
-	var _os = __webpack_require__(164);
+	var _os = __webpack_require__(166);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
@@ -2011,7 +2051,7 @@
 	exports.default = aliapp;
 
 /***/ },
-/* 163 */
+/* 165 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2102,7 +2142,7 @@
 	exports.default = Version;
 
 /***/ },
-/* 164 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2111,7 +2151,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(163);
+	var _version = __webpack_require__(165);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2163,7 +2203,7 @@
 	exports.default = os;
 
 /***/ },
-/* 165 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2172,7 +2212,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(163);
+	var _version = __webpack_require__(165);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2261,7 +2301,7 @@
 	exports.default = browser;
 
 /***/ },
-/* 166 */
+/* 168 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2299,7 +2339,7 @@
 	exports.default = thirdapp;
 
 /***/ },
-/* 167 */
+/* 169 */
 /***/ function(module, exports) {
 
 	'use strict';

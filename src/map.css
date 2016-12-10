@@ -1,11 +1,11 @@
 #stage-map {
     position: absolute;
-    left: 0;
+    left: 0.3rem;
     top: 0;
-    background-position: 0.8rem 1rem;
+    background-position: 0.4rem 0.7rem;
     background-repeat: no-repeat;
-    background-size: 0.62rem 0.68rem;
-    padding-left: 1.61rem;
+    background-size: 1.09rem 0.853rem;
+    padding-left: 1.8rem;
     padding-top: 0.56rem;
     -webkit-transform: translateZ(999px);
 }
@@ -13,6 +13,7 @@
 #stage-map.open {
     width: 100%;
     height: 100%;
+    left: 0;
     background-color: #000;
     background-image: none!important;
     padding: 0;
@@ -21,18 +22,27 @@
     -webkit-box-align: center;
 }
 
-#stage-map::before {
-    content: '点击查看全宇宙';
+#stage-map .text {
     color: #016fa0;
-    font-size: 12px;
+    font-size: 10px;
     width: 50px;
     line-height: 1.2em;
     position: absolute;
-    left: 0.2rem;
+    left: 0.1rem;
     top: 1.8rem;
+    text-align: center;
+    text-shadow:
+        1px 0 1px rgba(0, 203, 227,0.3),
+        0 1px 1px rgba(0, 203, 227,0.3), 
+        0 -1px 1px rgba(0, 203, 227,0.3),
+        -1px 0 1px rgba(0, 203, 227,0.3);
 }
 
-#stage-map.open::before {
+#stage-map .text b {
+    font-size: 12px;
+}
+
+#stage-map.open .text {
     display: none;
 }
 

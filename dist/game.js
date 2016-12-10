@@ -106,6 +106,8 @@
 	var staticElements = void 0;
 	var elementCount = void 0;
 	var map = void 0;
+	var pop = void 0;
+	var popStartDefer = void 0;
 	
 	preload.then(function (e) {
 	    // stage
@@ -122,6 +124,18 @@
 	    });
 	    ticker = new _ticker2.default();
 	}).then(function () {
+	    pop = new _pop2.default(viewport);
+	    return pop.ready();
+	}).then(function () {
+	    popStartDefer = (0, _util.defer)();
+	    return pop.popup({
+	        message: '浩瀚的宇宙之旅即将开始，让我们来一场说走就走的旅行！',
+	        btnText: '开始旅行',
+	        onclick: function onclick() {
+	            return popStartDefer.resolve();
+	        }
+	    });
+	}).then(function () {
 	    stage = new _stage2.default(viewport);
 	    return stage.ready();
 	}).then(function () {
@@ -129,9 +143,6 @@
 	    return scroller.ready();
 	}).then(function () {
 	    var promises = [];
-	
-	    // galaxy = new Galaxy(stage, items);
-	    // promises.push(galaxy.ready());
 	
 	    staticElements = new _elements.StaticElements(stage, items);
 	    promises.push(staticElements.ready());
@@ -173,7 +184,6 @@
 	
 	        if (scroller.isScrolling || ticker.has(clearId) || ticker.has(starId)) {
 	            stage.render.clearRect(0, 0, stage.vw, stage.vh);
-	            // stage.render.drawImage(galaxy.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
 	            stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
 	            stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
 	            stage.render.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
@@ -204,11 +214,15 @@
 	    elementCount = new _elements.ElementCount(viewport);
 	    return elementCount.ready();
 	}).then(function () {
+	    // run
+	    ticker.run();
+	}).then(function () {
+	    return popStartDefer.promise;
+	}).then(function () {
 	    // bone
 	    var boneX = stage.width / 2 - stage.vw / 2;
 	    var boneY = stage.height - stage.vh / 2;
 	    scroller.scrollTo(boneX, boneY);
-	    ticker.run();
 	});
 
 /***/ },
@@ -4392,7 +4406,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background-position: 0.8rem 1rem;\n    background-repeat: no-repeat;\n    background-size: 0.62rem 0.68rem;\n    padding-left: 1.61rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map::before {\n    content: '\\70B9\\51FB\\67E5\\770B\\5168\\5B87\\5B99';\n    color: #016fa0;\n    font-size: 12px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.2rem;\n    top: 1.8rem;\n}\n\n#stage-map.open::before {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #016fa0;\n    box-sizing: border-box;\n    width: 25px;\n    height: 84px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    background-color: #000;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
+	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0.3rem;\n    top: 0;\n    background-position: 0.4rem 0.7rem;\n    background-repeat: no-repeat;\n    background-size: 1.09rem 0.853rem;\n    padding-left: 1.8rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    left: 0;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map .text {\n    color: #016fa0;\n    font-size: 10px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.1rem;\n    top: 1.8rem;\n    text-align: center;\n    text-shadow:\n        1px 0 1px rgba(0, 203, 227,0.3),\n        0 1px 1px rgba(0, 203, 227,0.3), \n        0 -1px 1px rgba(0, 203, 227,0.3),\n        -1px 0 1px rgba(0, 203, 227,0.3);\n}\n\n#stage-map .text b {\n    font-size: 12px;\n}\n\n#stage-map.open .text {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #016fa0;\n    box-sizing: border-box;\n    width: 25px;\n    height: 84px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    background-color: #000;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
 	
 	// exports
 
@@ -5014,41 +5028,119 @@
 	
 	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 	
-	__webpack_require__(168);
+	var _createClass2 = __webpack_require__(67);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	__webpack_require__(151);
+	
+	var _util = __webpack_require__(6);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var pop = function pop() {
-	    (0, _classCallCheck3.default)(this, pop);
-	};
+	var Pop = function () {
+	    function Pop(viewport) {
+	        (0, _classCallCheck3.default)(this, Pop);
 	
-	exports.default = pop;
+	        this.popEl = (0, _util.query)(viewport, '#pop');
+	    }
+	
+	    (0, _createClass3.default)(Pop, [{
+	        key: 'ready',
+	        value: function ready() {
+	            var _this = this;
+	
+	            return new _util.Promise(function (resolve, reject) {
+	                _this.scropEl = (0, _util.query)(_this.popEl, '.scope');
+	                _this.contentEl = (0, _util.query)(_this.popEl, '.content');
+	                _this.closeEl = (0, _util.query)(_this.popEl, '.close1');
+	                _this.btnEl = (0, _util.query)(_this.popEl, '.btn');
+	                resolve();
+	            });
+	        }
+	    }, {
+	        key: 'close',
+	        value: function close() {
+	            var _this2 = this;
+	
+	            this.scropEl.style.display = 'none';
+	            this.contentEl.style.display = 'none';
+	            this.closeEl.style.display = 'none';
+	            this.btnEl.style.display = 'none';
+	            (0, _util.raf)(function () {
+	                return _this2.popEl.className = 'close';
+	            });
+	            return (0, _util.delay)(600).then(function () {
+	                return _this2.popEl.style.display = 'none';
+	            });
+	        }
+	    }, {
+	        key: 'popup',
+	        value: function popup(_ref) {
+	            var _this3 = this;
+	
+	            var message = _ref.message,
+	                btnText = _ref.btnText,
+	                onclose = _ref.onclose,
+	                onclick = _ref.onclick;
+	
+	            return new _util.Promise(function (resolve, reject) {
+	                _this3.popEl.style.display = '';
+	
+	                _this3.contentEl.textContent = message;
+	
+	                var handler = function handler(e) {
+	                    e.preventDefault();
+	                    _this3.closeEl.removeEventListener('tap', onClose);
+	                    _this3.btnEl.removeEventListener('tap', onClick);
+	                    return _this3.close();
+	                };
+	
+	                function onClose(e) {
+	                    handler(e).then(function () {
+	                        return onclose && onclose();
+	                    });
+	                }
+	
+	                _this3.closeEl.addEventListener('tap', onClose);
+	
+	                function onClick(e) {
+	                    handler(e).then(function () {
+	                        return onclick && onclick();
+	                    });
+	                }
+	
+	                _this3.btnEl.textContent = btnText;
+	                _this3.btnEl.addEventListener('tap', onClick);
+	
+	                (0, _util.raf)(function () {
+	                    return _this3.popEl.className = 'open';
+	                });
+	                (0, _util.delay)(400).then(function () {
+	                    _this3.scropEl.style.display = 'block';
+	                    _this3.contentEl.style.display = 'block';
+	                    if (onclose) {
+	                        _this3.closeEl.style.display = 'block';
+	                    }
+	                    _this3.btnEl.style.display = 'block';
+	                    resolve();
+	                });
+	            });
+	        }
+	    }]);
+	    return Pop;
+	}();
+	
+	exports.default = Pop;
 
 /***/ },
-/* 151 */,
-/* 152 */,
-/* 153 */,
-/* 154 */,
-/* 155 */,
-/* 156 */,
-/* 157 */,
-/* 158 */,
-/* 159 */,
-/* 160 */,
-/* 161 */,
-/* 162 */,
-/* 163 */,
-/* 164 */,
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(169);
+	var content = __webpack_require__(152);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -5068,7 +5160,7 @@
 	}
 
 /***/ },
-/* 169 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -5076,7 +5168,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#pop {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background-color: rgba(255, 255, 255, 0);\n    webkitTransform: translateZ(9999px);\n    width: 100%;\n    height: 100%;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n.popWin {\n    width: 8.29rem;\n    height: 6.2rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}", ""]);
+	exports.push([module.id, "#pop {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background-color: rgba(255, 255, 255, 0);\n    webkitTransform: translateZ(9999px);\n    width: 100%;\n    height: 100%;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#pop .wrap {\n    width: 8.29rem;\n    height: 6.2rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    position: relative;\n}\n\n#pop .popWin {\n    position: absolute;\n    width: 50%;\n    height: 100%;\n    background-repeat: no-repeat;\n    background-size: 8.29rem 6.2rem;\n    overflow: hidden;\n}\n\n#pop .popWin.left {\n    left: 0;\n    top: 0;\n    background-position: -100% 0;\n}\n\n#pop .popWin.right {\n    right: 0;\n    top: 0;\n    background-position: 200% 0;\n}\n\n#pop.open .popWin.left {\n    -webkit-animation: openleftwin 0.4s ease-out 0s forwards;\n}\n\n#pop.open .popWin.right {\n    -webkit-animation: openrightwin 0.4s ease-out 0s forwards;\n}\n\n#pop.close .popWin.left {\n    -webkit-animation: closeleftwin 0.4s ease-in 0s forwards;\n}\n\n#pop.close .popWin.right {\n    -webkit-animation: closerightwin 0.4s ease-in 0s forwards;\n}\n\n@-webkit-keyframes openleftwin {\n    0% {\n        background-position: -100% 0;\n    }\n\n    100% {\n        background-position: 0 0;\n    }\n}\n\n@-webkit-keyframes openrightwin {\n    0% {\n        background-position: 200% 0;\n    }\n\n    100% {\n        background-position: 100% 0;\n    }\n}\n\n@-webkit-keyframes closeleftwin {\n    0% {\n        background-position: 0 0;\n    }\n\n    100% {\n        background-position: -100% 0;\n    }\n}\n\n@-webkit-keyframes closerightwin {\n    0% {\n        background-position: 100% 0;\n    }\n\n    100% {\n        background-position: 200% 0;\n    }\n}\n\n#pop .scope {\n    display: none;\n    position: absolute;\n    left: 1.4rem;\n    top: 1.8rem;\n    width: 2.08rem;\n    height: 1.72rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n\n}\n\n#pop .content {\n    display: none;\n    font-size: 12px;\n    width: 100%;\n    height: 100%;\n    box-sizing: border-box;\n    padding: 1.867rem 0.8rem 1.6rem 3.4667rem;\n    color: #FFF;\n    overflow: hidden;\n    line-height: 1.5em;\n}\n\n#pop .close1 {\n    display: none;\n    position: absolute;\n    top: 0px;\n    right: 0px;\n    width: 1rem;\n    height: 1rem;\n    background-position: 40% 70%;\n    background-repeat: no-repeat;\n    background-size: 0.49rem 0.49rem;\n}\n\n#pop .btn {\n    display: none;\n    position: absolute;\n    left: 2.612rem;\n    bottom: 0.533rem;\n    width: 3.09rem;\n    height: 0.706rem;\n    font-size: 12px;\n    text-align: center;\n    line-height: 0.706rem;\n    color: #00cbe3;\n}", ""]);
 	
 	// exports
 
