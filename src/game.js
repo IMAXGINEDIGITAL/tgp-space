@@ -6,7 +6,8 @@ import {
     defer,
     query,
     queryAll,
-    getRect
+    getRect,
+    delay
 } from './util';
 import Scroller from './scroller';
 import Stage from './stage';
@@ -83,33 +84,40 @@ preload
     .then(() => { // render
         let scrollX = 0;
         let scrollY = 0;
+        let clearCloudId;
+        let starYRoll = stage.vh;
+        let starRollId;
+
+        scroller.on('scrollstart', e => {
+            if (clearCloudId) {
+                ticker.delete(clearCloudId);
+                clearCloudId = null;
+            }
+        });
 
         scroller.on('scrolling', e => {
             scrollX = e.x;
             scrollY = e.y;
         });
 
-        let clearId;
         scroller.on('scrollend', e => {
             const tick = cloud.clear(e.x, e.y);
-            clearId = ticker.add(tick);
+            clearCloudId = ticker.add(tick);
         });
 
-        let starYRoll = stage.vh;
-        const starTick = () => {
+        starRollId = ticker.add(() => {
             starYRoll--;
             if (starYRoll < 0) {
                 starYRoll = stage.vh;
             }
-        }
-        const starId = ticker.add(starTick);
+        });
 
         ticker.on('aftertick', e => {
             let updated = false;
 
             if (scroller.isScrolling ||
-                    ticker.has(clearId) ||
-                    ticker.has(starId)) {
+                    ticker.has(clearCloudId) ||
+                    ticker.has(starRollId)) {
                 stage.render.clearRect(0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
@@ -151,6 +159,47 @@ preload
         const boneX = stage.width / 2 - stage.vw / 2;
         const boneY = stage.height - stage.vh / 2;
         scroller.scrollTo(boneX, boneY);
+    })
+    .then(() => { // galaxy event
+        let firstEvent = false;
+        let secondEvent = false;
+
+        scroller.on('scrolling', e => {
+            if (!firstEvent && e.y < stage.vh * 6) {
+                firstEvent = true;
+                scroller.enable = false;
+                pop.popup({
+                    message: '我们现在将飞出太阳系，让我们来加个速去发现更广阔的世界。',
+                    btnText: '继续',
+                    onclick() {
+                        scroller.scale = 1.5;
+                        scroller.enable = true;
+                    }
+                });
+            }
+
+            if (!secondEvent && e.y < stage.vh * 2) {
+                secondEvent = true;
+                scroller.enable = false;
+                const wormholeEl = query(viewport, '#wormhole');
+                wormholeEl.style.display = 'block';
+
+                pop.popup({
+                    message: '我们现已进入虫洞进行空间跳跃，请坐直身体！抓稳手机！let\'go！！！',
+                    btnText: '跳跃',
+                    onclick() {
+                        const wormholeEl = query(viewport, '#wormhole');
+                        wormholeEl.className = ' flyin';
+                        delay(1000).then(() => {
+                            scroller.scrollTo(0, stage.vh / 2);
+                            wormholeEl.className = '';
+                            wormholeEl.style.display = 'none';
+                            scroller.enable = true;
+                        })
+                    }
+                });
+            }
+        });
     })
 
     

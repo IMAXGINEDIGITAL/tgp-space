@@ -158,31 +158,38 @@
 	    // render
 	    var scrollX = 0;
 	    var scrollY = 0;
+	    var clearCloudId = void 0;
+	    var starYRoll = stage.vh;
+	    var starRollId = void 0;
+	
+	    scroller.on('scrollstart', function (e) {
+	        if (clearCloudId) {
+	            ticker.delete(clearCloudId);
+	            clearCloudId = null;
+	        }
+	    });
 	
 	    scroller.on('scrolling', function (e) {
 	        scrollX = e.x;
 	        scrollY = e.y;
 	    });
 	
-	    var clearId = void 0;
 	    scroller.on('scrollend', function (e) {
 	        var tick = cloud.clear(e.x, e.y);
-	        clearId = ticker.add(tick);
+	        clearCloudId = ticker.add(tick);
 	    });
 	
-	    var starYRoll = stage.vh;
-	    var starTick = function starTick() {
+	    starRollId = ticker.add(function () {
 	        starYRoll--;
 	        if (starYRoll < 0) {
 	            starYRoll = stage.vh;
 	        }
-	    };
-	    var starId = ticker.add(starTick);
+	    });
 	
 	    ticker.on('aftertick', function (e) {
 	        var updated = false;
 	
-	        if (scroller.isScrolling || ticker.has(clearId) || ticker.has(starId)) {
+	        if (scroller.isScrolling || ticker.has(clearCloudId) || ticker.has(starRollId)) {
 	            stage.render.clearRect(0, 0, stage.vw, stage.vh);
 	            stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
 	            stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
@@ -223,6 +230,47 @@
 	    var boneX = stage.width / 2 - stage.vw / 2;
 	    var boneY = stage.height - stage.vh / 2;
 	    scroller.scrollTo(boneX, boneY);
+	}).then(function () {
+	    // galaxy event
+	    var firstEvent = false;
+	    var secondEvent = false;
+	
+	    scroller.on('scrolling', function (e) {
+	        if (!firstEvent && e.y < stage.vh * 6) {
+	            firstEvent = true;
+	            scroller.enable = false;
+	            pop.popup({
+	                message: '我们现在将飞出太阳系，让我们来加个速去发现更广阔的世界。',
+	                btnText: '继续',
+	                onclick: function onclick() {
+	                    scroller.scale = 1.5;
+	                    scroller.enable = true;
+	                }
+	            });
+	        }
+	
+	        if (!secondEvent && e.y < stage.vh * 2) {
+	            secondEvent = true;
+	            scroller.enable = false;
+	            var wormholeEl = (0, _util.query)(viewport, '#wormhole');
+	            wormholeEl.style.display = 'block';
+	
+	            pop.popup({
+	                message: '我们现已进入虫洞进行空间跳跃，请坐直身体！抓稳手机！let\'go！！！',
+	                btnText: '跳跃',
+	                onclick: function onclick() {
+	                    var wormholeEl = (0, _util.query)(viewport, '#wormhole');
+	                    wormholeEl.className = ' flyin';
+	                    (0, _util.delay)(1000).then(function () {
+	                        scroller.scrollTo(0, stage.vh / 2);
+	                        wormholeEl.className = '';
+	                        wormholeEl.style.display = 'none';
+	                        scroller.enable = true;
+	                    });
+	                }
+	            });
+	        }
+	    });
 	});
 
 /***/ },
@@ -260,7 +308,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#game {\n    width: 100%;\n    height: 100%;\n    padding: 0;\n    margin: 0;\n    position: relative;\n}\n\n@-webkit-keyframes flash {\n    0% {\n        opacity: 0;\n    }\n\n    100% {\n        opacity: 1;\n    }\n}\n\n@-webkit-keyframes infiroll {\n    0% {\n        -webkit-transform: translateY(-50%) translateZ(9px);\n    }\n\n    100% {\n        -webkit-transform: translateY(0) translateZ(9px);\n    }\n}\n", ""]);
+	exports.push([module.id, "#game {\n    width: 100%;\n    height: 100%;\n    padding: 0;\n    margin: 0;\n    position: relative;\n}\n\n#wormhole {\n    display: none;\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    position: absolute;\n    -webkit-transform: translateZ(999px);\n    background-color: #000;\n}\n\n#wormhole .wormhole {\n    width: 100%;\n    height: 100%;\n    background-size: contain;\n    background-position: center center;\n    background-repeat: no-repeat;\n    -webkit-transform: scale(0) rotate(0);\n    opacity: 1;\n}\n\n#wormhole.flyin .wormhole {\n    -webkit-animation: flyin 1s ease-in 0s backwards;\n}\n\n@-webkit-keyframes flyin {\n    0% {\n        -webkit-transform: scale(0) rotate(0);\n        opacity: 1;\n    }\n\n    100% {\n        -webkit-transform: scale(3) rotate(360deg);\n        opacity: 0;\n    }\n}\n\n\n\n\n\n", ""]);
 	
 	// exports
 
@@ -4406,7 +4454,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0.3rem;\n    top: 0;\n    background-position: 0.4rem 0.7rem;\n    background-repeat: no-repeat;\n    background-size: 1.09rem 0.853rem;\n    padding-left: 1.8rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    left: 0;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map .text {\n    color: #016fa0;\n    font-size: 10px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.1rem;\n    top: 1.8rem;\n    text-align: center;\n    text-shadow:\n        1px 0 1px rgba(0, 203, 227,0.3),\n        0 1px 1px rgba(0, 203, 227,0.3), \n        0 -1px 1px rgba(0, 203, 227,0.3),\n        -1px 0 1px rgba(0, 203, 227,0.3);\n}\n\n#stage-map .text b {\n    font-size: 12px;\n}\n\n#stage-map.open .text {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #016fa0;\n    box-sizing: border-box;\n    width: 25px;\n    height: 84px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    background-color: #000;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
+	exports.push([module.id, "#stage-map {\n    position: absolute;\n    left: 0.3rem;\n    top: 0;\n    background-position: 0.4rem 0.7rem;\n    background-repeat: no-repeat;\n    background-size: 1.09rem 0.853rem;\n    padding-left: 1.8rem;\n    padding-top: 0.56rem;\n    -webkit-transform: translateZ(999px);\n}\n\n#stage-map.open {\n    width: 100%;\n    height: 100%;\n    left: 0;\n    background-color: #000;\n    background-image: none!important;\n    padding: 0;\n    display: -webkit-box;\n    -webkit-box-pack: center;\n    -webkit-box-align: center;\n}\n\n#stage-map .text {\n    color: #016fa0;\n    font-size: 10px;\n    width: 50px;\n    line-height: 1.2em;\n    position: absolute;\n    left: 0.1rem;\n    top: 1.8rem;\n    text-align: center;\n    text-shadow:\n        1px 0 1px rgba(0, 203, 227,0.3),\n        0 1px 1px rgba(0, 203, 227,0.3), \n        0 -1px 1px rgba(0, 203, 227,0.3),\n        -1px 0 1px rgba(0, 203, 227,0.3);\n}\n\n#stage-map .text b {\n    font-size: 12px;\n}\n\n#stage-map.open .text {\n    display: none;\n}\n\n#stage-map .wrap {\n    border: 1px solid #016fa0;\n    box-sizing: border-box;\n    width: 25px;\n    height: 84px;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n    background-color: #000;\n    overflow: hidden;\n    position: relative;\n}\n\n#stage-map .map {\n    width: 100%;\n    height: 100%;\n}\n\n#stage-map .indicator {\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    position: absolute;\n    background-color: rgb(50, 50, 50);\n    opacity: 0;\n    -webkit-animation: flash 0.4s linear 0s infinite alternate;\n}\n\n@-webkit-keyframes flash {\n    0% {\n        opacity: 0;\n    }\n\n    100% {\n        opacity: 1;\n    }\n}\n\n#stage-map.open .indicator {\n    display: none;\n}\n\n#stage-map .close {\n    display: none;\n    width: 0.5rem;\n    height: 0.5rem;\n    background-position: 0 0;\n    background-repeat: no-repeat;\n    background-size: contain;\n}\n\n#stage-map.open .close {\n    display: block;\n}", ""]);
 	
 	// exports
 

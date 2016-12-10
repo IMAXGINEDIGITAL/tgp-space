@@ -60,6 +60,9 @@ const TEMPLATE_GAME = `
         </div>
         <div class="close" rol="image"></div>
     </div>
+    <div id="wormhole">
+        <div class="wormhole" rol="image"></div>
+    </div>
     <div id="pop" style="display:none;">
         <div class="wrap">
             <div class="popWin left" rol="image"></div>
@@ -243,9 +246,6 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
     queue.loadManifest({
         path: `assets/${assetsPrefix}/game/`,
         manifest: [
-            {id: 'galaxy-top', src: 'galaxy-1.jpg'},
-            {id: 'galaxy-mid', src: 'galaxy-2.jpg'},
-            {id: 'galaxy-bottom', src: 'galaxy-3.jpg'},
             {id: 'elements-top', src: 'elements-1.png'},
             {id: 'elements-mid', src: 'elements-2.png'},
             {id: 'elements-bottom', src: 'elements-3.png'},
@@ -256,7 +256,9 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
             {id: 'ball', src: 'ball.png'},
             {id: 'scope', src: 'scope.png'},
             {id: 'close', src: 'close.png'},
-            {id: 'close1', src: 'close1.png'}
+            {id: 'close1', src: 'close1.png'},
+            {id: 'polaris', src: 'polaris.jpg'},
+            {id: 'wormhole', src: 'wormhole.png'}
 
         ]
     });
