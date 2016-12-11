@@ -24,6 +24,17 @@ export default class Cloud extends CanvasImage {
         this.items = items;
     }
 
+    get completing() {
+        const imageData = this.render.getImageData(0, 0, this.width, this.height);
+        const amount = imageData.data.length / 4;
+        let count = 0;
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            if (imageData.data[i + 3] === 0) {
+                count++;
+            }
+        }
+        return count/amount;
+    }
 
     clear(x, y) {
         const cx = x + this.vw / 2;

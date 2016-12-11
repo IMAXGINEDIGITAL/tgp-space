@@ -47,12 +47,13 @@ export default class Scroller extends Event{
         this._enable = enable;
     }
 
-    _emit(name, extra = {}) {
+    _emit(name, originalEvent, extra = {}) {
         const e = {
             x: this.x,
             y: this.y,
             lx: this.lx,
-            ly: this.ly
+            ly: this.ly,
+            originalEvent
         }
 
         for (let key in extra) {
@@ -67,24 +68,24 @@ export default class Scroller extends Event{
             this._isScrolling = false;
 
             const emitTap = e => {
-                this._emit('tap', {
+                this._emit('tap', e, {
                     ex: this.x + e.touch.clientX,
                     ey: this.y + e.touch.clientY
                 });
             }
 
-            const emitStart = () => {
+            const emitStart = e => {
                 this._isScrolling = true;
                 this.lx = this.x;
                 this.ly = this.y;
-                this._emit('scrollstart');
+                this._emit('scrollstart', e);
             };
 
-            const emitScroll = () => this._emit('scrolling');
+            const emitScroll = e => this._emit('scrolling', e);
 
-            const emitEnd = () => {
+            const emitEnd = e => {
                 this._isScrolling = false;
-                this._emit('scrollend');
+                this._emit('scrollend', e);
             };
 
             const calXY = (e, noScale) => {
@@ -110,15 +111,15 @@ export default class Scroller extends Event{
             });
 
             doc.body.addEventListener('panstart', e => 
-                this._enable && emitStart()
+                this._enable && emitStart(e)
             );
 
             doc.body.addEventListener('panmove', e => 
-                this._enable && calXY(e) && emitScroll() 
+                this._enable && calXY(e) && emitScroll(e) 
             );
 
             doc.body.addEventListener('panend', e => 
-                this._enable && emitEnd()      
+                this._enable && emitEnd(e)      
             );
 
             this.scrollTo = (x, y) => {

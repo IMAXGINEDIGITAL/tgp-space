@@ -33,6 +33,7 @@ let stage;
 let galaxy;
 let cloud;
 let star;
+let starRollSpeed = 1;
 let staticElements;
 let animeElements;
 let elementCount;
@@ -43,7 +44,7 @@ let popStartDefer;
 preload
     .then(e => { // stage
         items = e;
-        viewport = doc.body;
+        viewport = query(doc.body, 'div[bodywrap]');
         viewport.addEventListener('touchstart', e => e.preventDefault());
         viewport.addEventListener('touchmove', e => e.preventDefault());
         viewport.addEventListener('touchend', e => e.preventDefault());
@@ -119,17 +120,20 @@ preload
         });
 
         scroller.on('tap', e => {
-            animeId = ticker.add(animeElements.play(e.ex, e.ey));
+            if (e.originalEvent.target === stage.canvas) {
+                animeId = ticker.add(animeElements.play(e.ex, e.ey));
+            }
         });
 
         starRollId = ticker.add(() => {
-            starYRoll--;
+            starYRoll -= starRollSpeed;
             if (starYRoll < 0) {
                 starYRoll = stage.vh;
             }
         });
 
         ticker.on('aftertick', e => {
+            elementCount.update(animeElements.amount, animeElements.found);
 
             if (scroller.isScrolling ||
                     ticker.has(animeId) ||
@@ -198,6 +202,8 @@ preload
             if (!firstEvent && e.y < stage.vh * 6) {
                 firstEvent = true;
                 scroller.enable = false;
+                starRollSpeed = 4;
+
                 pop.popup({
                     message: '我们现在将飞出太阳系，让我们来加个速去发现更广阔的世界。',
                     btnText: '继续',
@@ -229,6 +235,39 @@ preload
                     }
                 });
             }
+        });
+
+        elementCount.on('found', e => {
+            scroller.enable = false;
+
+            const {time} = e;
+            const message = [
+                '您发现了被隐藏在宇宙中的秘密，继续探索更大的宇宙世界吧。',
+                '您已熟练掌握了在宇宙中寻找乐趣的方式，继续探索将有惊喜等着您。',
+                '您离成功就差几次滑屏的距离了，继续探索就能收获惊喜。',
+                '恭喜您已寻找到宇宙中所有的小秘密，登录TGP发现更大的游戏世界！'
+            ][time - 1];
+
+            pop.popup({
+                message,
+                btnText: '分享',
+                onclose: () => {
+                    scroller.enable = true;
+                },
+                onclick: () => {
+                    scroller.enable = true;
+                }
+            })
+        });
+
+        map.on('open', e => {
+            scroller.enable = false;
+
+            pop.popup({
+                message: `现在您已经探测了（${(cloud.completing * 100).toFixed(1)}）%的世界，还有更辽阔的世界等着您去发现。`,
+                btnText: '继续',
+                onclick: () => scroller.enable = true
+            });
         });
     })
 

@@ -302,21 +302,76 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
     queue.loadManifest({
         path: `assets/${assetsPrefix}/game/anime/`,
         manifest: [
+            {id: 'anime-13-1', src: 'anime-13-1.png'},
+            {id: 'anime-13-2', src: 'anime-13-1.png'},
+            {id: 'anime-13-3', src: 'anime-13-1.png'},
+            {id: 'anime-13-4', src: 'anime-13-1.png'},
+            {id: 'anime-13-5', src: 'anime-13-5.png'},
+            {id: 'anime-14-1', src: 'anime-14-1.png'},
+            {id: 'anime-14-2', src: 'anime-14-1.png'},
+            {id: 'anime-14-3', src: 'anime-14-1.png'},
+            {id: 'anime-14-4', src: 'anime-14-1.png'},
+            {id: 'anime-14-5', src: 'anime-14-1.png'},
+            {id: 'anime-19-1', src: 'anime-19-1.png'},
+            {id: 'anime-19-2', src: 'anime-19-1.png'},
+            {id: 'anime-19-3', src: 'anime-19-1.png'},
+            {id: 'anime-19-4', src: 'anime-19-1.png'},
+            {id: 'anime-19-5', src: 'anime-19-5.png'},
+            {id: 'anime-20-1', src: 'anime-20-1.png'},
+            {id: 'anime-20-2', src: 'anime-20-1.png'},
+            {id: 'anime-20-3', src: 'anime-20-1.png'},
+            {id: 'anime-20-4', src: 'anime-20-1.png'},
+            {id: 'anime-20-5', src: 'anime-20-5.png'},
+            {id: 'anime-25-1', src: 'anime-25-1.png'},
+            {id: 'anime-25-2', src: 'anime-25-1.png'},
+            {id: 'anime-25-3', src: 'anime-25-1.png'},
+            {id: 'anime-25-4', src: 'anime-25-1.png'},
+            {id: 'anime-25-5', src: 'anime-25-5.png'},
+            {id: 'anime-33-1', src: 'anime-33-1.png'},
+            {id: 'anime-33-2', src: 'anime-33-1.png'},
+            {id: 'anime-33-3', src: 'anime-33-1.png'},
+            {id: 'anime-33-4', src: 'anime-33-1.png'},
+            {id: 'anime-33-5', src: 'anime-33-5.png'},
+            {id: 'anime-39-1', src: 'anime-39-1.png'},
+            {id: 'anime-39-2', src: 'anime-39-1.png'},
+            {id: 'anime-39-3', src: 'anime-39-1.png'},
+            {id: 'anime-39-4', src: 'anime-39-1.png'},
+            {id: 'anime-39-5', src: 'anime-39-5.png'},
+            {id: 'anime-41-1', src: 'anime-41-1.png'},
+            {id: 'anime-41-2', src: 'anime-41-1.png'},
+            {id: 'anime-41-3', src: 'anime-41-1.png'},
+            {id: 'anime-41-4', src: 'anime-41-1.png'},
+            {id: 'anime-41-5', src: 'anime-41-5.png'},
+            {id: 'anime-43-1', src: 'anime-43-1.png'},
+            {id: 'anime-43-2', src: 'anime-43-1.png'},
+            {id: 'anime-43-3', src: 'anime-43-1.png'},
+            {id: 'anime-43-4', src: 'anime-43-1.png'},
+            {id: 'anime-43-5', src: 'anime-43-5.png'},
+            {id: 'anime-44-1', src: 'anime-44-1.png'},
+            {id: 'anime-44-2', src: 'anime-44-1.png'},
+            {id: 'anime-44-3', src: 'anime-44-1.png'},
+            {id: 'anime-44-4', src: 'anime-44-1.png'},
+            {id: 'anime-44-5', src: 'anime-44-5.png'},
+            {id: 'anime-45-1', src: 'anime-45-1.png'},
+            {id: 'anime-45-2', src: 'anime-45-1.png'},
+            {id: 'anime-45-3', src: 'anime-45-1.png'},
+            {id: 'anime-45-4', src: 'anime-45-1.png'},
+            {id: 'anime-45-5', src: 'anime-45-5.png'},
             {id: 'anime-47-1', src: 'anime-47-1.png'},
-            {id: 'anime-47-2', src: 'anime-47-2.png'},
-            {id: 'anime-47-3', src: 'anime-47-3.png'},
-            {id: 'anime-47-4', src: 'anime-47-4.png'},
+            {id: 'anime-47-2', src: 'anime-47-1.png'},
+            {id: 'anime-47-3', src: 'anime-47-1.png'},
+            {id: 'anime-47-4', src: 'anime-47-1.png'},
             {id: 'anime-47-5', src: 'anime-47-5.png'},
             {id: 'anime-48-1', src: 'anime-48-1.png'},
-            {id: 'anime-48-2', src: 'anime-48-2.png'},
-            {id: 'anime-48-3', src: 'anime-48-3.png'},
-            {id: 'anime-48-4', src: 'anime-48-4.png'},
+            {id: 'anime-48-2', src: 'anime-48-1.png'},
+            {id: 'anime-48-3', src: 'anime-48-1.png'},
+            {id: 'anime-48-4', src: 'anime-48-1.png'},
             {id: 'anime-48-5', src: 'anime-48-5.png'},
             {id: 'anime-50-1', src: 'anime-50-1.png'},
-            {id: 'anime-50-2', src: 'anime-50-2.png'},
-            {id: 'anime-50-3', src: 'anime-50-3.png'},
-            {id: 'anime-50-4', src: 'anime-50-4.png'},
-            {id: 'anime-50-5', src: 'anime-50-5.png'}
+            {id: 'anime-50-2', src: 'anime-50-1.png'},
+            {id: 'anime-50-3', src: 'anime-50-1.png'},
+            {id: 'anime-50-4', src: 'anime-50-1.png'},
+            {id: 'anime-50-5', src: 'anime-50-1.png'}
         ]
     });
 
@@ -335,34 +390,35 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
     });
 });
 
+let viewport;
 domready()
     .then(() => { // load preload manifest
-        doc.body.setAttribute('id', 'preload');
-        doc.body.setAttribute('rol', 'image');
-        doc.body.className = 'bg-dark';
-        doc.body.innerHTML = TEMPLATE_PRELOAD;
+        viewport = query(doc.body, 'div[bodywrap]');
+        viewport.setAttribute('id', 'preload');
+        viewport.setAttribute('rol', 'image');
+        viewport.className = 'bg-dark';
+        viewport.innerHTML = TEMPLATE_PRELOAD;
 
-        return loadPreloadManifest(doc.body);
+        return loadPreloadManifest(viewport);
     })
     .then(() => {  // load game manifest
         const body = document.createElement('div');
         body.innerHTML = TEMPLATE_GAME;
-
         return loadGameManifest(body);
     })
-    .then(gameBody => {
+    .then((gameBody) => {
         const fragment = document.createDocumentFragment();
         const children = [...gameBody.children];
         for (const child of children) {
             fragment.appendChild(child); 
         }
 
-        doc.body.removeAttribute('id');
-        doc.body.removeAttribute('rol');
-        doc.body.style.cssText = '';
-        doc.body.className = '';
-        doc.body.innerHTML = '';
-        doc.body.appendChild(fragment);
+        viewport.removeAttribute('id');
+        viewport.removeAttribute('rol');
+        viewport.style.cssText = '';
+        viewport.className = '';
+        viewport.innerHTML = '';
+        viewport.appendChild(fragment);
 
         ready.resolve(items);
     })

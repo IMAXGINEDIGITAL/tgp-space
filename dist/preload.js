@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(153);
+	module.exports = __webpack_require__(163);
 
 
 /***/ },
@@ -1486,13 +1486,116 @@
 /* 126 */,
 /* 127 */,
 /* 128 */,
-/* 129 */,
-/* 130 */,
-/* 131 */,
-/* 132 */,
-/* 133 */,
-/* 134 */,
-/* 135 */,
+/* 129 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	
+	var _isIterable2 = __webpack_require__(130);
+	
+	var _isIterable3 = _interopRequireDefault(_isIterable2);
+	
+	var _getIterator2 = __webpack_require__(133);
+	
+	var _getIterator3 = _interopRequireDefault(_getIterator2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = function () {
+	  function sliceIterator(arr, i) {
+	    var _arr = [];
+	    var _n = true;
+	    var _d = false;
+	    var _e = undefined;
+	
+	    try {
+	      for (var _i = (0, _getIterator3.default)(arr), _s; !(_n = (_s = _i.next()).done); _n = true) {
+	        _arr.push(_s.value);
+	
+	        if (i && _arr.length === i) break;
+	      }
+	    } catch (err) {
+	      _d = true;
+	      _e = err;
+	    } finally {
+	      try {
+	        if (!_n && _i["return"]) _i["return"]();
+	      } finally {
+	        if (_d) throw _e;
+	      }
+	    }
+	
+	    return _arr;
+	  }
+	
+	  return function (arr, i) {
+	    if (Array.isArray(arr)) {
+	      return arr;
+	    } else if ((0, _isIterable3.default)(Object(arr))) {
+	      return sliceIterator(arr, i);
+	    } else {
+	      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+	    }
+	  };
+	}();
+
+/***/ },
+/* 130 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(131), __esModule: true };
+
+/***/ },
+/* 131 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(75);
+	__webpack_require__(10);
+	module.exports = __webpack_require__(132);
+
+/***/ },
+/* 132 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var classof   = __webpack_require__(59)
+	  , ITERATOR  = __webpack_require__(51)('iterator')
+	  , Iterators = __webpack_require__(33);
+	module.exports = __webpack_require__(18).isIterable = function(it){
+	  var O = Object(it);
+	  return O[ITERATOR] !== undefined
+	    || '@@iterator' in O
+	    || Iterators.hasOwnProperty(classof(O));
+	};
+
+/***/ },
+/* 133 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(134), __esModule: true };
+
+/***/ },
+/* 134 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(75);
+	__webpack_require__(10);
+	module.exports = __webpack_require__(135);
+
+/***/ },
+/* 135 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var anObject = __webpack_require__(23)
+	  , get      = __webpack_require__(58);
+	module.exports = __webpack_require__(18).getIterator = function(it){
+	  var iterFn = get(it);
+	  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
+	  return anObject(iterFn.call(it));
+	};
+
+/***/ },
 /* 136 */,
 /* 137 */,
 /* 138 */,
@@ -1510,16 +1613,26 @@
 /* 150 */,
 /* 151 */,
 /* 152 */,
-/* 153 */
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _getIterator2 = __webpack_require__(154);
+	var _getIterator2 = __webpack_require__(133);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
-	var _slicedToArray2 = __webpack_require__(157);
+	var _slicedToArray2 = __webpack_require__(129);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
@@ -1527,9 +1640,9 @@
 	
 	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 	
-	__webpack_require__(161);
+	__webpack_require__(164);
 	
-	var _amfeEnv = __webpack_require__(163);
+	var _amfeEnv = __webpack_require__(166);
 	
 	var _util = __webpack_require__(6);
 	
@@ -1715,7 +1828,7 @@
 	
 	        queue.loadManifest({
 	            path: 'assets/' + assetsPrefix + '/game/anime/',
-	            manifest: [{ id: 'anime-47-1', src: 'anime-47-1.png' }, { id: 'anime-47-2', src: 'anime-47-2.png' }, { id: 'anime-47-3', src: 'anime-47-3.png' }, { id: 'anime-47-4', src: 'anime-47-4.png' }, { id: 'anime-47-5', src: 'anime-47-5.png' }, { id: 'anime-48-1', src: 'anime-48-1.png' }, { id: 'anime-48-2', src: 'anime-48-2.png' }, { id: 'anime-48-3', src: 'anime-48-3.png' }, { id: 'anime-48-4', src: 'anime-48-4.png' }, { id: 'anime-48-5', src: 'anime-48-5.png' }, { id: 'anime-50-1', src: 'anime-50-1.png' }, { id: 'anime-50-2', src: 'anime-50-2.png' }, { id: 'anime-50-3', src: 'anime-50-3.png' }, { id: 'anime-50-4', src: 'anime-50-4.png' }, { id: 'anime-50-5', src: 'anime-50-5.png' }]
+	            manifest: [{ id: 'anime-13-1', src: 'anime-13-1.png' }, { id: 'anime-13-2', src: 'anime-13-1.png' }, { id: 'anime-13-3', src: 'anime-13-1.png' }, { id: 'anime-13-4', src: 'anime-13-1.png' }, { id: 'anime-13-5', src: 'anime-13-5.png' }, { id: 'anime-14-1', src: 'anime-14-1.png' }, { id: 'anime-14-2', src: 'anime-14-1.png' }, { id: 'anime-14-3', src: 'anime-14-1.png' }, { id: 'anime-14-4', src: 'anime-14-1.png' }, { id: 'anime-14-5', src: 'anime-14-1.png' }, { id: 'anime-19-1', src: 'anime-19-1.png' }, { id: 'anime-19-2', src: 'anime-19-1.png' }, { id: 'anime-19-3', src: 'anime-19-1.png' }, { id: 'anime-19-4', src: 'anime-19-1.png' }, { id: 'anime-19-5', src: 'anime-19-5.png' }, { id: 'anime-20-1', src: 'anime-20-1.png' }, { id: 'anime-20-2', src: 'anime-20-1.png' }, { id: 'anime-20-3', src: 'anime-20-1.png' }, { id: 'anime-20-4', src: 'anime-20-1.png' }, { id: 'anime-20-5', src: 'anime-20-5.png' }, { id: 'anime-25-1', src: 'anime-25-1.png' }, { id: 'anime-25-2', src: 'anime-25-1.png' }, { id: 'anime-25-3', src: 'anime-25-1.png' }, { id: 'anime-25-4', src: 'anime-25-1.png' }, { id: 'anime-25-5', src: 'anime-25-5.png' }, { id: 'anime-33-1', src: 'anime-33-1.png' }, { id: 'anime-33-2', src: 'anime-33-1.png' }, { id: 'anime-33-3', src: 'anime-33-1.png' }, { id: 'anime-33-4', src: 'anime-33-1.png' }, { id: 'anime-33-5', src: 'anime-33-5.png' }, { id: 'anime-39-1', src: 'anime-39-1.png' }, { id: 'anime-39-2', src: 'anime-39-1.png' }, { id: 'anime-39-3', src: 'anime-39-1.png' }, { id: 'anime-39-4', src: 'anime-39-1.png' }, { id: 'anime-39-5', src: 'anime-39-5.png' }, { id: 'anime-41-1', src: 'anime-41-1.png' }, { id: 'anime-41-2', src: 'anime-41-1.png' }, { id: 'anime-41-3', src: 'anime-41-1.png' }, { id: 'anime-41-4', src: 'anime-41-1.png' }, { id: 'anime-41-5', src: 'anime-41-5.png' }, { id: 'anime-43-1', src: 'anime-43-1.png' }, { id: 'anime-43-2', src: 'anime-43-1.png' }, { id: 'anime-43-3', src: 'anime-43-1.png' }, { id: 'anime-43-4', src: 'anime-43-1.png' }, { id: 'anime-43-5', src: 'anime-43-5.png' }, { id: 'anime-44-1', src: 'anime-44-1.png' }, { id: 'anime-44-2', src: 'anime-44-1.png' }, { id: 'anime-44-3', src: 'anime-44-1.png' }, { id: 'anime-44-4', src: 'anime-44-1.png' }, { id: 'anime-44-5', src: 'anime-44-5.png' }, { id: 'anime-45-1', src: 'anime-45-1.png' }, { id: 'anime-45-2', src: 'anime-45-1.png' }, { id: 'anime-45-3', src: 'anime-45-1.png' }, { id: 'anime-45-4', src: 'anime-45-1.png' }, { id: 'anime-45-5', src: 'anime-45-5.png' }, { id: 'anime-47-1', src: 'anime-47-1.png' }, { id: 'anime-47-2', src: 'anime-47-1.png' }, { id: 'anime-47-3', src: 'anime-47-1.png' }, { id: 'anime-47-4', src: 'anime-47-1.png' }, { id: 'anime-47-5', src: 'anime-47-5.png' }, { id: 'anime-48-1', src: 'anime-48-1.png' }, { id: 'anime-48-2', src: 'anime-48-1.png' }, { id: 'anime-48-3', src: 'anime-48-1.png' }, { id: 'anime-48-4', src: 'anime-48-1.png' }, { id: 'anime-48-5', src: 'anime-48-5.png' }, { id: 'anime-50-1', src: 'anime-50-1.png' }, { id: 'anime-50-2', src: 'anime-50-1.png' }, { id: 'anime-50-3', src: 'anime-50-1.png' }, { id: 'anime-50-4', src: 'anime-50-1.png' }, { id: 'anime-50-5', src: 'anime-50-1.png' }]
 	        });
 	
 	        queue.loadManifest({
@@ -1730,19 +1843,20 @@
 	    });
 	};
 	
+	var viewport = void 0;
 	(0, _util.domready)().then(function () {
 	    // load preload manifest
-	    _util.doc.body.setAttribute('id', 'preload');
-	    _util.doc.body.setAttribute('rol', 'image');
-	    _util.doc.body.className = 'bg-dark';
-	    _util.doc.body.innerHTML = TEMPLATE_PRELOAD;
+	    viewport = (0, _util.query)(_util.doc.body, 'div[bodywrap]');
+	    viewport.setAttribute('id', 'preload');
+	    viewport.setAttribute('rol', 'image');
+	    viewport.className = 'bg-dark';
+	    viewport.innerHTML = TEMPLATE_PRELOAD;
 	
-	    return loadPreloadManifest(_util.doc.body);
+	    return loadPreloadManifest(viewport);
 	}).then(function () {
 	    // load game manifest
 	    var body = document.createElement('div');
 	    body.innerHTML = TEMPLATE_GAME;
-	
 	    return loadGameManifest(body);
 	}).then(function (gameBody) {
 	    var fragment = document.createDocumentFragment();
@@ -1772,12 +1886,12 @@
 	        }
 	    }
 	
-	    _util.doc.body.removeAttribute('id');
-	    _util.doc.body.removeAttribute('rol');
-	    _util.doc.body.style.cssText = '';
-	    _util.doc.body.className = '';
-	    _util.doc.body.innerHTML = '';
-	    _util.doc.body.appendChild(fragment);
+	    viewport.removeAttribute('id');
+	    viewport.removeAttribute('rol');
+	    viewport.style.cssText = '';
+	    viewport.className = '';
+	    viewport.innerHTML = '';
+	    viewport.appendChild(fragment);
 	
 	    ready.resolve(items);
 	}).catch(function (e) {
@@ -1785,123 +1899,13 @@
 	});
 
 /***/ },
-/* 154 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(155), __esModule: true };
-
-/***/ },
-/* 155 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(75);
-	__webpack_require__(10);
-	module.exports = __webpack_require__(156);
-
-/***/ },
-/* 156 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var anObject = __webpack_require__(23)
-	  , get      = __webpack_require__(58);
-	module.exports = __webpack_require__(18).getIterator = function(it){
-	  var iterFn = get(it);
-	  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
-	  return anObject(iterFn.call(it));
-	};
-
-/***/ },
-/* 157 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	exports.__esModule = true;
-	
-	var _isIterable2 = __webpack_require__(158);
-	
-	var _isIterable3 = _interopRequireDefault(_isIterable2);
-	
-	var _getIterator2 = __webpack_require__(154);
-	
-	var _getIterator3 = _interopRequireDefault(_getIterator2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = function () {
-	  function sliceIterator(arr, i) {
-	    var _arr = [];
-	    var _n = true;
-	    var _d = false;
-	    var _e = undefined;
-	
-	    try {
-	      for (var _i = (0, _getIterator3.default)(arr), _s; !(_n = (_s = _i.next()).done); _n = true) {
-	        _arr.push(_s.value);
-	
-	        if (i && _arr.length === i) break;
-	      }
-	    } catch (err) {
-	      _d = true;
-	      _e = err;
-	    } finally {
-	      try {
-	        if (!_n && _i["return"]) _i["return"]();
-	      } finally {
-	        if (_d) throw _e;
-	      }
-	    }
-	
-	    return _arr;
-	  }
-	
-	  return function (arr, i) {
-	    if (Array.isArray(arr)) {
-	      return arr;
-	    } else if ((0, _isIterable3.default)(Object(arr))) {
-	      return sliceIterator(arr, i);
-	    } else {
-	      throw new TypeError("Invalid attempt to destructure non-iterable instance");
-	    }
-	  };
-	}();
-
-/***/ },
-/* 158 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(159), __esModule: true };
-
-/***/ },
-/* 159 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(75);
-	__webpack_require__(10);
-	module.exports = __webpack_require__(160);
-
-/***/ },
-/* 160 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var classof   = __webpack_require__(59)
-	  , ITERATOR  = __webpack_require__(51)('iterator')
-	  , Iterators = __webpack_require__(33);
-	module.exports = __webpack_require__(18).isIterable = function(it){
-	  var O = Object(it);
-	  return O[ITERATOR] !== undefined
-	    || '@@iterator' in O
-	    || Iterators.hasOwnProperty(classof(O));
-	};
-
-/***/ },
-/* 161 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(162);
+	var content = __webpack_require__(165);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(5)(content, {});
@@ -1921,7 +1925,7 @@
 	}
 
 /***/ },
-/* 162 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(4)();
@@ -1929,13 +1933,13 @@
 	
 	
 	// module
-	exports.push([module.id, "#preload {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    position: relative;\n}\n\n#preload .bg-light {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    -webkit-transition: opacity 0.4s linear 0s;\n    position: relative;\n}\n\n#preload .human {\n    position: absolute;\n    width: 1.68rem;\n    height: 3.36rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0.53rem;\n    bottom: 0.133rem;\n}\n\n#preload .light-point {\n    position: absolute;\n    width: 2.2rem;\n    height: 2.2rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    left: 1.05rem;\n    bottom: 2.35rem;\n}\n\n#preload .light-point.anime {\n    -webkit-transition: opacity 0.4s linear 0s;\n    opacity: 1;\n}\n\n#preload .light-point.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .light-lazer {\n    position: absolute;\n    width: 7.36rem;\n    height: 10.33rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 2rem;\n    bottom: 3.4rem;\n    opacity: 0;\n    -webkit-transform: rotate(0deg);\n    -webkit-transform-origin: 0 bottom;\n}\n\n#preload .light-lazer.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    -webkit-animation: lazer-swing 1s linear 0.6s infinite alternate;\n    opacity: 1;\n}\n\n#preload .light-lazer.anime.end {\n    -webkit-transition: none;\n    -webkit-animation: none;\n    opacity: 1;\n}\n\n@-webkit-keyframes lazer-swing {\n    0% {\n        -webkit-transform: rotate(-15deg);\n    }\n\n    100% {\n        -webkit-transform: rotate(15deg);\n    }\n}\n\n#preload .logo {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0;\n    bottom: 0;\n    opacity: 0;\n}\n\n#preload .logo.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    opacity: 1;\n}\n\n#preload .logo.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .progress {\n    position: absolute;\n    left: 2.4rem;\n    bottom: 2.133rem;\n    width: 100%;\n}\n\n#preload .progress p {\n    text-align: left;\n    padding: 0;\n    margin: 0;\n    line-height: 22px;\n    height: 22px;\n    font-size: 12px;\n    color: #00bed5;\n    display: block;\n    width: 70%;\n    display: -webkit-box;\n    -webkit-box-align: center;\n    text-shadow:\n        4px 0 2px rgba(0, 203, 227,0.3),\n        0 4px 2px rgba(0, 203, 227,0.3), \n        0 -4px 2px rgba(0, 203, 227,0.3),\n        -4px 0 2px rgba(0, 203, 227,0.3);\n}\n\n#preload .progress p * {\n    display: block;\n}\n\n#preload .progress p span {\n    display: none;\n    width: 3px;\n    height: 10px;\n    margin: 0 1px;\n    background-color: #00bed5;\n    box-shadow:\n        4px 0 2px rgba(0, 203, 227,0.3),\n        0 4px 2px rgba(0, 203, 227,0.3), \n        0 -4px 2px rgba(0, 203, 227,0.3),\n        -4px 0 2px rgba(0, 203, 227,0.3);\n}\n\n#preload .progress p label,\n    #preload .progress p b {\n    margin: 0 2px;\n}", ""]);
+	exports.push([module.id, "#preload {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n}\n\n#preload .bg-light {\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    -webkit-transition: opacity 0.4s linear 0s;\n    position: relative;\n}\n\n#preload .human {\n    position: absolute;\n    width: 1.68rem;\n    height: 3.36rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0.53rem;\n    bottom: 0.133rem;\n}\n\n#preload .light-point {\n    position: absolute;\n    width: 2.2rem;\n    height: 2.2rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    opacity: 0;\n    left: 1.05rem;\n    bottom: 2.35rem;\n}\n\n#preload .light-point.anime {\n    -webkit-transition: opacity 0.4s linear 0s;\n    opacity: 1;\n}\n\n#preload .light-point.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .light-lazer {\n    position: absolute;\n    width: 7.36rem;\n    height: 10.33rem;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 2rem;\n    bottom: 3.4rem;\n    opacity: 0;\n    -webkit-transform: rotate(0deg);\n    -webkit-transform-origin: 0 bottom;\n}\n\n#preload .light-lazer.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    -webkit-animation: lazer-swing 1s linear 0.6s infinite alternate;\n    opacity: 1;\n}\n\n#preload .light-lazer.anime.end {\n    -webkit-transition: none;\n    -webkit-animation: none;\n    opacity: 1;\n}\n\n@-webkit-keyframes lazer-swing {\n    0% {\n        -webkit-transform: rotate(-15deg);\n    }\n\n    100% {\n        -webkit-transform: rotate(15deg);\n    }\n}\n\n#preload .logo {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    background-position: left bottom;\n    background-repeat: no-repeat;\n    background-size: cover;\n    left: 0;\n    bottom: 0;\n    opacity: 0;\n}\n\n#preload .logo.anime {\n    -webkit-transition: opacity 0.6s linear 0s;\n    opacity: 1;\n}\n\n#preload .logo.anime.end {\n    -webkit-transition: none;\n    opacity: 1;\n}\n\n#preload .progress {\n    position: absolute;\n    left: 2.4rem;\n    bottom: 2.133rem;\n    width: 100%;\n}\n\n#preload .progress p {\n    text-align: left;\n    padding: 0;\n    margin: 0;\n    line-height: 22px;\n    height: 22px;\n    font-size: 12px;\n    color: #00bed5;\n    display: block;\n    width: 70%;\n    display: -webkit-box;\n    -webkit-box-align: center;\n    text-shadow:\n        4px 0 2px rgba(0, 203, 227,0.3),\n        0 4px 2px rgba(0, 203, 227,0.3), \n        0 -4px 2px rgba(0, 203, 227,0.3),\n        -4px 0 2px rgba(0, 203, 227,0.3);\n}\n\n#preload .progress p * {\n    display: block;\n}\n\n#preload .progress p span {\n    display: none;\n    width: 3px;\n    height: 10px;\n    margin: 0 1px;\n    background-color: #00bed5;\n    box-shadow:\n        4px 0 2px rgba(0, 203, 227,0.3),\n        0 4px 2px rgba(0, 203, 227,0.3), \n        0 -4px 2px rgba(0, 203, 227,0.3),\n        -4px 0 2px rgba(0, 203, 227,0.3);\n}\n\n#preload .progress p label,\n    #preload .progress p b {\n    margin: 0 2px;\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 163 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1945,27 +1949,27 @@
 	});
 	exports.Version = exports.params = exports.thirdapp = exports.aliapp = exports.os = exports.browser = undefined;
 	
-	var _aliapp = __webpack_require__(164);
+	var _aliapp = __webpack_require__(167);
 	
 	var _aliapp2 = _interopRequireDefault(_aliapp);
 	
-	var _browser = __webpack_require__(167);
+	var _browser = __webpack_require__(170);
 	
 	var _browser2 = _interopRequireDefault(_browser);
 	
-	var _os = __webpack_require__(166);
+	var _os = __webpack_require__(169);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
-	var _thirdapp = __webpack_require__(168);
+	var _thirdapp = __webpack_require__(171);
 	
 	var _thirdapp2 = _interopRequireDefault(_thirdapp);
 	
-	var _params = __webpack_require__(169);
+	var _params = __webpack_require__(172);
 	
 	var _params2 = _interopRequireDefault(_params);
 	
-	var _version = __webpack_require__(165);
+	var _version = __webpack_require__(168);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -1979,7 +1983,7 @@
 	exports.Version = _version2.default;
 
 /***/ },
-/* 164 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1988,11 +1992,11 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(165);
+	var _version = __webpack_require__(168);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
-	var _os = __webpack_require__(166);
+	var _os = __webpack_require__(169);
 	
 	var _os2 = _interopRequireDefault(_os);
 	
@@ -2061,7 +2065,7 @@
 	exports.default = aliapp;
 
 /***/ },
-/* 165 */
+/* 168 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2152,7 +2156,7 @@
 	exports.default = Version;
 
 /***/ },
-/* 166 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2161,7 +2165,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(165);
+	var _version = __webpack_require__(168);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2213,7 +2217,7 @@
 	exports.default = os;
 
 /***/ },
-/* 167 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2222,7 +2226,7 @@
 	    value: true
 	});
 	
-	var _version = __webpack_require__(165);
+	var _version = __webpack_require__(168);
 	
 	var _version2 = _interopRequireDefault(_version);
 	
@@ -2311,7 +2315,7 @@
 	exports.default = browser;
 
 /***/ },
-/* 168 */
+/* 171 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2349,7 +2353,7 @@
 	exports.default = thirdapp;
 
 /***/ },
-/* 169 */
+/* 172 */
 /***/ function(module, exports) {
 
 	'use strict';

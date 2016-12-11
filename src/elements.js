@@ -105,6 +105,14 @@ export class AnimeElements extends CanvasImage {
         this.items = items;
     }
 
+    get amount() {
+        return Object.keys(this.slices).length;
+    }
+
+    get found() {
+        return Object.keys(this.slices).filter(i => this.slices[i].completed).length;
+    }
+
     drawImages(scrollX, scrollY) {
         let x = parseInt(scrollX / this.sliceWidth);
         let y = parseInt(scrollY / this.slicehHeight);
@@ -162,6 +170,7 @@ export class AnimeElements extends CanvasImage {
                 if (frame < count) {
                     slice.frame = frame;
                 } else {
+                    slice.completed = true;
                     slice.frame = count - 1;
                     return true;
                 }
@@ -206,20 +215,31 @@ export class AnimeElements extends CanvasImage {
     }
 }
 
-export class ElementCount {
+export class ElementCount extends Event {
     constructor(viewport) {
+        super();
+
+        this.step = 5;
         this.countEl = query(viewport, '#elements-count');
-        this.elementAmout = 50;
-        this.findedCount = 0;
+        this.found = 0;
+        this.amount = 0;
     }
 
-    update() {
-        this.countEl.textContent = `${this.findedCount}/${this.elementAmout}`;
+    update(amount, found) {
+        if (found !== this.found) {
+            this.countEl.textContent = `${found}/${amount}`;
+            if (found !== 0 && found % this.step === 0) {
+                this.emit('found', {
+                    time: parseInt(found / this.step)
+                });
+            }
+            this.found = found;
+            this.amount = amount;
+        }
     }
 
     ready() {
         return new Promise((resolve, reject) => {
-            this.update();
             resolve(this);
         });
     }
