@@ -16,6 +16,7 @@ import Cloud from './cloud';
 import Star from './star';
 import {
     StaticElements,
+    AnimeElements,
     ElementCount
 } from './elements';
 import Map from './map';
@@ -33,6 +34,7 @@ let galaxy;
 let cloud;
 let star;
 let staticElements;
+let animeElements;
 let elementCount;
 let map;
 let pop;
@@ -65,6 +67,7 @@ preload
     })
     .then(() => {
         scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, 0.3);
+        scroller.enable = false;
         return scroller.ready();
     })
     .then(() => {
@@ -72,6 +75,9 @@ preload
 
         staticElements = new StaticElements(stage, items);
         promises.push(staticElements.ready());
+
+        animeElements = new AnimeElements(stage, items);
+        promises.push(animeElements.ready());
 
         cloud = new Cloud(stage, items);
         promises.push(cloud.ready());
@@ -84,6 +90,7 @@ preload
     .then(() => { // render
         let scrollX = 0;
         let scrollY = 0;
+        let animeId;
         let clearCloudId;
         let starYRoll = stage.vh;
         let starRollId;
@@ -93,16 +100,26 @@ preload
                 ticker.delete(clearCloudId);
                 clearCloudId = null;
             }
+
+            if (animeId) {
+                ticker.delete(animeId);
+                animeId = null;
+            }
         });
 
         scroller.on('scrolling', e => {
             scrollX = e.x;
             scrollY = e.y;
+            staticElements.drawImages(scrollX, scrollY);
+            animeElements.drawImages(scrollX, scrollY);
         });
 
         scroller.on('scrollend', e => {
-            const tick = cloud.clear(e.x, e.y);
-            clearCloudId = ticker.add(tick);
+            clearCloudId = ticker.add(cloud.clear(e.x, e.y));
+        });
+
+        scroller.on('tap', e => {
+            animeId = ticker.add(animeElements.play(e.ex, e.ey));
         });
 
         starRollId = ticker.add(() => {
@@ -113,19 +130,31 @@ preload
         });
 
         ticker.on('aftertick', e => {
-            let updated = false;
 
             if (scroller.isScrolling ||
+                    ticker.has(animeId) ||
                     ticker.has(clearCloudId) ||
                     ticker.has(starRollId)) {
                 stage.render.clearRect(0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+
+                if (ticker.has(animeId)) {
+                    animeElements.drawImages(scrollX, scrollY);
+                }
+
+                if (scroller.isScrolling ||
+                        ticker.has(animeId) ||
+                        ticker.has(clearCloudId)) {
+                    stage.offscreenRender.clearRect(0, 0, stage.vw, stage.vh);
+                    stage.offscreenRender.drawImage(staticElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                    stage.offscreenRender.drawImage(animeElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                    stage.offscreenRender.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                }
+
+                stage.render.drawImage(stage.offscreenCanvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                updated = true;
             }
 
-            updated && stage.commit();
         });
     })
     .then(() => { // map
@@ -158,6 +187,7 @@ preload
     .then(() => { // bone
         const boneX = stage.width / 2 - stage.vw / 2;
         const boneY = stage.height - stage.vh / 2;
+        scroller.enable = true;
         scroller.scrollTo(boneX, boneY);
     })
     .then(() => { // galaxy event

@@ -21,7 +21,7 @@ export default class Ticker extends Event{
     }
 
     add(f) {
-        if (!this._mapC.has(f)) {
+        if (f && !this._mapC.has(f)) {
             const id = this._id++;
             this._mapF.set(id, f);
             this._mapC.set(f, {
@@ -36,7 +36,7 @@ export default class Ticker extends Event{
     }
 
     delete(id) {
-        if (this._mapF.has(id)) {
+        if (id && this._mapF.has(id)) {
             const f = this._mapF.get(id);
             const c = this._mapC.get(f);
             c.cancel = true;

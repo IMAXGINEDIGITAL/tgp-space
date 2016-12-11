@@ -36,10 +36,15 @@ export class CanvasImage {
     draw(images) {
         const loaded = images.map(image => {
             const deferred = defer();
-            const img = new Image();
-            image.img = img;
-            img.onload = () => deferred.resolve(image);
-            img.src = image.src;
+            if (image.img) {
+                deferred.resolve(image);
+            } else {
+                const img = new Image();
+                image.img = img;
+                img.onload = () => deferred.resolve(image);
+                img.src = image.src;
+            }
+
             return deferred.promise;
         });
 
@@ -82,29 +87,29 @@ export class CanvasRender {
         this.height = height;
         this._visible = new CanvasImage(canvas, width, height);
         this._offscreen = new CanvasImage(width, height); 
-        this._isOffscreen = false;       
     }
 
     get canvas() {
-        return this._isOffscreen ? this._offscreen.canvas : this._visible.canvas;
+        return this._visible.canvas;
     }
 
     get render() {
-        return this._isOffscreen ? this._offscreen.render : this._visible.render;
+        return this._visible.render;
     }
 
     get image() {
-        return this._isOffscreen ? this._offscreen.image : this._visible.image;
+        return this._visible.image;
     }
 
-    transferControlToOffscreen() {
-        this._isOffscreen = true;
+    get offscreenCanvas() {
+        return this._offscreen.canvas;
     }
 
-    commit() {
-        if (this._isOffscreen) {
-            this._visible.render.clearRect(0, 0, this.width, this.height);
-            this._visible.render.drawImage(this._offscreen.canvas, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
-        }
+    get offscreenRender() {
+        return this._offscreen.render;
+    }
+
+    get offscreenImage() {
+        return this._offscreen.image;
     }
 }

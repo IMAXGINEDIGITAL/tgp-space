@@ -14,7 +14,7 @@ export default class Scroller extends Event{
         super();
 
         this._isScrolling = false;
-        this._enable = true;
+        this._enable = false;
         this._scale = scale;
 
         this.width = width;
@@ -25,8 +25,6 @@ export default class Scroller extends Event{
         this.y = 0;
         this.lx = 0;
         this.ly = 0;
-        this.sx = 0;
-        this.sy = 0;
     }
 
     get isScrolling() {
@@ -49,12 +47,16 @@ export default class Scroller extends Event{
         this._enable = enable;
     }
 
-    _emit(name) {
+    _emit(name, extra = {}) {
         const e = {
             x: this.x,
             y: this.y,
             lx: this.lx,
             ly: this.ly
+        }
+
+        for (let key in extra) {
+            e[key] = extra[key];
         }
 
         this.emit(name, e);
@@ -63,6 +65,13 @@ export default class Scroller extends Event{
     ready() {
         return new Promise((resolve, reject) => {
             this._isScrolling = false;
+
+            const emitTap = e => {
+                this._emit('tap', {
+                    ex: this.x + e.touch.clientX,
+                    ey: this.y + e.touch.clientY
+                });
+            }
 
             const emitStart = () => {
                 this._isScrolling = true;
@@ -95,6 +104,10 @@ export default class Scroller extends Event{
                 this.y = y;
                 return true;
             }
+
+            doc.body.addEventListener('tap', e => {
+                this._enable && emitTap(e);
+            });
 
             doc.body.addEventListener('panstart', e => 
                 this._enable && emitStart()

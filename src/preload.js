@@ -14,6 +14,7 @@ import {
 } from './util';
 
 const TEMPLATE_PRELOAD = `
+    <img src="assets/logo.jpg" style="display:none" />
     <div class="bg-light" rol="image"></div>
     <div class="logo" rol="image"></div>
     <div class="light-lazer" rol="image"></div>
@@ -50,6 +51,7 @@ const TEMPLATE_PRELOAD = `
 `;
 
 const TEMPLATE_GAME = `
+    <img src="assets/logo.jpg" style="display:none" />
     <canvas id="stage"></canvas>
     <div id="elements-count" class="ventouse"></div>
     <div id="stage-map" class="ball" rol="image">
@@ -259,7 +261,62 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
             {id: 'close1', src: 'close1.png'},
             {id: 'polaris', src: 'polaris.jpg'},
             {id: 'wormhole', src: 'wormhole.png'}
+        ]
+    });
 
+    queue.loadManifest({
+        path: `assets/${assetsPrefix}/game/static/`,
+        manifest: [
+            {id: 'static-03', src: 'static-03.png'},
+            {id: 'static-10', src: 'static-10.png'},
+            {id: 'static-11', src: 'static-11.png'},
+            {id: 'static-12', src: 'static-12.png'},
+            {id: 'static-14', src: 'static-14.png'},
+            {id: 'static-15', src: 'static-15.png'},
+            {id: 'static-16', src: 'static-16.png'},
+            {id: 'static-17', src: 'static-17.png'},
+            {id: 'static-18', src: 'static-18.png'},
+            {id: 'static-19', src: 'static-19.png'},
+            {id: 'static-21', src: 'static-21.png'},
+            {id: 'static-22', src: 'static-22.png'},
+            {id: 'static-24', src: 'static-24.png'},
+            {id: 'static-26', src: 'static-26.png'},
+            {id: 'static-27', src: 'static-27.png'},
+            {id: 'static-28', src: 'static-28.png'},
+            {id: 'static-29', src: 'static-29.png'},
+            {id: 'static-31', src: 'static-31.png'},
+            {id: 'static-32', src: 'static-32.png'},
+            {id: 'static-34', src: 'static-34.png'},
+            {id: 'static-35', src: 'static-35.png'},
+            {id: 'static-36', src: 'static-36.png'},
+            {id: 'static-37', src: 'static-37.png'},
+            {id: 'static-38', src: 'static-38.png'},
+            {id: 'static-40', src: 'static-40.png'},
+            {id: 'static-42', src: 'static-42.png'},
+            {id: 'static-47', src: 'static-47.png'},
+            {id: 'static-48', src: 'static-48.png'},
+            {id: 'static-49', src: 'static-49.png'}
+        ]
+    });
+
+    queue.loadManifest({
+        path: `assets/${assetsPrefix}/game/anime/`,
+        manifest: [
+            {id: 'anime-47-1', src: 'anime-47-1.png'},
+            {id: 'anime-47-2', src: 'anime-47-2.png'},
+            {id: 'anime-47-3', src: 'anime-47-3.png'},
+            {id: 'anime-47-4', src: 'anime-47-4.png'},
+            {id: 'anime-47-5', src: 'anime-47-5.png'},
+            {id: 'anime-48-1', src: 'anime-48-1.png'},
+            {id: 'anime-48-2', src: 'anime-48-2.png'},
+            {id: 'anime-48-3', src: 'anime-48-3.png'},
+            {id: 'anime-48-4', src: 'anime-48-4.png'},
+            {id: 'anime-48-5', src: 'anime-48-5.png'},
+            {id: 'anime-50-1', src: 'anime-50-1.png'},
+            {id: 'anime-50-2', src: 'anime-50-2.png'},
+            {id: 'anime-50-3', src: 'anime-50-3.png'},
+            {id: 'anime-50-4', src: 'anime-50-4.png'},
+            {id: 'anime-50-5', src: 'anime-50-5.png'}
         ]
     });
 

@@ -104,6 +104,7 @@
 	var cloud = void 0;
 	var star = void 0;
 	var staticElements = void 0;
+	var animeElements = void 0;
 	var elementCount = void 0;
 	var map = void 0;
 	var pop = void 0;
@@ -140,12 +141,16 @@
 	    return stage.ready();
 	}).then(function () {
 	    scroller = new _scroller2.default(stage.width, stage.height, stage.vw, stage.vh, 0.3);
+	    scroller.enable = false;
 	    return scroller.ready();
 	}).then(function () {
 	    var promises = [];
 	
 	    staticElements = new _elements.StaticElements(stage, items);
 	    promises.push(staticElements.ready());
+	
+	    animeElements = new _elements.AnimeElements(stage, items);
+	    promises.push(animeElements.ready());
 	
 	    cloud = new _cloud2.default(stage, items);
 	    promises.push(cloud.ready());
@@ -158,6 +163,7 @@
 	    // render
 	    var scrollX = 0;
 	    var scrollY = 0;
+	    var animeId = void 0;
 	    var clearCloudId = void 0;
 	    var starYRoll = stage.vh;
 	    var starRollId = void 0;
@@ -167,16 +173,26 @@
 	            ticker.delete(clearCloudId);
 	            clearCloudId = null;
 	        }
+	
+	        if (animeId) {
+	            ticker.delete(animeId);
+	            animeId = null;
+	        }
 	    });
 	
 	    scroller.on('scrolling', function (e) {
 	        scrollX = e.x;
 	        scrollY = e.y;
+	        staticElements.drawImages(scrollX, scrollY);
+	        animeElements.drawImages(scrollX, scrollY);
 	    });
 	
 	    scroller.on('scrollend', function (e) {
-	        var tick = cloud.clear(e.x, e.y);
-	        clearCloudId = ticker.add(tick);
+	        clearCloudId = ticker.add(cloud.clear(e.x, e.y));
+	    });
+	
+	    scroller.on('tap', function (e) {
+	        animeId = ticker.add(animeElements.play(e.ex, e.ey));
 	    });
 	
 	    starRollId = ticker.add(function () {
@@ -187,17 +203,25 @@
 	    });
 	
 	    ticker.on('aftertick', function (e) {
-	        var updated = false;
 	
-	        if (scroller.isScrolling || ticker.has(clearCloudId) || ticker.has(starRollId)) {
+	        if (scroller.isScrolling || ticker.has(animeId) || ticker.has(clearCloudId) || ticker.has(starRollId)) {
 	            stage.render.clearRect(0, 0, stage.vw, stage.vh);
 	            stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-	            stage.render.drawImage(staticElements.image, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-	            stage.render.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-	            updated = true;
-	        }
 	
-	        updated && stage.commit();
+	            if (ticker.has(animeId)) {
+	                animeElements.drawImages(scrollX, scrollY);
+	            }
+	
+	            if (scroller.isScrolling || ticker.has(animeId) || ticker.has(clearCloudId)) {
+	                stage.offscreenRender.clearRect(0, 0, stage.vw, stage.vh);
+	                stage.offscreenRender.drawImage(staticElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	                stage.offscreenRender.drawImage(animeElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	                stage.offscreenRender.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	            }
+	
+	            stage.render.drawImage(stage.offscreenCanvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	            stage.render.drawImage(cloud.canvas, scrollX, scrollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+	        }
 	    });
 	}).then(function () {
 	    // map
@@ -229,6 +253,7 @@
 	    // bone
 	    var boneX = stage.width / 2 - stage.vw / 2;
 	    var boneY = stage.height - stage.vh / 2;
+	    scroller.enable = true;
 	    scroller.scrollTo(boneX, boneY);
 	}).then(function () {
 	    // galaxy event
@@ -1664,7 +1689,7 @@
 	        var _this = (0, _possibleConstructorReturn3.default)(this, (Scroller.__proto__ || (0, _getPrototypeOf2.default)(Scroller)).call(this));
 	
 	        _this._isScrolling = false;
-	        _this._enable = true;
+	        _this._enable = false;
 	        _this._scale = scale;
 	
 	        _this.width = width;
@@ -1675,20 +1700,24 @@
 	        _this.y = 0;
 	        _this.lx = 0;
 	        _this.ly = 0;
-	        _this.sx = 0;
-	        _this.sy = 0;
 	        return _this;
 	    }
 	
 	    (0, _createClass3.default)(Scroller, [{
 	        key: '_emit',
 	        value: function _emit(name) {
+	            var extra = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	
 	            var e = {
 	                x: this.x,
 	                y: this.y,
 	                lx: this.lx,
 	                ly: this.ly
 	            };
+	
+	            for (var key in extra) {
+	                e[key] = extra[key];
+	            }
 	
 	            this.emit(name, e);
 	        }
@@ -1699,6 +1728,13 @@
 	
 	            return new _util.Promise(function (resolve, reject) {
 	                _this2._isScrolling = false;
+	
+	                var emitTap = function emitTap(e) {
+	                    _this2._emit('tap', {
+	                        ex: _this2.x + e.touch.clientX,
+	                        ey: _this2.y + e.touch.clientY
+	                    });
+	                };
 	
 	                var emitStart = function emitStart() {
 	                    _this2._isScrolling = true;
@@ -1732,6 +1768,10 @@
 	                    _this2.y = y;
 	                    return true;
 	                };
+	
+	                _util.doc.body.addEventListener('tap', function (e) {
+	                    _this2._enable && emitTap(e);
+	                });
 	
 	                _util.doc.body.addEventListener('panstart', function (e) {
 	                    return _this2._enable && emitStart();
@@ -3712,12 +3752,17 @@
 	
 	            var loaded = images.map(function (image) {
 	                var deferred = (0, _util.defer)();
-	                var img = new Image();
-	                image.img = img;
-	                img.onload = function () {
-	                    return deferred.resolve(image);
-	                };
-	                img.src = image.src;
+	                if (image.img) {
+	                    deferred.resolve(image);
+	                } else {
+	                    var img = new Image();
+	                    image.img = img;
+	                    img.onload = function () {
+	                        return deferred.resolve(image);
+	                    };
+	                    img.src = image.src;
+	                }
+	
 	                return deferred.promise;
 	            });
 	
@@ -3774,36 +3819,37 @@
 	        this.height = height;
 	        this._visible = new CanvasImage(canvas, width, height);
 	        this._offscreen = new CanvasImage(width, height);
-	        this._isOffscreen = false;
 	    }
 	
 	    (0, _createClass3.default)(CanvasRender, [{
-	        key: 'transferControlToOffscreen',
-	        value: function transferControlToOffscreen() {
-	            this._isOffscreen = true;
-	        }
-	    }, {
-	        key: 'commit',
-	        value: function commit() {
-	            if (this._isOffscreen) {
-	                this._visible.render.clearRect(0, 0, this.width, this.height);
-	                this._visible.render.drawImage(this._offscreen.canvas, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
-	            }
-	        }
-	    }, {
 	        key: 'canvas',
 	        get: function get() {
-	            return this._isOffscreen ? this._offscreen.canvas : this._visible.canvas;
+	            return this._visible.canvas;
 	        }
 	    }, {
 	        key: 'render',
 	        get: function get() {
-	            return this._isOffscreen ? this._offscreen.render : this._visible.render;
+	            return this._visible.render;
 	        }
 	    }, {
 	        key: 'image',
 	        get: function get() {
-	            return this._isOffscreen ? this._offscreen.image : this._visible.image;
+	            return this._visible.image;
+	        }
+	    }, {
+	        key: 'offscreenCanvas',
+	        get: function get() {
+	            return this._offscreen.canvas;
+	        }
+	    }, {
+	        key: 'offscreenRender',
+	        get: function get() {
+	            return this._offscreen.render;
+	        }
+	    }, {
+	        key: 'offscreenImage',
+	        get: function get() {
+	            return this._offscreen.image;
 	        }
 	    }]);
 	    return CanvasRender;
@@ -4121,7 +4167,19 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.ElementCount = exports.StaticElements = undefined;
+	exports.ElementCount = exports.AnimeElements = exports.StaticElements = undefined;
+	
+	var _slicedToArray2 = __webpack_require__(157);
+	
+	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+	
+	var _typeof2 = __webpack_require__(72);
+	
+	var _typeof3 = _interopRequireDefault(_typeof2);
+	
+	var _keys = __webpack_require__(170);
+	
+	var _keys2 = _interopRequireDefault(_keys);
 	
 	var _getPrototypeOf = __webpack_require__(62);
 	
@@ -4161,39 +4219,232 @@
 	    function StaticElements(stage, items) {
 	        (0, _classCallCheck3.default)(this, StaticElements);
 	
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (StaticElements.__proto__ || (0, _getPrototypeOf2.default)(StaticElements)).call(this, stage.width, stage.height));
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (StaticElements.__proto__ || (0, _getPrototypeOf2.default)(StaticElements)).call(this, stage.vw, stage.vh));
 	
-	        _this.width = stage.width;
-	        _this.height = stage.height;
+	        _this.hSlice = stage.hSlice;
+	        _this.vSlice = stage.vSlice;
+	        _this.sliceWidth = stage.width / stage.hSlice;
+	        _this.slicehHeight = stage.height / stage.vSlice;
 	        _this.items = items;
 	        return _this;
 	    }
 	
 	    (0, _createClass3.default)(StaticElements, [{
+	        key: 'drawImages',
+	        value: function drawImages(scrollX, scrollY) {
+	            var _this2 = this;
+	
+	            var x = parseInt(scrollX / this.sliceWidth);
+	            var y = parseInt(scrollY / this.slicehHeight);
+	            var index = y * this.hSlice + x;
+	
+	            var params = [];
+	
+	            var pushParams = function pushParams(index) {
+	                var slice = _this2.slices[String(index)];
+	                params.push({
+	                    x: slice.x - scrollX,
+	                    y: slice.y - scrollY,
+	                    width: slice.width,
+	                    height: slice.height,
+	                    img: _this2.slices[index].img
+	                });
+	            };
+	
+	            if (this.slices[String(index)]) {
+	                pushParams(index);
+	            }
+	
+	            if (x < 4 && this.slices[String(index + 1)]) {
+	                pushParams(index + 1);
+	            }
+	
+	            if (y < 9 && this.slices[String(index + this.hSlice)]) {
+	                pushParams(index + this.hSlice);
+	            }
+	
+	            if (x < 4 && y < 9 && this.slices[String(index + this.hSlice + 1)]) {
+	                pushParams(index + this.hSlice + 1);
+	            }
+	
+	            this.draw(params);
+	        }
+	    }, {
 	        key: 'ready',
 	        value: function ready() {
-	            return this.draw([{
-	                src: this.items['elements-top'].src,
-	                x: 0,
-	                y: 0,
-	                width: this.width,
-	                height: this.height * 0.2
-	            }, {
-	                src: this.items['elements-mid'].src,
-	                x: 0,
-	                y: this.height * 0.2,
-	                width: this.width,
-	                height: this.height * 0.4
-	            }, {
-	                src: this.items['elements-bottom'].src,
-	                x: 0,
-	                y: this.height * 0.6,
-	                width: this.width,
-	                height: this.height * 0.4
-	            }]);
+	            var _this3 = this;
+	
+	            var loaded = [];
+	            this.slices = {};
+	
+	            (0, _keys2.default)(this.items).filter(function (id) {
+	                return id.indexOf('static-') === 0;
+	            }).forEach(function (id) {
+	                var item = _this3.items[id];
+	                var index = parseInt(id.match(/^static-(\d+)$/)[1]);
+	                var deferred = (0, _util.defer)();
+	                var image = new Image();
+	                image.onload = function () {
+	                    return deferred.resolve();
+	                };
+	                image.src = item.src;
+	
+	                var x = (index - 1) % _this3.hSlice;
+	                var y = parseInt((index - 1) / _this3.hSlice);
+	
+	                _this3.slices[String(index - 1)] = {
+	                    img: image,
+	                    x: x * _this3.sliceWidth,
+	                    y: y * _this3.slicehHeight,
+	                    width: _this3.sliceWidth,
+	                    height: _this3.slicehHeight
+	                };
+	            });
+	
+	            return _util.Promise.all(loaded);
 	        }
 	    }]);
 	    return StaticElements;
+	}(_canvas.CanvasImage);
+	
+	var AnimeElements = exports.AnimeElements = function (_CanvasImage2) {
+	    (0, _inherits3.default)(AnimeElements, _CanvasImage2);
+	
+	    function AnimeElements(stage, items) {
+	        (0, _classCallCheck3.default)(this, AnimeElements);
+	
+	        var _this4 = (0, _possibleConstructorReturn3.default)(this, (AnimeElements.__proto__ || (0, _getPrototypeOf2.default)(AnimeElements)).call(this, stage.vw, stage.vh));
+	
+	        _this4.hSlice = stage.hSlice;
+	        _this4.vSlice = stage.vSlice;
+	        _this4.sliceWidth = stage.width / stage.hSlice;
+	        _this4.slicehHeight = stage.height / stage.vSlice;
+	        _this4.items = items;
+	        return _this4;
+	    }
+	
+	    (0, _createClass3.default)(AnimeElements, [{
+	        key: 'drawImages',
+	        value: function drawImages(scrollX, scrollY) {
+	            var _this5 = this;
+	
+	            var x = parseInt(scrollX / this.sliceWidth);
+	            var y = parseInt(scrollY / this.slicehHeight);
+	            var index = y * this.hSlice + x;
+	
+	            var params = [];
+	            var pushParams = function pushParams(index) {
+	                var slice = _this5.slices[String(index)];
+	                if (slice.frame < slice.imgs.length) {
+	                    params.push({
+	                        x: slice.x - scrollX,
+	                        y: slice.y - scrollY,
+	                        width: slice.width,
+	                        height: slice.height,
+	                        img: slice.imgs[slice.frame]
+	                    });
+	                }
+	            };
+	
+	            if (this.slices[String(index)]) {
+	                pushParams(index);
+	            }
+	
+	            if (x < 4 && this.slices[String(index + 1)]) {
+	                pushParams(index + 1);
+	            }
+	
+	            if (y < 9 && this.slices[String(index + this.hSlice)]) {
+	                pushParams(index + this.hSlice);
+	            }
+	
+	            if (x < 4 && y < 9 && this.slices[String(index + this.hSlice + 1)]) {
+	                pushParams(index + this.hSlice + 1);
+	            }
+	
+	            this.draw(params);
+	        }
+	    }, {
+	        key: 'play',
+	        value: function play(ex, ey) {
+	            var x = parseInt(ex / this.sliceWidth);
+	            var y = parseInt(ey / this.slicehHeight);
+	            var index = y * this.hSlice + x;
+	            var slice = this.slices[String(index)];
+	
+	            if (slice && slice.frame < slice.imgs.length) {
+	                var _ret = function () {
+	                    var duration = 1000;
+	
+	                    return {
+	                        v: function v(_ref) {
+	                            var delta = _ref.delta,
+	                                elapsed = _ref.elapsed;
+	
+	                            var count = slice.imgs.length;
+	                            var frame = Math.floor(count * (elapsed / duration));
+	
+	                            if (frame < count) {
+	                                slice.frame = frame;
+	                            } else {
+	                                slice.frame = count - 1;
+	                                return true;
+	                            }
+	                        }
+	                    };
+	                }();
+	
+	                if ((typeof _ret === 'undefined' ? 'undefined' : (0, _typeof3.default)(_ret)) === "object") return _ret.v;
+	            }
+	        }
+	    }, {
+	        key: 'ready',
+	        value: function ready() {
+	            var _this6 = this;
+	
+	            var loaded = [];
+	            this.slices = {};
+	
+	            (0, _keys2.default)(this.items).filter(function (id) {
+	                return id.indexOf('anime-') === 0;
+	            }).forEach(function (id) {
+	                var item = _this6.items[id];
+	
+	                var _id$match$slice$filte = id.match(/^anime-(\d+)-(\d+)$/).slice(1, 3).filter(function (i) {
+	                    return parseInt(i);
+	                }),
+	                    _id$match$slice$filte2 = (0, _slicedToArray3.default)(_id$match$slice$filte, 2),
+	                    index = _id$match$slice$filte2[0],
+	                    frame = _id$match$slice$filte2[1];
+	
+	                var deferred = (0, _util.defer)();
+	                var image = new Image();
+	                image.onload = function () {
+	                    return deferred.resolve();
+	                };
+	                image.src = item.src;
+	
+	                var x = (index - 1) % _this6.hSlice;
+	                var y = parseInt((index - 1) / _this6.hSlice);
+	
+	                var slice = _this6.slices[String(index - 1)];
+	                if (!slice) {
+	                    slice = _this6.slices[String(index - 1)] = {
+	                        imgs: [],
+	                        frame: 0,
+	                        x: x * _this6.sliceWidth,
+	                        y: y * _this6.slicehHeight,
+	                        width: _this6.sliceWidth,
+	                        height: _this6.slicehHeight
+	                    };
+	                }
+	                slice.imgs[frame - 1] = image;
+	            });
+	
+	            return _util.Promise.all(loaded);
+	        }
+	    }]);
+	    return AnimeElements;
 	}(_canvas.CanvasImage);
 	
 	var ElementCount = exports.ElementCount = function () {
@@ -4213,11 +4464,11 @@
 	    }, {
 	        key: 'ready',
 	        value: function ready() {
-	            var _this2 = this;
+	            var _this7 = this;
 	
 	            return new _util.Promise(function (resolve, reject) {
-	                _this2.update();
-	                resolve(_this2);
+	                _this7.update();
+	                resolve(_this7);
 	            });
 	        }
 	    }]);
@@ -4529,7 +4780,7 @@
 	    (0, _createClass3.default)(Ticker, [{
 	        key: 'add',
 	        value: function add(f) {
-	            if (!this._mapC.has(f)) {
+	            if (f && !this._mapC.has(f)) {
 	                var id = this._id++;
 	                this._mapF.set(id, f);
 	                this._mapC.set(f, {
@@ -4545,7 +4796,7 @@
 	    }, {
 	        key: 'delete',
 	        value: function _delete(id) {
-	            if (this._mapF.has(id)) {
+	            if (id && this._mapF.has(id)) {
 	                var f = this._mapF.get(id);
 	                var c = this._mapC.get(f);
 	                c.cancel = true;
@@ -5220,6 +5471,153 @@
 	
 	// exports
 
+
+/***/ },
+/* 153 */,
+/* 154 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(155), __esModule: true };
+
+/***/ },
+/* 155 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(75);
+	__webpack_require__(10);
+	module.exports = __webpack_require__(156);
+
+/***/ },
+/* 156 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var anObject = __webpack_require__(23)
+	  , get      = __webpack_require__(58);
+	module.exports = __webpack_require__(18).getIterator = function(it){
+	  var iterFn = get(it);
+	  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
+	  return anObject(iterFn.call(it));
+	};
+
+/***/ },
+/* 157 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	
+	var _isIterable2 = __webpack_require__(158);
+	
+	var _isIterable3 = _interopRequireDefault(_isIterable2);
+	
+	var _getIterator2 = __webpack_require__(154);
+	
+	var _getIterator3 = _interopRequireDefault(_getIterator2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = function () {
+	  function sliceIterator(arr, i) {
+	    var _arr = [];
+	    var _n = true;
+	    var _d = false;
+	    var _e = undefined;
+	
+	    try {
+	      for (var _i = (0, _getIterator3.default)(arr), _s; !(_n = (_s = _i.next()).done); _n = true) {
+	        _arr.push(_s.value);
+	
+	        if (i && _arr.length === i) break;
+	      }
+	    } catch (err) {
+	      _d = true;
+	      _e = err;
+	    } finally {
+	      try {
+	        if (!_n && _i["return"]) _i["return"]();
+	      } finally {
+	        if (_d) throw _e;
+	      }
+	    }
+	
+	    return _arr;
+	  }
+	
+	  return function (arr, i) {
+	    if (Array.isArray(arr)) {
+	      return arr;
+	    } else if ((0, _isIterable3.default)(Object(arr))) {
+	      return sliceIterator(arr, i);
+	    } else {
+	      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+	    }
+	  };
+	}();
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(159), __esModule: true };
+
+/***/ },
+/* 159 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(75);
+	__webpack_require__(10);
+	module.exports = __webpack_require__(160);
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var classof   = __webpack_require__(59)
+	  , ITERATOR  = __webpack_require__(51)('iterator')
+	  , Iterators = __webpack_require__(33);
+	module.exports = __webpack_require__(18).isIterable = function(it){
+	  var O = Object(it);
+	  return O[ITERATOR] !== undefined
+	    || '@@iterator' in O
+	    || Iterators.hasOwnProperty(classof(O));
+	};
+
+/***/ },
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(171), __esModule: true };
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(172);
+	module.exports = __webpack_require__(18).Object.keys;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.14 Object.keys(O)
+	var toObject = __webpack_require__(53)
+	  , $keys    = __webpack_require__(37);
+	
+	__webpack_require__(65)('keys', function(){
+	  return function keys(it){
+	    return $keys(toObject(it));
+	  };
+	});
 
 /***/ }
 /******/ ]);
