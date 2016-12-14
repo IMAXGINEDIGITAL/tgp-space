@@ -23,13 +23,13 @@ export class StaticElements extends CanvasImage {
         this.hSlice = stage.hSlice;
         this.vSlice = stage.vSlice;
         this.sliceWidth = stage.width / stage.hSlice;
-        this.slicehHeight = stage.height / stage.vSlice;
+        this.sliceHeight = stage.height / stage.vSlice;
         this.items = items;
     }
 
     drawImages(scrollX, scrollY) {
         let x = parseInt(scrollX / this.sliceWidth);
-        let y = parseInt(scrollY / this.slicehHeight);
+        let y = parseInt(scrollY / this.sliceHeight);
         let index = y * this.hSlice + x;
 
         const params = [];
@@ -77,6 +77,7 @@ export class StaticElements extends CanvasImage {
             const image = new Image();
             image.onload = () => deferred.resolve();
             image.src = item.src;
+            loaded.push(deferred.promise);
 
             let x = (index - 1) % this.hSlice;
             let y = parseInt((index - 1) / this.hSlice);
@@ -84,9 +85,9 @@ export class StaticElements extends CanvasImage {
             this.slices[String(index - 1)] = {
                 img: image,
                 x: x * this.sliceWidth,
-                y: y * this.slicehHeight,
+                y: y * this.sliceHeight,
                 width: this.sliceWidth,
-                height: this.slicehHeight
+                height: this.sliceHeight
             }
         });
 
@@ -101,7 +102,7 @@ export class AnimeElements extends CanvasImage {
         this.hSlice = stage.hSlice;
         this.vSlice = stage.vSlice;
         this.sliceWidth = stage.width / stage.hSlice;
-        this.slicehHeight = stage.height / stage.vSlice;
+        this.sliceHeight = stage.height / stage.vSlice;
         this.items = items;
     }
 
@@ -115,7 +116,7 @@ export class AnimeElements extends CanvasImage {
 
     drawImages(scrollX, scrollY) {
         let x = parseInt(scrollX / this.sliceWidth);
-        let y = parseInt(scrollY / this.slicehHeight);
+        let y = parseInt(scrollY / this.sliceHeight);
         let index = y * this.hSlice + x;
 
         const params = [];
@@ -153,11 +154,11 @@ export class AnimeElements extends CanvasImage {
 
     play(ex, ey) {
         const x = parseInt(ex / this.sliceWidth);
-        const y = parseInt(ey / this.slicehHeight);
+        const y = parseInt(ey / this.sliceHeight);
         const index = y * this.hSlice + x;
         const slice = this.slices[String(index)];
 
-        if (slice && slice.frame < slice.imgs.length) {
+        if (slice && slice.frame < slice.imgs.length && !slice.completed) {
             const duration = 1000;
 
             return ({
@@ -193,6 +194,7 @@ export class AnimeElements extends CanvasImage {
             const image = new Image();
             image.onload = () => deferred.resolve();
             image.src = item.src;
+            loaded.push(deferred.promise);
 
             let x = (index - 1) % this.hSlice;
             let y = parseInt((index - 1) / this.hSlice);
@@ -203,9 +205,9 @@ export class AnimeElements extends CanvasImage {
                     imgs: [],
                     frame: 0,
                     x: x * this.sliceWidth,
-                    y: y * this.slicehHeight,
+                    y: y * this.sliceHeight,
                     width: this.sliceWidth,
-                    height: this.slicehHeight
+                    height: this.sliceHeight
                 }
             }
             slice.imgs[frame - 1] = image;

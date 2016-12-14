@@ -1486,18 +1486,21 @@
 /* 126 */,
 /* 127 */,
 /* 128 */,
-/* 129 */
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _isIterable2 = __webpack_require__(130);
+	var _isIterable2 = __webpack_require__(133);
 	
 	var _isIterable3 = _interopRequireDefault(_isIterable2);
 	
-	var _getIterator2 = __webpack_require__(133);
+	var _getIterator2 = __webpack_require__(136);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -1542,34 +1545,6 @@
 	}();
 
 /***/ },
-/* 130 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(131), __esModule: true };
-
-/***/ },
-/* 131 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(75);
-	__webpack_require__(10);
-	module.exports = __webpack_require__(132);
-
-/***/ },
-/* 132 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var classof   = __webpack_require__(59)
-	  , ITERATOR  = __webpack_require__(51)('iterator')
-	  , Iterators = __webpack_require__(33);
-	module.exports = __webpack_require__(18).isIterable = function(it){
-	  var O = Object(it);
-	  return O[ITERATOR] !== undefined
-	    || '@@iterator' in O
-	    || Iterators.hasOwnProperty(classof(O));
-	};
-
-/***/ },
 /* 133 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1587,6 +1562,34 @@
 /* 135 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var classof   = __webpack_require__(59)
+	  , ITERATOR  = __webpack_require__(51)('iterator')
+	  , Iterators = __webpack_require__(33);
+	module.exports = __webpack_require__(18).isIterable = function(it){
+	  var O = Object(it);
+	  return O[ITERATOR] !== undefined
+	    || '@@iterator' in O
+	    || Iterators.hasOwnProperty(classof(O));
+	};
+
+/***/ },
+/* 136 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(137), __esModule: true };
+
+/***/ },
+/* 137 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(75);
+	__webpack_require__(10);
+	module.exports = __webpack_require__(138);
+
+/***/ },
+/* 138 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var anObject = __webpack_require__(23)
 	  , get      = __webpack_require__(58);
 	module.exports = __webpack_require__(18).getIterator = function(it){
@@ -1596,9 +1599,6 @@
 	};
 
 /***/ },
-/* 136 */,
-/* 137 */,
-/* 138 */,
 /* 139 */,
 /* 140 */,
 /* 141 */,
@@ -1628,11 +1628,11 @@
 
 	'use strict';
 	
-	var _getIterator2 = __webpack_require__(133);
+	var _getIterator2 = __webpack_require__(136);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
-	var _slicedToArray2 = __webpack_require__(129);
+	var _slicedToArray2 = __webpack_require__(132);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
@@ -1818,7 +1818,7 @@
 	
 	        queue.loadManifest({
 	            path: 'assets/' + assetsPrefix + '/game/',
-	            manifest: [{ id: 'elements-top', src: 'elements-1.png' }, { id: 'elements-mid', src: 'elements-2.png' }, { id: 'elements-bottom', src: 'elements-3.png' }, { id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud', src: 'cloud.png' }, { id: 'star', src: 'star.png' }, { id: 'popWin', src: 'pop.png' }, { id: 'ball', src: 'ball.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }, { id: 'close1', src: 'close1.png' }, { id: 'polaris', src: 'polaris.jpg' }, { id: 'wormhole', src: 'wormhole.png' }]
+	            manifest: [{ id: 'galaxy-map', src: 'map.jpg' }, { id: 'cloud-1', src: 'cloud-1.png' }, { id: 'cloud-2', src: 'cloud-2.png' }, { id: 'cloud-3', src: 'cloud-3.png' }, { id: 'cloud-4', src: 'cloud-4.png' }, { id: 'cloud-5', src: 'cloud-5.png' }, { id: 'cloud-6', src: 'cloud-6.png' }, { id: 'cloud-7', src: 'cloud-7.png' }, { id: 'cloud-8', src: 'cloud-8.png' }, { id: 'cloud-mask', src: 'cloud-mask.png' }, { id: 'star', src: 'star.png' }, { id: 'popWin', src: 'pop.png' }, { id: 'ball', src: 'ball.png' }, { id: 'scope', src: 'scope.png' }, { id: 'close', src: 'close.png' }, { id: 'close1', src: 'close1.png' }, { id: 'polaris', src: 'polaris.jpg' }, { id: 'wormhole', src: 'wormhole.png' }]
 	        });
 	
 	        queue.loadManifest({
