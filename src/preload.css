@@ -1,157 +1,54 @@
-#preload {
-    width: 100%;
-    height: 100%;
-    background-position: left bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
+body.anime {
+    -webkit-backface-visibility: visible;
+    -webkit-perspective-origin: 0% 50%;
+    -webkit-transform-style: preserve-3d;
+    -webkit-perspective: 10rem;
 }
 
-#preload .bg-light {
+#preload {
+    -webkit-transform: rotateY(0);
+}
+
+#preload .bg {
     width: 100%;
     height: 100%;
     background-position: left bottom;
     background-repeat: no-repeat;
     background-size: cover;
-    opacity: 0;
     -webkit-transition: opacity 0.4s linear 0s;
     position: relative;
 }
 
-#preload .human {
-    position: absolute;
-    width: 1.68rem;
-    height: 3.36rem;
-    background-position: left bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
-    left: 0.53rem;
-    bottom: 0.133rem;
-}
-
-#preload .light-point {
-    position: absolute;
-    width: 2.2rem;
-    height: 2.2rem;
-    background-position: left bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
-    opacity: 0;
-    left: 1.05rem;
-    bottom: 2.35rem;
-}
-
-#preload .light-point.anime {
-    -webkit-transition: opacity 0.4s linear 0s;
-    opacity: 1;
-}
-
-#preload .light-point.anime.end {
-    -webkit-transition: none;
-    opacity: 1;
-}
-
-#preload .light-lazer {
-    position: absolute;
-    width: 7.36rem;
-    height: 10.33rem;
-    background-position: left bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
-    left: 2rem;
-    bottom: 3.4rem;
-    opacity: 0;
-    -webkit-transform: rotate(0deg);
-    -webkit-transform-origin: 0 bottom;
-}
-
-#preload .light-lazer.anime {
-    -webkit-transition: opacity 0.6s linear 0s;
-    -webkit-animation: lazer-swing 1s linear 0.6s infinite alternate;
-    opacity: 1;
-}
-
-#preload .light-lazer.anime.end {
-    -webkit-transition: none;
-    -webkit-animation: none;
-    opacity: 1;
-}
-
-@-webkit-keyframes lazer-swing {
-    0% {
-        -webkit-transform: rotate(-15deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(15deg);
-    }
-}
-
-#preload .logo {
+#preload .light {
     position: absolute;
     width: 100%;
-    height: 100%;
+    height: 11.973rem;
     background-position: left bottom;
     background-repeat: no-repeat;
     background-size: cover;
     left: 0;
-    bottom: 0;
+    bottom: 3.786rem;
+}
+
+#preload .logo {
+    position: absolute;
+    width: 10rem;
+    height: 11.973rem;
+    background-position: left bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
+    left: 0rem;
+    bottom: 3.786rem;
     opacity: 0;
 }
 
 #preload .logo.anime {
-    -webkit-transition: opacity 0.6s linear 0s;
+    -webkit-transition: opacity 0.6s ease-in 0s;
     opacity: 1;
 }
 
-#preload .logo.anime.end {
-    -webkit-transition: none;
-    opacity: 1;
-}
-
-#preload .progress {
-    position: absolute;
-    left: 2.4rem;
-    bottom: 2.133rem;
-    width: 100%;
-}
-
-#preload .progress p {
-    text-align: left;
-    padding: 0;
-    margin: 0;
-    line-height: 22px;
-    height: 22px;
-    font-size: 12px;
-    color: #00bed5;
-    display: block;
-    width: 70%;
-    display: -webkit-box;
-    -webkit-box-align: center;
-    text-shadow:
-        4px 0 2px rgba(0, 203, 227,0.3),
-        0 4px 2px rgba(0, 203, 227,0.3), 
-        0 -4px 2px rgba(0, 203, 227,0.3),
-        -4px 0 2px rgba(0, 203, 227,0.3);
-}
-
-#preload .progress p * {
-    display: block;
-}
-
-#preload .progress p span {
-    display: none;
-    width: 3px;
-    height: 10px;
-    margin: 0 1px;
-    background-color: #00bed5;
-    box-shadow:
-        4px 0 2px rgba(0, 203, 227,0.3),
-        0 4px 2px rgba(0, 203, 227,0.3), 
-        0 -4px 2px rgba(0, 203, 227,0.3),
-        -4px 0 2px rgba(0, 203, 227,0.3);
-}
-
-#preload .progress p label,
-    #preload .progress p b {
-    margin: 0 2px;
+#preload.anime {
+    -webkit-transform-origin: 0 50% 0;
+    -webkit-transition: -webkit-transform 1s ease-out 0s;
+    -webkit-transform: rotateY(90deg);
 }

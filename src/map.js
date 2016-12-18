@@ -18,9 +18,14 @@ export default class Map extends Event {
         this.canvasEl = query(this.viewport, 'canvas');
         this.render = this.canvasEl.getContext('2d');
         this.indicatorEl = query(this.viewport, '.indicator');
+        this.textEl = query(this.viewport, '.text b');
         this.hSlice = hSlice;
         this.vSlice = vSlice;
         this.opened = false;
+    }
+
+    text(str) {
+        this.textEl.textContent = str;
     }
 
     update(xp, yp) {
@@ -39,31 +44,10 @@ export default class Map extends Event {
         this.render.fillRect(cWidth * xp, cHeight * yp, sWidth, sHeight);
     }
 
-    toggleOpen() {
-        if (!this.opened) {
-            this.wrapEl.rects = null;
-            this.viewport.rects = null;
-
-            const {width, height} = getRect(this.wrapEl);
-            this.viewport.className += ' open';
-            const {height: vh} = getRect(this.viewport);
-
-            this.wrapEl.style.width = `${width * vh / height}px`;
-            this.wrapEl.style.height = `${vh}px`;
-
-            this.opened = true;
-            this.emit('open');
-        } else {
-            this.viewport.className = this.viewport.className.replace('open', '');
-            this.wrapEl.style.width = '';
-            this.wrapEl.style.height = '';
-            this.opened = false;
-            this.emit('close');
-        }
-    }
-
     ready() {
         return new Promise((resolve, reject) => {
+            this.viewport.style.display = '';
+
             const {width, height} = getRect(this.canvasEl);
             this.width = width;
             this.height = height;
@@ -77,8 +61,6 @@ export default class Map extends Event {
             this.render.fillRect(0, 0, width, height);
             this.render.fillStyle = 'rgba(0, 0, 0, 1)';
             this.render.globalCompositeOperation = 'destination-out';
-
-            this.viewport.addEventListener('tap', () => this.toggleOpen(), false);
 
             resolve(this);
         });

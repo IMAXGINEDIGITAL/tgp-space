@@ -4,6 +4,7 @@ import {
     doc,
     Promise,
     defer,
+    delay,
     query,
     queryAll,
     getRect,
@@ -218,20 +219,31 @@ export class AnimeElements extends CanvasImage {
 }
 
 export class ElementCount extends Event {
-    constructor(viewport) {
+    constructor(viewport, items) {
         super();
 
         this.step = 5;
-        this.countEl = query(viewport, '#elements-count');
+        this.wrapEl = query(viewport, '#elements-count');
+        this.textEl = query(this.wrapEl, '.text');
+        this.textNumberEl = query(this.textEl, '.number');
+        this.textTipEl = query(this.textEl, '.tip');
+        this.textBgEl = query(this.textEl, '.bg');
+        this.barEl = query(this.wrapEl, '.progress .bar');
         this.found = 0;
         this.amount = 0;
+        this.items = items;
     }
 
     update(amount, found) {
-        if (found !== this.found) {
-            this.countEl.textContent = `${found}/${amount}`;
+        if (found !== this.found 
+            || amount !== this.amount) {
+            this.textNumberEl.textContent = `${found}/${amount}`;
+            this.barEl.style.width = `${found/amount*100}%`;
+
             if (found !== 0 && found % this.step === 0) {
                 this.emit('found', {
+                    found: found,
+                    amount: amount,
                     time: parseInt(found / this.step)
                 });
             }
@@ -240,8 +252,40 @@ export class ElementCount extends Event {
         }
     }
 
+    show({
+        tip,
+        bgType
+    }) {
+        const items = this.items;
+
+        return new Promise((resolve, reject) => {
+            this.textTipEl.innerHTML = tip;
+            this.textBgEl.className = `bg bg${bgType}`;
+            this.textBgEl.style.backgroundImage = 
+                `url(${items['tipBg' + bgType].src})`;
+            this.wrapEl.className = 'open';
+
+            delay(400)
+                .then(() => {
+                    this.textTipEl.style.display = '';
+                    this.textBgEl.style.display = '';
+                    return delay(3000);
+                })
+                .then(() => {
+                    this.textTipEl.style.display = 'none';
+                    this.textBgEl.style.display = 'none';
+                    this.wrapEl.className = '';
+                    return delay(400);
+                })
+                .then(() => {
+                    resolve();
+                })
+        });
+    }
+
     ready() {
         return new Promise((resolve, reject) => {
+            this.wrapEl.style.display = '';
             resolve(this);
         });
     }

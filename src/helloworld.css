@@ -1,0 +1,9 @@
+#helloworld {
+    width: 100%;
+    height: 100%;
+    background-position: 0 center;
+    background-size: 60rem 17.786rem;
+    background-repeat: no-repeat;
+    position: absolute;
+    -webkit-tranform: translateZ(9999px);
+}

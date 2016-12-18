@@ -3,6 +3,7 @@ import {
     doc,
     Promise,
     defer,
+    loadImg,
     query,
     queryAll,
     getRect
@@ -33,49 +34,51 @@ export class CanvasImage {
         return this._image;
     }
 
-    draw(images) {
-        const loaded = images.map(image => {
+    draw(params) {
+        const loaded = params.map(param => {
             const deferred = defer();
-            if (image.img) {
-                deferred.resolve(image);
+            
+            if (param.img) {
+                deferred.resolve(param);
+            } else if (param.src) {
+                const [img, promise] = loadImg(param.src);
+                param.img = img;
+                promise.then(() => deferred.resolve(param));
             } else {
-                const img = new Image();
-                image.img = img;
-                img.onload = () => deferred.resolve(image);
-                img.src = image.src;
+                deferred.resolve(param);
             }
 
             return deferred.promise;
         });
 
         return Promise.all(loaded)
-            .then(images => {
+            .then(params => {
                 this.render.clearRect(0, 0, this.width, this.height);
 
-                images.forEach(image => {
-                    const params = [image.img, image.x, image.y];
+                params.forEach(param => {
+                    const args = [param.img, param.x, param.y];
 
-                    if (image.width != null) {
-                        params.push(image.width);
+                    if (param.width != null) {
+                        args.push(param.width);
                     }
-                    if (image.height != null) {
-                        params.push(image.height);
-                    }
-
-                    if (image.sx != null) {
-                        params.push(image.sx);
-                    }
-                    if (image.sx != null) {
-                        params.push(image.sx);
-                    }
-                    if (image.sw != null) {
-                        params.push(image.sw);
-                    }
-                    if (image.sh != null) {
-                        params.push(image.sh);
+                    if (param.height != null) {
+                        args.push(param.height);
                     }
 
-                    this.render.drawImage(...params);
+                    if (param.sx != null) {
+                        args.push(param.sx);
+                    }
+                    if (param.sx != null) {
+                        args.push(param.sx);
+                    }
+                    if (param.sw != null) {
+                        args.push(param.sw);
+                    }
+                    if (param.sh != null) {
+                        args.push(param.sh);
+                    }
+
+                    this.render.drawImage(...args);
                 });
             }); 
     }

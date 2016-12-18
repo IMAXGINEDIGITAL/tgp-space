@@ -2,6 +2,7 @@ import {
     win,
     doc,
     Promise,
+    defer,
     query,
     queryAll,
     getRect,
@@ -26,6 +27,7 @@ export default class Ticker extends Event{
             this._mapF.set(id, f);
             this._mapC.set(f, {
                 id: id,
+                deferred: defer(),
                 cancel: false,
                 start: 0,
                 elapsed: 0,
@@ -35,18 +37,29 @@ export default class Ticker extends Event{
         }
     }
 
+    has(id) {
+        return typeof id === 'number' && this._mapF.has(id);
+    }
+
     delete(id) {
-        if (id && this._mapF.has(id)) {
+        if (this.has(id)) {
             const f = this._mapF.get(id);
             const c = this._mapC.get(f);
             c.cancel = true;
+            c.deferred.resolve();
             this._mapF.delete(id);
             this._mapC.delete(f);
         }
     }
 
-    has(id) {
-        return this._mapF.has(id);
+    end(id) {
+        if (this.has(id)) {
+            const f = this._mapF.get(id);
+            const c = this._mapC.get(f);
+            return c.deferred.promise;
+        } else {
+            return Promise.resolve();
+        }
     }
 
     run() {

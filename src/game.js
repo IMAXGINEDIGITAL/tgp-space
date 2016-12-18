@@ -11,7 +11,8 @@ import {
 } from './util';
 import Scroller from './scroller';
 import Stage from './stage';
-import Galaxy from './galaxy';
+import Opening from './opening';
+import HelloWorld from './helloWorld';
 import Cloud from './cloud';
 import Star from './star';
 import {
@@ -22,63 +23,99 @@ import {
 import Map from './map';
 import Ticker from './ticker';
 import Pop from './pop';
+import textConfig from './textConfig';
 
-const preload = win.preload;
+const {
+    assetsPreload: preload,
+    assetsItems: items,
+} = win;
 
-let items
-let viewport;
+let viewport = query(doc.body, '#game');
 let scroller;
 let ticker;
 let stage;
-let galaxy;
+let opening;
+let helloWorld;
 let cloud;
 let star;
-let starRollSpeed = 1;
 let staticElements;
 let animeElements;
 let elementCount;
 let map;
 let pop;
-let popStartDefer;
+
+function showTip(config) {
+    elementCount && elementCount.show({
+        tip: config.tip,
+        bgType: config.bgType
+    });
+}
+
+function showPop(config) {
+    scroller && (scroller.enable = false);
+
+    pop && pop.popup({
+        title: config.title,
+        text: config.text,
+        shareble: true,
+        bgType: config.bgType,
+        onleftclick: () => {
+            // pop.close().then(() => scroller.enable = true);
+        },
+        onrightclick: () => {
+            pop.close().then(() => scroller.enable = true);
+        }
+    }) 
+}
 
 preload
-    .then(e => { // stage
-        items = e;
-        viewport = query(doc.body, 'div[bodywrap]');
+    .then(() => { // prevent event
         viewport.addEventListener('touchstart', e => e.preventDefault());
         viewport.addEventListener('touchmove', e => e.preventDefault());
         viewport.addEventListener('touchend', e => e.preventDefault());
+    })
+    .then(() => { // ticker
         ticker = new Ticker();
+        ticker.run();
     })
-    .then(() => {
-        pop = new Pop(viewport);
-        return pop.ready();
+    .then(() => { // opening
+        opening = new Opening(viewport, items);
+        return opening.ready()
+                .then(() => {
+                    const frameId = ticker.add(opening.play());
+                    const starId = ticker.add(opening.star());
+
+                    return Promise.all([
+                        ticker.end(frameId),
+                        ticker.end(starId)
+                    ]);
+                })
+                .then(() => {
+                    return opening.chicken().then(() => delay(2000));
+                })
+                .then(() => opening.ending())
     })
-    .then(() => {
-        popStartDefer = defer();
-        return pop.popup({
-            message: '浩瀚的宇宙之旅即将开始，让我们来一场说走就走的旅行！',
-            btnText: '开始旅行',
-            onclick: () => popStartDefer.resolve()
-        });
+    .then(() => { // helloworld
+        helloWorld = new HelloWorld(viewport, items);
+        return helloWorld.ready();
     })
-    .then(() => {
+    .then(() => { // stage
         stage = new Stage(viewport);
         return stage.ready();
     })
-    .then(() => {
+    .then(() => { // scroller
         scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, 0.3);
         scroller.enable = false;
         return scroller.ready();
     })
-    .then(() => {
+    .then(() => { // things
         const promises = [];
 
-        staticElements = new StaticElements(stage, items);
-        promises.push(staticElements.ready());
+        // staticElements = new StaticElements(stage, items);
+        // promises.push(staticElements.ready());
 
-        animeElements = new AnimeElements(stage, items);
-        promises.push(animeElements.ready());
+        // animeElements = new AnimeElements(stage, items);
+        // promises.push(animeElements.ready());
 
         cloud = new Cloud(stage, items);
         promises.push(cloud.ready());
@@ -89,12 +126,19 @@ preload
         return Promise.all(promises);
     })
     .then(() => { // render
+        let firstRendered = false;
         let scrollX = 0;
         let scrollY = 0;
-        let playAnimeId;
+        // let playAnimeId;
         let clearCloudId;
-        let starYRoll = stage.vh;
-        let starRollId;
+        let starRollY = stage.vh;
+        let starRollId = ticker.add(() => {
+            starRollY -= starRollSpeed;
+            if (starRollY < 0) {
+                starRollY = stage.vh;
+            }
+        });
+        let starRollSpeed = 1;
 
         scroller.on('scrollstart', e => {
             if (clearCloudId) {
@@ -102,69 +146,73 @@ preload
                 clearCloudId = null;
             }
 
-            if (playAnimeId) {
-                ticker.delete(playAnimeId);
-                playAnimeId = null;
-            }
+            // if (playAnimeId) {
+            //     ticker.delete(playAnimeId);
+            //     playAnimeId = null;
+            // }
         });
 
         scroller.on('scrolling', e => {
             scrollX = e.x;
             scrollY = e.y;
-            staticElements.drawImages(scrollX, scrollY);
-            animeElements.drawImages(scrollX, scrollY);
-            cloud.drawImages(scrollX, scrollY);
+            // const [hover, related] = stage.getHoverSlice(scrollX, scrollY);
+            // staticElements.drawImages(scrollX, scrollY);
+            // animeElements.drawImages(scrollX, scrollY);
+            // cloud.drawImages([hover, ...related]);
         });
 
         scroller.on('scrollend', e => {
-            clearCloudId = ticker.add(cloud.clear(e.x + stage.vw / 2, e.y + stage.vh / 2));
+            const focusSlice = stage.getFocusSlice(scrollX, scrollY);
+            if (focusSlice) {
+                clearCloudId = ticker.add(cloud.clear(focusSlice));
+            }
         });
 
         scroller.on('tap', e => {
-            if (e.originalEvent.target === stage.canvas) {
-                playAnimeId = ticker.add(animeElements.play(e.ex, e.ey));
-            }
-        });
-
-        starRollId = ticker.add(() => {
-            starYRoll -= starRollSpeed;
-            if (starYRoll < 0) {
-                starYRoll = stage.vh;
-            }
+            // if (e.originalEvent.target === stage.canvas) {
+            //     playAnimeId = ticker.add(animeElements.play(e.ex, e.ey));
+            // }
         });
 
         ticker.on('aftertick', e => {
-            elementCount.update(animeElements.amount, animeElements.found);
+            elementCount && elementCount.update(stage.specialAmount, stage.specialFound);
 
-            if (scroller.isScrolling ||
-                    ticker.has(playAnimeId) ||
-                    ticker.has(clearCloudId) ||
-                    ticker.has(starRollId)) {
-                stage.render.clearRect(0, 0, stage.vw, stage.vh);
-                stage.render.drawImage(star.image, 0, starYRoll, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+            const hoverSlice = stage.getHoverSlice(scrollX, scrollY);
+            // if (!firstRendered
+            //         || scroller.isScrolling
+            //         // || ticker.has(playAnimeId)
+            //         || ticker.has(clearCloudId)
+            //         || ticker.has(starRollId)
+            //     ) {
 
-                if (ticker.has(playAnimeId)) {
-                    animeElements.drawImages(scrollX, scrollY);
-                }
+                // if (ticker.has(playAnimeId)) {
+                //     animeElements.drawImages(scrollX, scrollY);
+                // }
 
-                if (ticker.has(clearCloudId)) {
-                    cloud.drawImages(scrollX, scrollY);
-                }
+                // if (!firstRendered
+                        // || ticker.has(clearCloudId)) {
+                    cloud.drawImages(hoverSlice, scrollX, scrollY);
+                // }
 
-                if (scroller.isScrolling ||
-                        ticker.has(playAnimeId) ||
-                        ticker.has(clearCloudId)) {
+                // if (!firstRendered
+                        // || scroller.isScrolling
+                //         || ticker.has(playAnimeId)
+                        // || ticker.has(clearCloudId)) {
                     stage.offscreenRender.clearRect(0, 0, stage.vw, stage.vh);
-                    stage.offscreenRender.drawImage(staticElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                    stage.offscreenRender.drawImage(animeElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                //     stage.offscreenRender.drawImage(staticElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                //     stage.offscreenRender.drawImage(animeElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+                    stage.offscreenRender.drawImage(star.image, 0, starRollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
                     stage.offscreenRender.drawImage(cloud.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                }
+                // }
 
+                stage.render.clearRect(0, 0, stage.vw, stage.vh);
                 stage.render.drawImage(stage.offscreenCanvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                stage.render.drawImage(cloud.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-            }
-
+            // }
         });
+    })
+    .then(() => { // show helloworld
+        const tickerId = ticker.add(helloWorld.play());
+        return ticker.end(tickerId);
     })
     .then(() => { // map
         map = new Map(viewport, stage.hSlice, stage.vSlice);
@@ -179,16 +227,38 @@ preload
             const xp = e.x / stage.width;
             const yp = e.y / stage.height;
             map.clear(xp, yp);
+            const focusSlice = stage.getFocusSlice(e.x, e.y);
+            if (focusSlice && focusSlice.distance) {
+                map.text(focusSlice.distance);
+            }
         });
 
         return map.ready();
     })
-    .then(() => { // elements
-        elementCount = new ElementCount(viewport);
-        return elementCount.ready();
+    .then(() => { // pop
+        pop = new Pop(viewport);
+        return pop.ready();
     })
-    .then(() => {
-        return popStartDefer.promise;
+    .then(() => { // elements count
+        elementCount = new ElementCount(viewport, items);
+
+        elementCount.on('found', ({
+            found,
+            amount,
+            time
+        }) => {
+            const config = textConfig[`found${found}`];
+
+            if (config) {
+                if (config.type === 'tip') {
+                    showTip(config);
+                } else if (config.type === 'popup') {
+                    showPop(config);  
+                }
+            }
+        });
+
+        return elementCount.ready();
     })
     .then(() => { // bone
         const boneX = stage.width / 2 - stage.vw / 2;
@@ -196,84 +266,6 @@ preload
         scroller.enable = true;
         scroller.scrollTo(boneX, boneY);
     })
-    .then(() => { // run
-        ticker.run();
+    .then(() => { // show guide
+        showTip(textConfig.guide);
     })
-    .then(() => { // galaxy event
-        let firstEvent = false;
-        let secondEvent = false;
-
-        scroller.on('scrolling', e => {
-            if (!firstEvent && e.y < stage.vh * 6) {
-                firstEvent = true;
-                scroller.enable = false;
-                starRollSpeed = 4;
-
-                pop.popup({
-                    message: '我们现在将飞出太阳系，让我们来加个速去发现更广阔的世界。',
-                    btnText: '继续',
-                    onclick() {
-                        scroller.scale = 1.5;
-                        scroller.enable = true;
-                    }
-                });
-            }
-
-            if (!secondEvent && e.y < stage.vh * 2) {
-                secondEvent = true;
-                scroller.enable = false;
-                const wormholeEl = query(viewport, '#wormhole');
-                wormholeEl.style.display = 'block';
-
-                pop.popup({
-                    message: '我们现已进入虫洞进行空间跳跃，请坐直身体！抓稳手机！let\'go！！！',
-                    btnText: '跳跃',
-                    onclick() {
-                        const wormholeEl = query(viewport, '#wormhole');
-                        wormholeEl.className = ' flyin';
-                        delay(1000).then(() => {
-                            scroller.scrollTo(0, stage.vh / 2);
-                            wormholeEl.className = '';
-                            wormholeEl.style.display = 'none';
-                            scroller.enable = true;
-                        })
-                    }
-                });
-            }
-        });
-
-        elementCount.on('found', e => {
-            scroller.enable = false;
-
-            const {time} = e;
-            const message = [
-                '您发现了被隐藏在宇宙中的秘密，继续探索更大的宇宙世界吧。',
-                '您已熟练掌握了在宇宙中寻找乐趣的方式，继续探索将有惊喜等着您。',
-                '您离成功就差几次滑屏的距离了，继续探索就能收获惊喜。',
-                '恭喜您已寻找到宇宙中所有的小秘密，登录TGP发现更大的游戏世界！'
-            ][time - 1];
-
-            pop.popup({
-                message,
-                btnText: '分享',
-                onclose: () => {
-                    scroller.enable = true;
-                },
-                onclick: () => {
-                    scroller.enable = true;
-                }
-            })
-        });
-
-        map.on('open', e => {
-            scroller.enable = false;
-
-            pop.popup({
-                message: `现在您已经探测了（${(cloud.completing * 100).toFixed(1)}）%的世界，还有更辽阔的世界等着您去发现。`,
-                btnText: '继续',
-                onclick: () => scroller.enable = true
-            });
-        });
-    })
-
-    

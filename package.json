@@ -15,6 +15,7 @@
     "amfe-env": "^2.0.0",
     "event-emitter": "^0.3.4",
     "gesture-js": "^0.1.0",
+    "hilojs": "^1.0.2",
     "iscroll": "^5.2.0"
   },
   "devDependencies": {

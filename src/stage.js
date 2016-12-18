@@ -10,11 +10,14 @@ import {
 import {
     CanvasRender
 } from './canvas';
+import sliceConfig from './sliceConfig';
 
-const width = 3750;
-const height = 13340;
-const hSlice = 5;
-const vSlice = 10;
+const sliceWidth = 750;
+const sliceHeight = 1334;
+const hSlice = 9;
+const vSlice = 14;
+const width = sliceWidth * hSlice;
+const height = sliceHeight * vSlice;
 
 export default class Stage extends CanvasRender{
     constructor(viewport) {
@@ -22,17 +25,120 @@ export default class Stage extends CanvasRender{
 
         super(query(viewport, '#stage'), vw, vh);
 
-        this.hSlice = hSlice;
-        this.vSlice = vSlice;
         this.vw = vw;
         this.vh = vh;
-        this.height = vw / (width / hSlice) * height;
         this.width = vw * hSlice;
+        this.height = vw / (width / hSlice) * height;
+        this.hSlice = hSlice;
+        this.vSlice = vSlice;
+        this.sliceWidth = this.width / hSlice;
+        this.sliceHeight = this.height / vSlice;
+        this.slices = [];
+
+        for (let v = 0; v < this.vSlice; v++) {
+            for (let h = 0; h < this.hSlice; h++) {
+                const index = v * this.hSlice + h;
+                const config = {
+                    index: v * this.hSlice + h,
+                    h,
+                    v
+                };
+                if (sliceConfig[String(index)]) {
+                    for (const key in sliceConfig[String(index)]) {
+                        config[key] = sliceConfig[String(index)][key];
+                    }
+                }
+
+                this.slices.push(config);
+            }
+        }
+    }
+
+    get totalAmount() {
+        return this.slices.length;
+    }
+
+    get specialAmount() {
+        return this.slices.filter(slice =>
+            slice.special
+        ).length;
+    }
+
+    get specialFound() {
+        return this.slices.filter(slice =>
+            slice.special && slice.found
+        ).length;
+    }
+
+    get focusedAmount() {
+        return this.slices.filter(slice =>
+            slice.focused
+        ).length;
+    }
+
+    get hoveredAmount() {
+        return this.slices.filter(slice =>
+            slice.hovered
+        ).length;
+    }
+
+    getSlice(scrollX, scrollY) {
+        const h = parseInt(scrollX / this.sliceWidth);
+        const v = parseInt(scrollY / this.sliceHeight);
+        return this.slices[v * this.hSlice + h];
+    }
+
+    getHoverSlice(scrollX, scrollY) {
+        const hover = this.getSlice(scrollX, scrollY);
+        const {
+            h,
+            v,
+            index
+        } = hover;
+        const related = [];
+
+        if (h < this.hSlice - 1) {
+            related.push(this.slices[index + 1]);
+        }
+
+        if (v < this.vSlice - 1) {
+            related.push(this.slices[index + this.hSlice]);
+        }
+
+        if (h < this.hSlice - 1
+            && v < this.vSlice - 1) {
+            related.push(this.slices[index + this.hSlice + 1]);
+        }
+
+        return [
+            hover,
+            ...related
+        ].map(slice => {
+            slice.hovered = true;
+            return slice;
+        });
+    }
+
+    getFocusSlice(scrollX, scrollY) {
+        const cx = scrollX + this.sliceWidth / 2;
+        const cy = scrollY + this.sliceHeight / 2;
+        const h = parseInt(cx / this.sliceWidth);
+        const v = parseInt(cy / this.sliceHeight);
+        const dx = parseInt(cx % this.sliceWidth);
+        const dy = parseInt(cy % this.sliceHeight);
+
+        let slice;
+        if (dx > this.sliceWidth * 0.25 && dx < this.sliceWidth * 0.75
+                && dy > this.sliceHeight * 0.25 && dy < this.sliceHeight * 0.75) {
+            slice = this.slices[v * this.hSlice + h];
+            slice.focused = true;
+        }
+
+        return slice;
     }
 
     ready() {
         return new Promise((resolve, reject) => {
-            // this.transferControlToOffscreen();
             resolve();
         });
     }

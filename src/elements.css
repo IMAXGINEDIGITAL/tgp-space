@@ -1,7 +1,106 @@
 #elements-count {
     position: absolute;
     right: 0.73rem;
-    top: 0.3rem;
-    color: #00cbe3;
-    font-size: 0.7rem;
+    top: 0.4rem;
+    color: #00ddf1;
+    font-size: 12px;
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    background-repeat: no-repeat;
+    background-position: 0 center;
+    background-size: 1.106rem 0.413rem;
+}
+
+#elements-count .textWrap {
+    width: 1.106rem;
+    height: 0.413rem;
+    position: relative;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAfCAYAAAA89UfsAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANdJREFUeNqclD0LgVEYho+P8lqMMsrMrkxkNCn8LYMfQTEYSBaTUjIZRcliUaQM5ON+6o1Fby53XZ06dXW+nvOE3PrUdM7F3SctsXQBCX+Zq4solZKiSCVLRSSo5IkqlSx5kaFSSDT88WfJkvZXRJLzz+ZRKeHfJpIsJZGiUkTUqGTJihyV3nVJJavLMpUshfAfWxyaEAPCVszIKk/RtpFIc7EhV34VPfq4I3Ek0kGMacHatm5EWokF+YQP0aE9Yip2RLqIPm1hA3Em0l5MaFvuinuQ9BJgAFqNIhUPhZOEAAAAAElFTkSuQmCC);
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 0.173rem 0.413rem;
+    overflow: visible;
+}
+
+#elements-count .text {
+    width: 1.3rem;
+    height: 0.5rem;
+    position: absolute;
+    border: 1px solid #00ddf1;
+    border-radius: 4px;
+    box-sizing: border-box;
+    right: 0.17rem;
+    top: -0.18rem;
+    box-shadow: 2px 3px 0px rgba(0, 221, 241, 0.5);
+    -webkit-transition: all 0.4s ease-in 0s;
+    overflow: visible;
+}
+
+#elements-count.open .text {
+    width: 5.8rem;
+    height: 2.3rem;
+    box-shadow: none;
+}
+
+#elements-count .text .number {
+    text-align: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1.3rem;
+    height: 0.5rem;
+    line-height: 0.5rem;
+    text-align: center;
+}
+
+#elements-count .text .tip {
+    position: absolute;
+    width: 3.306rem;
+    height: 1.24rem;
+    line-height: 1.2em;
+    left: 0.2rem;
+    top: 0.36rem;
+    font-size: 12px;
+    color: #00ddf1;
+}
+
+#elements-count .text .bg {
+    position: absolute;
+    left: 3.506rem;
+    top: 0.36rem;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: contain;
+}
+
+#elements-count .text .bg.bg1 {
+    width: 2.066rem;
+    height: 1.8rem;
+}
+
+#elements-count .text .bg.bg2 {
+    width: 2.253rem;
+    height: 1.946rem;
+}
+
+#elements-count .text .bg.bg3 {
+    width: 2.346rem;
+    height: 1.933rem;
+}
+
+#elements-count .progress {
+    box-sizing: border-box;
+    width: 1.8rem;
+    height: 0.3rem;
+    border: 1px solid #00ddf1;
+    border-radius: 0.15rem;
+    margin: 0 4px;
+}
+
+#elements-count .progress .bar{
+    width: 0;
+    height: 100%;
+    background-color: #00ddf1;
+    border-radius: 0.15rem;
 }
