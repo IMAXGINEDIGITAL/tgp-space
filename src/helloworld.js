@@ -17,7 +17,7 @@ export default class HelloWorld {
 
     play() {
         const duration = 3000;
-        const times = 3;
+        const times = 5;
         const count = 6;
 
         return ({
@@ -28,10 +28,14 @@ export default class HelloWorld {
                 const index = parseInt(count * times * elapsed / duration) % count;
                 this.wrapEl.style.backgroundPositionX = `-${index * 10}rem`;
             } else {
-                this.wrapEl.style.display = 'none';
+                this.wrapEl.style.backgroundPositionX = '0';
                 return true;
             }
         };
+    }
+
+    ending() {
+        this.wrapEl.style.display = 'none';
     }
 
     ready() {

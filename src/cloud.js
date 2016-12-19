@@ -37,16 +37,19 @@ export default class Cloud extends CanvasImage {
                 } = this.slices[String(slice.index)];
 
                 params.push({
-                    x: x - scrollX,
-                    y: y - scrollY,
-                    width: width,
-                    height: height,
+                    x: x - width * 0.4 - scrollX,
+                    y: y - height * 0.4 - scrollY,
+                    width: width * 1.8,
+                    height: height * 1.8,
                     img: canvas
                 });
             }
         }
 
+        // this.render.save();
+        // this.render.scale(3, 3);
         this.draw(params);
+        // this.render.restore();
     }
 
     clear(focusSilce) {

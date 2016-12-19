@@ -13,6 +13,7 @@ import {
 
 export default class Opening {
     constructor(viewport, items) {
+        this.viewport = viewport;
         this.wrapEl = query(viewport, '#opening');
         this.items = items;
     }
@@ -166,9 +167,10 @@ export default class Opening {
     }
 
     ready() {
+        const items = this.items;
+
         return new Promise((resolve, reject) => {
             this.duration = 3000;
-
 
             this.framesCount = Object.keys(this.items)
                                 .filter(key => key.match(/^opening\d+$/))

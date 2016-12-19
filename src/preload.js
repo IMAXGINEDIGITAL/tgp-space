@@ -155,10 +155,12 @@ window.assetsPreload = domready()
     .then(() => {
         gameWrapEl.style.display = 'block';
         doc.body.className = 'anime';
+        // doc.body.style.backgroundImage = `url(${items['bg'].src})`;
+        return delay(100);
     })
     .then(() => openGate())
     .then(() => {
         doc.body.className = '';
-        preloadWrapEl.style.display = 'none';
+        // preloadWrapEl.style.display = 'none';
         return loadImgObject(items);
     });

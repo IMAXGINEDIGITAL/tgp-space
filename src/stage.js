@@ -22,9 +22,11 @@ const height = sliceHeight * vSlice;
 export default class Stage extends CanvasRender{
     constructor(viewport) {
         const {width: vw, height: vh} = getRect(viewport);
+        const stageEl = query(viewport, '#stage');
 
-        super(query(viewport, '#stage'), vw, vh);
+        super(stageEl, vw, vh);
 
+        this.stageEl = stageEl;
         this.vw = vw;
         this.vh = vh;
         this.width = vw * hSlice;
@@ -101,13 +103,25 @@ export default class Stage extends CanvasRender{
             related.push(this.slices[index + 1]);
         }
 
+        if (h > 1) {
+            related.push(this.slices[index - 1]);
+        }
+
         if (v < this.vSlice - 1) {
             related.push(this.slices[index + this.hSlice]);
+        }
+
+        if (v > 1) {
+            related.push(this.slices[index - this.hSlice]);
         }
 
         if (h < this.hSlice - 1
             && v < this.vSlice - 1) {
             related.push(this.slices[index + this.hSlice + 1]);
+        }
+
+        if (h > 1 && v > 1) {
+            related.push(this.slices[index - this.hSlice - 1]);
         }
 
         return [
@@ -139,6 +153,7 @@ export default class Stage extends CanvasRender{
 
     ready() {
         return new Promise((resolve, reject) => {
+            this.stageEl.style.display = '';
             resolve();
         });
     }

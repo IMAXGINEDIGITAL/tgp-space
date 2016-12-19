@@ -212,7 +212,9 @@ preload
     })
     .then(() => { // show helloworld
         const tickerId = ticker.add(helloWorld.play());
-        return ticker.end(tickerId);
+        return ticker.end(tickerId)
+                    .then(() => delay(2000))
+                    .then(() => helloWorld.ending());
     })
     .then(() => { // map
         map = new Map(viewport, stage.hSlice, stage.vSlice);
