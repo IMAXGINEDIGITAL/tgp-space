@@ -56,7 +56,22 @@ export class CanvasImage {
                 this.render.clearRect(0, 0, this.width, this.height);
 
                 params.forEach(param => {
-                    const args = [param.img, param.x, param.y];
+                    const args = [param.img];
+
+                    if (param.sx != null) {
+                        args.push(param.sx);
+                    }
+                    if (param.sx != null) {
+                        args.push(param.sy);
+                    }
+                    if (param.sw != null) {
+                        args.push(param.sw);
+                    }
+                    if (param.sh != null) {
+                        args.push(param.sh);
+                    }
+
+                    args.push(param.x, param.y);
 
                     if (param.width != null) {
                         args.push(param.width);
@@ -65,18 +80,6 @@ export class CanvasImage {
                         args.push(param.height);
                     }
 
-                    if (param.sx != null) {
-                        args.push(param.sx);
-                    }
-                    if (param.sx != null) {
-                        args.push(param.sx);
-                    }
-                    if (param.sw != null) {
-                        args.push(param.sw);
-                    }
-                    if (param.sh != null) {
-                        args.push(param.sh);
-                    }
 
                     this.render.drawImage(...args);
                 });

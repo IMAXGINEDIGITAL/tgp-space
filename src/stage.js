@@ -37,6 +37,7 @@ export default class Stage extends CanvasRender{
         this.sliceHeight = this.height / vSlice;
         this.slices = [];
 
+
         for (let v = 0; v < this.vSlice; v++) {
             for (let h = 0; h < this.hSlice; h++) {
                 const index = v * this.hSlice + h;
@@ -62,13 +63,13 @@ export default class Stage extends CanvasRender{
 
     get specialAmount() {
         return this.slices.filter(slice =>
-            slice.special
+            slice.type === 3
         ).length;
     }
 
     get specialFound() {
         return this.slices.filter(slice =>
-            slice.special && slice.found
+            slice.type === 3 && slice.found
         ).length;
     }
 
@@ -103,25 +104,13 @@ export default class Stage extends CanvasRender{
             related.push(this.slices[index + 1]);
         }
 
-        if (h > 1) {
-            related.push(this.slices[index - 1]);
-        }
-
         if (v < this.vSlice - 1) {
             related.push(this.slices[index + this.hSlice]);
-        }
-
-        if (v > 1) {
-            related.push(this.slices[index - this.hSlice]);
         }
 
         if (h < this.hSlice - 1
             && v < this.vSlice - 1) {
             related.push(this.slices[index + this.hSlice + 1]);
-        }
-
-        if (h > 1 && v > 1) {
-            related.push(this.slices[index - this.hSlice - 1]);
         }
 
         return [
@@ -133,9 +122,7 @@ export default class Stage extends CanvasRender{
         });
     }
 
-    getFocusSlice(scrollX, scrollY) {
-        const cx = scrollX + this.sliceWidth / 2;
-        const cy = scrollY + this.sliceHeight / 2;
+    getFocusSlice(cx, cy) {
         const h = parseInt(cx / this.sliceWidth);
         const v = parseInt(cy / this.sliceHeight);
         const dx = parseInt(cx % this.sliceWidth);

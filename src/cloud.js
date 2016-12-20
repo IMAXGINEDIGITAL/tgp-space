@@ -19,22 +19,25 @@ export default class Cloud extends CanvasImage {
 
         this.hSlice = stage.hSlice;
         this.vSlice = stage.vSlice;
-        this.sliceWidth = stage.width / stage.hSlice;
-        this.sliceHeight = stage.height / stage.vSlice;
+        this.sliceWidth = stage.sliceWidth;
+        this.sliceHeight = stage.sliceHeight;
         this.items = items;
     }
 
-    drawImages(slices, scrollX, scrollY) {
+    drawImages(hovers, focus, scrollX, scrollY) {
         const params = [];
-        for (const slice of slices) {
-            if (this.slices[String(slice.index)]) {
+        const ids = [];
+
+        const pushParams = id => {
+            if (ids.indexOf(id) < 0
+                    && this.slices[id]) {
                 const {
                     x,
                     y,
                     width,
                     height,
                     canvas
-                } = this.slices[String(slice.index)];
+                } = this.slices[id];
 
                 params.push({
                     x: x - width * 0.4 - scrollX,
@@ -44,24 +47,45 @@ export default class Cloud extends CanvasImage {
                     img: canvas
                 });
             }
+            ids.push(id);
         }
 
-        // this.render.save();
-        // this.render.scale(3, 3);
+        if (hovers) {
+            for (const hover of hovers) {
+                pushParams(String(hover.index));
+            }
+        }
+
+        if (focus) {
+            if (focus.h < this.hSlice - 1) {
+                pushParams(focus.index + 1);
+            }
+
+            if (focus.h > 1) {
+                pushParams(focus.index - 1);
+            }
+
+            if (focus.v < this.vSlice - 1) {
+                pushParams(focus.index + this.hSlice);
+            }
+
+            if (focus.v > 1) {
+                pushParams(focus.index - this.hSlice);
+            }
+        }
+
         this.draw(params);
-        // this.render.restore();
     }
 
-    clear(focusSilce) {
+    clear(focus) {
         const {
             cleared,
             index
-        } = focusSilce;
+        } = focus;
 
         const slice = this.slices[String(index)];
 
         if (slice) {
-
             let {
                 img,
                 render
@@ -78,11 +102,11 @@ export default class Cloud extends CanvasImage {
                         render.globalAlpha -= delta / duration;
                     } else {
                         render.globalAlpha = 0;
-                        focusSilce.cleared = true;
+                        focus.cleared = true;
                     }
                     render.clearRect(0, 0, this.sliceWidth, this.sliceHeight);
                     render.drawImage(img, 0, 0, this.sliceWidth, this.sliceHeight);
-                    return focusSilce.cleared;
+                    return focus.cleared;
                 }
             }
         }

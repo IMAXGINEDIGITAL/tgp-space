@@ -1,4 +1,5 @@
 import {os} from 'amfe-env';
+import sliceConfig from './sliceConfig';
 
 const assetsPrefix = os.isIOS ? '2x' : '1x';
 
@@ -30,6 +31,33 @@ for (let i = 1; i <= openingStarCount; i++) {
     });
 }
 
+const elementsManifest = [];
+Object.keys(sliceConfig).forEach(key => {
+    if (key.match(/^\d+$/)) {
+        const config = sliceConfig[key];
+        if (config.type >= 1) {
+            elementsManifest.push({
+                id: `i${key}-e-s`,
+                src: `i${key}-e-s.png`
+            });
+        }
+
+        if (config.type >= 2) {
+            elementsManifest.push({
+                id: `i${key}-e-t`,
+                src: `i${key}-e-t.png`
+            });
+        }
+
+        if (config.type >= 3) {
+            elementsManifest.push({
+                id: `i${key}-e-g`,
+                src: `i${key}-e-g.png`
+            });
+        }
+    }
+});
+
 export const game = [
     {
         path: `assets/${assetsPrefix}/game/`,
@@ -55,12 +83,8 @@ export const game = [
         manifest: openingManifest
     },
     {
-        path: `assets/${assetsPrefix}/game/static/`,
-        manifest: []
-    },
-    {
-        path: `assets/${assetsPrefix}/game/anime/`,
-        manifest: []
+        path: `assets/${assetsPrefix}/game/elements/`,
+        manifest: elementsManifest
     },
     {
         path: 'assets/',

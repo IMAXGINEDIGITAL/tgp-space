@@ -16,8 +16,7 @@ import HelloWorld from './helloWorld';
 import Cloud from './cloud';
 import Star from './star';
 import {
-    StaticElements,
-    AnimeElements,
+    Elements,
     ElementCount
 } from './elements';
 import Map from './map';
@@ -38,8 +37,7 @@ let opening;
 let helloWorld;
 let cloud;
 let star;
-let staticElements;
-let animeElements;
+let elements;
 let elementCount;
 let map;
 let pop;
@@ -111,17 +109,14 @@ preload
     .then(() => { // things
         const promises = [];
 
-        // staticElements = new StaticElements(stage, items);
-        // promises.push(staticElements.ready());
+        star = new Star(stage, items);
+        promises.push(star.ready());
 
-        // animeElements = new AnimeElements(stage, items);
-        // promises.push(animeElements.ready());
+        elements = new Elements(stage, items);
+        promises.push(elements.ready());
 
         cloud = new Cloud(stage, items);
         promises.push(cloud.ready());
-
-        star = new Star(stage, items);
-        promises.push(star.ready());
 
         return Promise.all(promises);
     })
@@ -129,8 +124,6 @@ preload
         let firstRendered = false;
         let scrollX = 0;
         let scrollY = 0;
-        // let playAnimeId;
-        let clearCloudId;
         let starRollY = stage.vh;
         let starRollId = ticker.add(() => {
             starRollY -= starRollSpeed;
@@ -139,75 +132,58 @@ preload
             }
         });
         let starRollSpeed = 1;
+        let showTextId;
+        let showGlodId;
+        let clearCloudId;
+        let hoverSlice = stage.getHoverSlice(0, 0);
+        let focusSlice = stage.getFocusSlice(stage.sliceWidth / 2, stage.sliceHeight / 2);
 
         scroller.on('scrollstart', e => {
             if (clearCloudId) {
                 ticker.delete(clearCloudId);
                 clearCloudId = null;
             }
-
-            // if (playAnimeId) {
-            //     ticker.delete(playAnimeId);
-            //     playAnimeId = null;
-            // }
         });
 
         scroller.on('scrolling', e => {
             scrollX = e.x;
             scrollY = e.y;
-            // const [hover, related] = stage.getHoverSlice(scrollX, scrollY);
-            // staticElements.drawImages(scrollX, scrollY);
-            // animeElements.drawImages(scrollX, scrollY);
-            // cloud.drawImages([hover, ...related]);
+            hoverSlice = stage.getHoverSlice(scrollX, scrollY);
+            focusSlice = stage.getFocusSlice(scrollX + stage.sliceWidth / 2, scrollY + stage.sliceHeight / 2);
         });
 
         scroller.on('scrollend', e => {
-            const focusSlice = stage.getFocusSlice(scrollX, scrollY);
             if (focusSlice) {
                 clearCloudId = ticker.add(cloud.clear(focusSlice));
+                if (focusSlice.type >= 2) {
+                    showTextId = ticker.add(elements.showText(focusSlice));
+                }
             }
         });
 
         scroller.on('tap', e => {
-            // if (e.originalEvent.target === stage.canvas) {
-            //     playAnimeId = ticker.add(animeElements.play(e.ex, e.ey));
-            // }
+            if (e.originalEvent.target === stage.canvas
+                    && focusSlice) {
+                const tapFocusSlice = stage.getFocusSlice(e.ex, e.ey);
+                if (tapFocusSlice) {
+                    showGlodId = ticker.add(elements.showGold(tapFocusSlice));
+                }
+            }
         });
 
         ticker.on('aftertick', e => {
             elementCount && elementCount.update(stage.specialAmount, stage.specialFound);
 
-            const hoverSlice = stage.getHoverSlice(scrollX, scrollY);
-            // if (!firstRendered
-            //         || scroller.isScrolling
-            //         // || ticker.has(playAnimeId)
-            //         || ticker.has(clearCloudId)
-            //         || ticker.has(starRollId)
-            //     ) {
+            elements.drawImages(hoverSlice, focusSlice, scrollX, scrollY);
+            cloud.drawImages(hoverSlice, focusSlice, scrollX, scrollY);
 
-                // if (ticker.has(playAnimeId)) {
-                //     animeElements.drawImages(scrollX, scrollY);
-                // }
+            stage.offscreenRender.clearRect(0, 0, stage.vw, stage.vh);
+            stage.offscreenRender.drawImage(star.image, 0, starRollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+            stage.offscreenRender.drawImage(elements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
+            stage.offscreenRender.drawImage(cloud.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
 
-                // if (!firstRendered
-                        // || ticker.has(clearCloudId)) {
-                    cloud.drawImages(hoverSlice, scrollX, scrollY);
-                // }
-
-                // if (!firstRendered
-                        // || scroller.isScrolling
-                //         || ticker.has(playAnimeId)
-                        // || ticker.has(clearCloudId)) {
-                    stage.offscreenRender.clearRect(0, 0, stage.vw, stage.vh);
-                //     stage.offscreenRender.drawImage(staticElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                //     stage.offscreenRender.drawImage(animeElements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                    stage.offscreenRender.drawImage(star.image, 0, starRollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                    stage.offscreenRender.drawImage(cloud.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-                // }
-
-                stage.render.clearRect(0, 0, stage.vw, stage.vh);
-                stage.render.drawImage(stage.offscreenCanvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-            // }
+            stage.render.clearRect(0, 0, stage.vw, stage.vh);
+            stage.render.drawImage(stage.offscreenCanvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
         });
     })
     .then(() => { // show helloworld

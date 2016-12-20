@@ -17,201 +17,168 @@ import {
     CanvasImage
 } from './canvas';
 
-export class StaticElements extends CanvasImage {
+const originSliceWidth = 750;
+const originSliceHeight = 1334
+
+export class Elements extends CanvasImage {
     constructor(stage, items) {
         super(stage.vw, stage.vh);
 
         this.hSlice = stage.hSlice;
         this.vSlice = stage.vSlice;
-        this.sliceWidth = stage.width / stage.hSlice;
-        this.sliceHeight = stage.height / stage.vSlice;
+        this.sliceWidth = stage.sliceWidth;
+        this.sliceHeight = stage.sliceHeight;
         this.items = items;
+        this.scaleRatio = this.sliceWidth / originSliceWidth;
     }
 
-    drawImages(scrollX, scrollY) {
-        let x = parseInt(scrollX / this.sliceWidth);
-        let y = parseInt(scrollY / this.sliceHeight);
-        let index = y * this.hSlice + x;
+    showText(focus) {
+        const {
+            shown,
+            index
+        } = focus;
 
-        const params = [];
-
-        const pushParams = (index) => {
-            const slice = this.slices[String(index)];
-            params.push({
-                x: slice.x - scrollX,
-                y: slice.y - scrollY,
-                width: slice.width,
-                height: slice.height,
-                img: this.slices[index].img
-            });
-        }
-
-        if (this.slices[String(index)]) {
-            pushParams(index)
-        }
-
-        if (x < 4 && this.slices[String(index + 1)]) {
-            pushParams(index + 1);
-        }
-
-        if (y < 9 && this.slices[String(index + this.hSlice)]) {
-            pushParams(index + this.hSlice);
-        }
-
-        if (x < 4 && y < 9 && this.slices[String(index + this.hSlice + 1)]) {
-            pushParams(index + this.hSlice + 1);
-        }
-
-        this.draw(params);
-    }
-
-    ready() {
-        const loaded = [];
-        this.slices = {};
-
-        Object.keys(this.items).filter(id => {
-            return id.indexOf('static-') === 0;
-        }).forEach(id => {
-            const item = this.items[id];
-            const index = parseInt(id.match(/^static-(\d+)$/)[1]);
-            const deferred = defer();
-            const image = new Image();
-            image.onload = () => deferred.resolve();
-            image.src = item.src;
-            loaded.push(deferred.promise);
-
-            let x = (index - 1) % this.hSlice;
-            let y = parseInt((index - 1) / this.hSlice);
-
-            this.slices[String(index - 1)] = {
-                img: image,
-                x: x * this.sliceWidth,
-                y: y * this.sliceHeight,
-                width: this.sliceWidth,
-                height: this.sliceHeight
-            }
-        });
-
-        return Promise.all(loaded);
-    }
-}
-
-export class AnimeElements extends CanvasImage {
-    constructor(stage, items) {
-        super(stage.vw, stage.vh);
-
-        this.hSlice = stage.hSlice;
-        this.vSlice = stage.vSlice;
-        this.sliceWidth = stage.width / stage.hSlice;
-        this.sliceHeight = stage.height / stage.vSlice;
-        this.items = items;
-    }
-
-    get amount() {
-        return Object.keys(this.slices).length;
-    }
-
-    get found() {
-        return Object.keys(this.slices).filter(i => this.slices[i].completed).length;
-    }
-
-    drawImages(scrollX, scrollY) {
-        let x = parseInt(scrollX / this.sliceWidth);
-        let y = parseInt(scrollY / this.sliceHeight);
-        let index = y * this.hSlice + x;
-
-        const params = [];
-        const pushParams = (index) => {
-            const slice = this.slices[String(index)];
-            if (slice.frame < slice.imgs.length) {
-                params.push({
-                    x: slice.x - scrollX,
-                    y: slice.y - scrollY,
-                    width: slice.width,
-                    height: slice.height,
-                    img: slice.imgs[slice.frame]
-                });
-            }
-        }
-
-        if (this.slices[String(index)]) {
-            pushParams(index)
-        }
-
-        if (x < 4 && this.slices[String(index + 1)]) {
-            pushParams(index + 1);
-        }
-
-        if (y < 9 && this.slices[String(index + this.hSlice)]) {
-            pushParams(index + this.hSlice);
-        }
-
-        if (x < 4 && y < 9 && this.slices[String(index + this.hSlice + 1)]) {
-            pushParams(index + this.hSlice + 1);
-        }
-
-        this.draw(params);
-    }
-
-    play(ex, ey) {
-        const x = parseInt(ex / this.sliceWidth);
-        const y = parseInt(ey / this.sliceHeight);
-        const index = y * this.hSlice + x;
         const slice = this.slices[String(index)];
+        if (slice) {
+            if (!shown) {
+                const delay = 1500;
+                const duration = 1000;
 
-        if (slice && slice.frame < slice.imgs.length && !slice.completed) {
-            const duration = 1000;
-
-            return ({
-                delta,
-                elapsed
-            }) => {
-                const count = slice.imgs.length;
-                const frame = Math.floor(count * (elapsed / duration));
-
-                if (frame < count) {
-                    slice.frame = frame;
-                } else {
-                    slice.completed = true;
-                    slice.frame = count - 1;
-                    return true;
+                return ({
+                    delta,
+                    elapsed
+                }) => {
+                    if (elapsed <= delay) {
+                        slice.textAlpha = 0;
+                    } else if (elapsed - delay <= duration) {
+                        slice.textAlpha = (elapsed - delay) / duration;
+                    } else {
+                        slice.textAlpha = 1;
+                        focus.shown = true;
+                    }
+                    return focus.shown;
                 }
             }
         }
     }
 
+    showGold(focus) {
+        const {
+            found,
+            index,
+            y1,
+            y2
+        } = focus;
+
+        const slice = this.slices[String(index)];
+        if (slice) {
+            if (!found) {
+                const duration = 1000;
+
+                return ({
+                    delta,
+                    elapsed
+                }) => {
+                    if (elapsed <= duration) {
+                        slice.goldY = y1 + (y2 - y1) * elapsed / duration;
+                    } else {
+                        slice.goldY = y2;
+                        focus.found = true;
+                    }
+
+                    return focus.found;
+                }
+            }
+        }
+    }
+
+    drawImages(hovers, focus, scrollX, scrollY) {
+        const params = [];
+        if (hovers) {
+           for (const hover of hovers) {
+                const {
+                    type,
+                    index
+                } = hover;
+
+                const slice = this.slices[String(index)];
+                if (slice) {
+                    const {
+                        x,
+                        y,
+                        width,
+                        height,
+                        canvasImage,
+                        staticImg,
+                        textImg,
+                        textAlpha = 0,
+                        goldImg
+                    } = slice;
+
+                    canvasImage.render.clearRect(0, 0, width, height);
+
+                    if (type >= 1) {
+                        canvasImage.render.drawImage(staticImg, 0, 0, width, height);
+                    }
+
+                    if (type >= 2) {
+                        canvasImage.render.save();
+                        canvasImage.render.globalAlpha = textAlpha || 0;
+                        canvasImage.render.drawImage(textImg, 0, 0, width, height);
+                        canvasImage.render.restore();
+                    }
+
+                    if (type >= 3
+                            && slice.goldY != null) {
+                        const goldY = slice.goldY;
+                        const y = goldY * this.scaleRatio;
+                        canvasImage.render.drawImage(goldImg, 0, goldY, originSliceWidth, originSliceHeight - goldY, 0, y, width, height - y);
+                    }
+
+                    params.push({
+                        x: x - scrollX,
+                        y: y - scrollY,
+                        width: width,
+                        height: height,
+                        img: canvasImage.canvas
+                    });
+                }
+            }
+        }
+
+        this.draw(params);
+    }
+
     ready() {
         const loaded = [];
         this.slices = {};
 
         Object.keys(this.items).filter(id => {
-            return id.indexOf('anime-') === 0;
+            return id.match(/^i\d+\-e\-(s|t|g)/);
         }).forEach(id => {
             const item = this.items[id];
-            const [index, frame] = id.match(/^anime-(\d+)-(\d+)$/)
-                                    .slice(1, 3).filter(i => parseInt(i));
+            const [, index, type] = id.match(/^i(\d+)\-e\-(s|t|g)$/);
 
-            const deferred = defer();
-            const image = new Image();
-            image.onload = () => deferred.resolve();
-            image.src = item.src;
-            loaded.push(deferred.promise);
-
-            let x = (index - 1) % this.hSlice;
-            let y = parseInt((index - 1) / this.hSlice);
-
-            let slice = this.slices[String(index - 1)];
+            const x = Number(index) % this.hSlice;
+            const y = parseInt(Number(index) / this.hSlice);
+            let slice = this.slices[String(index)];
             if (!slice) {
-                slice = this.slices[String(index - 1)] = {
-                    imgs: [],
-                    frame: 0,
+                slice = this.slices[String(index)] = {
+                    canvasImage: new CanvasImage(this.sliceWidth, this.sliceHeight),
                     x: x * this.sliceWidth,
                     y: y * this.sliceHeight,
                     width: this.sliceWidth,
-                    height: this.sliceHeight
+                    height: this.sliceHeight,
                 }
             }
-            slice.imgs[frame - 1] = image;
+            
+            if (type === 's') {
+                slice.staticImg = item.obj;
+            } else if (type === 't') {
+                slice.textImg = item.obj;
+            } else if (type === 'g') {
+                slice.goldImg = item.obj;
+            }
         });
 
         return Promise.all(loaded);
