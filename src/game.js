@@ -28,6 +28,7 @@ const {
     assetsItems: items,
 } = win;
 
+const scrollSlowRatio = 0.5;
 let viewport = query(doc.body, '#game');
 let scroller;
 let ticker;
@@ -86,7 +87,7 @@ preload
         return stage.ready();
     })
     .then(() => { // scroller
-        scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, 2);
+        scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, scrollSlowRatio);
         scroller.enable = false;
         return scroller.ready();
     })
