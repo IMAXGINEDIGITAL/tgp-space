@@ -75,7 +75,13 @@ export const game = [
             {id: 'popBg2', src: 'popBg-2.png'},
             {id: 'tipBg1', src: 'tipBg-1.png'},
             {id: 'tipBg2', src: 'tipBg-2.png'},
-            {id: 'tipBg3', src: 'tipBg-3.png'}
+            {id: 'tipBg3', src: 'tipBg-3.png'},
+            {id: 'coin1', src: 'coin-1.png'},
+            {id: 'coin2', src: 'coin-2.png'},
+            {id: 'coin3', src: 'coin-3.png'},
+            {id: 'coin4', src: 'coin-4.png'},
+            {id: 'coin5', src: 'coin-5.png'},
+            {id: 'coin6', src: 'coin-6.png'}
         ]
     },
     {

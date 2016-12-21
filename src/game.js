@@ -134,6 +134,7 @@ preload
         let starRollSpeed = 1;
         let showTextId;
         let showGlodId;
+        let flyCoinId;
         let clearCloudId;
         let hoverSlice = stage.getHoverSlice(0, 0);
         let focusSlice = stage.getFocusSlice(stage.sliceWidth / 2, stage.sliceHeight / 2);
@@ -167,6 +168,10 @@ preload
                 const tapFocusSlice = stage.getFocusSlice(e.ex, e.ey);
                 if (tapFocusSlice) {
                     showGlodId = ticker.add(elements.showGold(tapFocusSlice));
+                    ticker.end(showGlodId)
+                            .then(() => 
+                                flyCoinId = ticker.add(elements.flyCoin(tapFocusSlice))
+                            );
                 }
             }
         });

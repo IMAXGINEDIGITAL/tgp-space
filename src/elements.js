@@ -9,6 +9,7 @@ import {
     queryAll,
     getRect,
     getDistance,
+    appendStyle,
     raf,
     caf
 } from './util';
@@ -92,13 +93,57 @@ export class Elements extends CanvasImage {
         }
     }
 
+    flyCoin(focus) {
+        const {
+            noCoin,
+            index,
+            coinX,
+            coinY
+        } = focus;
+
+        const slice = this.slices[String(index)];
+        if (slice) {
+            if (!noCoin) {
+                const coin = slice.coin;
+                const duration = 500;
+                const endX = 650;
+                const endY = 50;
+
+                return ({
+                    delta,
+                    elapsed
+                }) => {
+                    if (elapsed <= duration) {
+                        const percent = elapsed / duration;
+                        coin.x = coinX + (endX - coinX) * percent;
+                        coin.y = coinY + (endY - coinY) * percent;
+                        coin.scale += delta / duration * 5;
+                        coin.slow -= delta / duration * 5;
+                    } else {
+                        coin.x = endX;
+                        coin.y = endY;
+                        focus.noCoin = true;
+                    }
+
+                    return focus.noCoin;
+                }
+            }
+        }
+    }
+    
     drawImages(hovers, focus, scrollX, scrollY) {
         const params = [];
         if (hovers) {
            for (const hover of hovers) {
                 const {
                     type,
-                    index
+                    index,
+                    y1,
+                    y2,
+                    coinX,
+                    coinY,
+                    noCoin,
+                    found
                 } = hover;
 
                 const slice = this.slices[String(index)];
@@ -112,7 +157,8 @@ export class Elements extends CanvasImage {
                         staticImg,
                         textImg,
                         textAlpha = 0,
-                        goldImg
+                        goldImg,
+                        coin
                     } = slice;
 
                     canvasImage.render.clearRect(0, 0, width, height);
@@ -128,11 +174,35 @@ export class Elements extends CanvasImage {
                         canvasImage.render.restore();
                     }
 
-                    if (type >= 3
-                            && slice.goldY != null) {
-                        const goldY = slice.goldY;
-                        const y = goldY * this.scaleRatio;
-                        canvasImage.render.drawImage(goldImg, 0, goldY, originSliceWidth, originSliceHeight - goldY, 0, y, width, height - y);
+                    if (type >= 3) {
+
+                        if (slice.goldY != null) {
+                            const goldY = slice.goldY;
+                            const y = goldY * this.scaleRatio;
+                            canvasImage.render.drawImage(goldImg, 0, goldY, originSliceWidth, originSliceHeight - goldY, 0, y, width, height - y);
+                        }
+
+                        if (this.coins.length
+                                && !noCoin) {
+                            let {
+                                index,
+                                slow,
+                                scale,
+                                x = coinX,
+                                y = coinY
+                            } = coin;
+
+                            slow = slow < 1 ? 1 : slow;
+                            scale = scale > 10 ? 10 : scale;
+
+                            const coinImg = this.coins[parseInt(index / slow)];
+                            if (coinImg) {
+                                const {width, height} = coinImg;
+                                canvasImage.render.drawImage(coinImg, x * this.scaleRatio, y * this.scaleRatio, width / scale, height / scale);
+                            }
+                            coin.index = (coin.index + 1) % (this.coins.length * slow);
+                        }
+                        
                     }
 
                     params.push({
@@ -151,7 +221,14 @@ export class Elements extends CanvasImage {
 
     ready() {
         const loaded = [];
+        this.coins = [];
         this.slices = {};
+
+        Object.keys(this.items).filter(id =>
+            id.match(/^coin\d$/)
+        ).forEach(id => {
+            this.coins.push(this.items[id].obj);
+        });
 
         Object.keys(this.items).filter(id => {
             return id.match(/^i\d+\-e\-(s|t|g)/);
@@ -164,6 +241,11 @@ export class Elements extends CanvasImage {
             let slice = this.slices[String(index)];
             if (!slice) {
                 slice = this.slices[String(index)] = {
+                    coin: {
+                        index: 0,
+                        slow: 8,
+                        scale: 3
+                    },
                     canvasImage: new CanvasImage(this.sliceWidth, this.sliceHeight),
                     x: x * this.sliceWidth,
                     y: y * this.sliceHeight,
@@ -196,6 +278,7 @@ export class ElementCount extends Event {
         this.textTipEl = query(this.textEl, '.tip');
         this.textBgEl = query(this.textEl, '.bg');
         this.barEl = query(this.wrapEl, '.progress .bar');
+        this.tipsEl = query(this.wrapEl, '.tips'); 
         this.found = 0;
         this.amount = 0;
         this.items = items;
@@ -253,6 +336,36 @@ export class ElementCount extends Event {
     ready() {
         return new Promise((resolve, reject) => {
             this.wrapEl.style.display = '';
+
+            let keyframes = '';
+            Object.keys(this.items).filter(id =>
+                id.match(/^coin\d$/)
+            ).forEach((id, i) => {
+                const item = this.items[id];
+                keyframes += `
+                    ${1 / 6 * i * 100}% {
+                        background-image: url(${item.src});
+                    }
+                `;
+
+                if (i === 0) {
+                    keyframes += `
+                        100% {
+                            background-image: url(${item.src});
+                        }
+                    `;  
+                }
+            });
+
+            appendStyle(`
+                @-webkit-keyframes coin {
+                    ${keyframes}
+                }
+            `);
+
+            this.tipsEl.style.webkitAnimation = 'coin 1s linear 0s infinite';
+            // this.tipsEl.style.backgroundImage = `url(${this.items['coin1'].src})`
+
             resolve(this);
         });
     }

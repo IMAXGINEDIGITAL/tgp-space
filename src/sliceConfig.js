@@ -14,7 +14,9 @@ export default {
         distance: '0公里',
         type: 3,
         y1: 1334,
-        y2: 0
+        y2: 0,
+        coinX: 400,
+        coinY: 150
     },
     '122': {
         distance: '38.44万公里',
