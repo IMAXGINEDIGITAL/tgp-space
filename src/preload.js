@@ -154,7 +154,6 @@ window.assetsPreload = domready()
         }) => {
             if (sumDelta > 300) {
                 sumDelta = 0;
-                debugger
                 let p = texts[textPIndex];
                 let t = p[textLIndex];
 
