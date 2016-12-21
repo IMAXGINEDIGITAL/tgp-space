@@ -14,16 +14,21 @@ import {
     defer,
     query,
     queryAll,
-    createjs
+    createjs,
+    raf,
+    caf
 } from './util';
+import textConfig from './textConfig';
+import Ticker from './ticker';
 
 const items = {};
 window.assetsItems = items;
 
 const preloadWrapEl = query(doc.body, '#preload');
 const gameWrapEl = query(doc.body, '#game');
-const lightEl = query(preloadWrapEl, '.light');
-const logoEl = query(preloadWrapEl, '.logo');
+const bg1El = query(preloadWrapEl, '.bg1');
+const bg2El = query(preloadWrapEl, '.bg2');
+const textsEl = query(preloadWrapEl, '.texts');
 
 function setBackgrounImage(viewport, id, src) {
     let els = viewport.querySelectorAll(`.${id}[rol="image"]`);
@@ -45,21 +50,8 @@ function getProgress(sVal, eVal, loaded, total) {
     return [percent, val];
 }
 
-function showLight(val) {
-    const logoRect = lightEl.getBoundingClientRect();
-    const y = logoRect.height * (1 - val / 100);
-    lightEl.style.backgroundPositionY =  `-${y}px`;
-    lightEl.style.webkitTransform = `translateY(${y}px)`; 
-}
-
-function showLogo(precent) {
-    logoEl.className += ' anime';
-    return delay(600);
-}
- 
-function openGate() {
-    preloadWrapEl.className += ' anime';
-    return delay(1000);
+function setBgClear(val) {
+    bg2El.style.opacity = val / 100; 
 }
 
 function fileload(e, viewport) {
@@ -97,7 +89,7 @@ const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
         } = e;
 
         const [percent, val] = getProgress(0, 10, loaded, total);
-        showLight(val);
+        setBgClear(val);
     });
 
     queue.on('error', () => reject(viewport));
@@ -119,7 +111,7 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
         } = e;
 
         const [percent, val] = getProgress(10, 100, loaded, total);
-        showLight(val);
+        setBgClear(val);
     });
 
     queue.on('error', () => reject(viewport));
@@ -143,7 +135,48 @@ const loadImgObject = (items) => {
     return Promise.all(promises);
 };
 
+const ticker = new Ticker();
+let tickId;
+
 window.assetsPreload = domready()
+    .then(() => {
+        ticker.run();
+
+        const texts = textConfig.loading.texts;
+        const textPLen = texts.length;
+        let textPIndex = 0;
+        let textLIndex = 0;
+        let sumDelta = 301;
+
+        tickId = ticker.add(({
+            delta,
+            elapsed
+        }) => {
+            if (sumDelta > 300) {
+                sumDelta = 0;
+                debugger
+                let p = texts[textPIndex];
+                let t = p[textLIndex];
+
+                if (textLIndex === p.length) {
+                    textPIndex = (textPIndex + 1) % textPLen;
+                    textLIndex = 0;
+                    textsEl.innerHTML = '';
+
+                    p = texts[textPIndex];
+                    t = p[textLIndex];
+                }
+
+                const el = document.createElement('p');
+                el.textContent = t;
+                textsEl.appendChild(el);
+
+                textLIndex++;
+            } else {
+                sumDelta += delta;
+            }
+        });
+    })
     .then(() => { // load preload manifest
         preloadWrapEl.style.display = 'block';
         return loadPreloadManifest(preloadWrapEl);
@@ -151,16 +184,9 @@ window.assetsPreload = domready()
     .then(() => {  // load game manifest
         return loadGameManifest(gameWrapEl);
     })
-    .then(() => showLogo())
     .then(() => {
+        ticker.cancel();
+        preloadWrapEl.style.display = 'none';
         gameWrapEl.style.display = 'block';
-        doc.body.className = 'anime';
-        // doc.body.style.backgroundImage = `url(${items['bg'].src})`;
-        return delay(100);
-    })
-    .then(() => openGate())
-    .then(() => {
-        doc.body.className = '';
-        // preloadWrapEl.style.display = 'none';
         return loadImgObject(items);
     });

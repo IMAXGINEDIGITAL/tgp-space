@@ -27,6 +27,7 @@ export default class Cloud extends CanvasImage {
     drawImages(hovers, focus, scrollX, scrollY) {
         const params = [];
         const ids = [];
+        const scale = 0.4;
 
         const pushParams = id => {
             if (ids.indexOf(id) < 0
@@ -40,10 +41,10 @@ export default class Cloud extends CanvasImage {
                 } = this.slices[id];
 
                 params.push({
-                    x: x - width * 0.4 - scrollX,
-                    y: y - height * 0.4 - scrollY,
-                    width: width * 1.8,
-                    height: height * 1.8,
+                    x: x - width * scale / 2 - scrollX,
+                    y: y - height * scale / 2 - scrollY,
+                    width: width * (1 + scale),
+                    height: height * (1 + scale),
                     img: canvas
                 });
             }
@@ -92,7 +93,7 @@ export default class Cloud extends CanvasImage {
             } = slice;
 
             if (!cleared) {
-                const duration = 1500;
+                const duration = 2500;
 
                 return ({
                     delta,

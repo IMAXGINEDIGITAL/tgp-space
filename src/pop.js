@@ -49,22 +49,25 @@ export default class Pop {
         text,
         bgType,
         onleftclick,
-        onrightclick
+        onrightclick,
+        oncloseclick
     }) {
         return new Promise((resolve, reject) => {
             this.popEl.style.display = '';
 
             this.titleEl.textContent = title;
             this.textEl.innerHTML = text;
+            this.popEl.className += `  bg${bgType}`;
 
             if (shareble) {
-                this.popEl.className += ` shareble bg${bgType}`;
+                this.popEl.className += ` shareble`;
             }
 
             const handler = (e) => {
                 e.preventDefault();
                 this.leftBtnEl.removeEventListener('tap', onLeftClick);
                 this.rightBtnEl.removeEventListener('tap', onRightClick);
+                this.closeEl.removeEventListener('tap', onCloseClick);
                 return Promise.resolve();
             }
 
@@ -79,6 +82,12 @@ export default class Pop {
             }
 
             this.rightBtnEl.addEventListener('tap', onRightClick);
+
+            function onCloseClick(e) {
+                handler(e).then(() => oncloseclick && oncloseclick());
+            }
+
+            this.closeEl.addEventListener('tap', onCloseClick);
 
             raf(() => this.popEl.className += ' open');
 

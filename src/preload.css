@@ -1,71 +1,44 @@
-body {
-    background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: cover;
-}
+#preload {}
 
-body.anime {
-    -webkit-backface-visibility: visible;
-    -webkit-perspective-origin: 0% 50%;
-    -webkit-transform-style: preserve-3d;
-    -webkit-perspective: 10rem;
-}
-
-#preload {
-    -webkit-transform: rotateY(0);
-}
-
-#preload .bg {
+#preload .bg1,
+    #preload .bg2 {
     width: 100%;
     height: 100%;
     background-position: left bottom;
     background-repeat: no-repeat;
     background-size: cover;
-    -webkit-transition: opacity 0.4s linear 0s;
-    position: relative;
-}
-
-#preload .light {
     position: absolute;
-    width: 100%;
-    height: 11.973rem;
-    background-position: left bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
     left: 0;
-    bottom: 3.786rem;
+    top: 0;
 }
 
-#preload .logo {
-    position: absolute;
-    width: 10rem;
-    height: 11.973rem;
-    background-position: left bottom;
-    background-repeat: no-repeat;
-    background-size: cover;
-    left: 0rem;
-    bottom: 3.786rem;
+#preload .bg2 {
     opacity: 0;
 }
 
-#preload .logo.anime {
-    -webkit-transition: opacity 0.6s ease-in 0s;
-    opacity: 1;
+#preload .texts {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    -webkit-box-orient: vertical;
+    box-sizing: border-box;
+    padding-top: 4rem;
 }
 
-#preload.anime .bg {
-    -webkit-transition: -webkit-filter 0.6s ease-in 0s;
-    -webkit-filter: saturate(24%) hue-rotate(198deg);
-}
-
-#preload.anime .light {
-    -webkit-transition: -webkit-filter 0.6s ease-in 0s;
-    -webkit-filter: saturate(24%) hue-rotate(198deg);
-}
-
-#preload.anime .logo {
-    -webkit-transform-origin: 0 50% 0;
-    -webkit-transition: -webkit-transform 1s ease-out 0s;
-    -webkit-transform: rotateY(90deg);
-    opacity: 1;
+#preload .texts p {
+    line-height: 1.5em;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    color: #00cbe3;
+    text-shadow:
+        1px 0 1px rgba(0, 203, 227, 0.3),
+        0 1px 1px rgba(0, 203, 227, 0.3), 
+        0 -1px 1px rgba(0, 203, 227, 0.3),
+        -1px 0 1px rgba(0, 203, 227, 0.3);
 }

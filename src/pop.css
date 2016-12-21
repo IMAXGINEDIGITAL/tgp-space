@@ -105,8 +105,8 @@
 #pop .popBg1 {
     display: none;
     position: absolute;
-    width: 4.36rem;
-    height: 3.346rem;
+    width: 3.36rem;
+    height: 2.92rem;
     right: 5px;
     bottom: 2px;
     background-repeat: no-repeat;
@@ -121,8 +121,8 @@
 #pop .popBg2 {
     display: none;
     position: absolute;
-    width: 4.626rem;
-    height: 3.506rem;
+    width: 4.36rem;
+    height: 3.346rem;
     right: 5px;
     bottom: 2px;
     background-repeat: no-repeat;
@@ -134,11 +134,19 @@
     display: block;
 }
 
-#pop.shareble .popBg1 {
-    display: block;
+#pop .popBg3 {
+    display: none;
+    position: absolute;
+    width: 4.626rem;
+    height: 3.506rem;
+    right: 5px;
+    bottom: 2px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: contain;
 }
 
-#pop.shareble .popBg2 {
+#pop.bg3 .popBg3 {
     display: block;
 }
 
@@ -369,6 +377,7 @@
         0 2px 2px rgba(0, 203, 227, 0.3), 
         0 -2px 2px rgba(0, 203, 227, 0.3),
         -2px 0 2px rgba(0, 203, 227, 0.3);
+    white-space: nowrap;
 }
 
 #pop .text {

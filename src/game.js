@@ -11,7 +11,6 @@ import {
 } from './util';
 import Scroller from './scroller';
 import Stage from './stage';
-import Opening from './opening';
 import HelloWorld from './helloWorld';
 import Cloud from './cloud';
 import Star from './star';
@@ -33,7 +32,6 @@ let viewport = query(doc.body, '#game');
 let scroller;
 let ticker;
 let stage;
-let opening;
 let helloWorld;
 let cloud;
 let star;
@@ -52,15 +50,18 @@ function showTip(config) {
 function showPop(config) {
     scroller && (scroller.enable = false);
 
-    pop && pop.popup({
+    return pop && pop.popup({
         title: config.title,
         text: config.text,
-        shareble: true,
+        shareble: config.shareble,
         bgType: config.bgType,
         onleftclick: () => {
-            // pop.close().then(() => scroller.enable = true);
+            pop.close().then(() => scroller.enable = true);
         },
         onrightclick: () => {
+            pop.close().then(() => scroller.enable = true);
+        },
+        oncloseclick: () => {
             pop.close().then(() => scroller.enable = true);
         }
     }) 
@@ -76,23 +77,6 @@ preload
         ticker = new Ticker();
         ticker.run();
     })
-    .then(() => { // opening
-        opening = new Opening(viewport, items);
-        return opening.ready()
-                .then(() => {
-                    const frameId = ticker.add(opening.play());
-                    const starId = ticker.add(opening.star());
-
-                    return Promise.all([
-                        ticker.end(frameId),
-                        ticker.end(starId)
-                    ]);
-                })
-                .then(() => {
-                    return opening.chicken().then(() => delay(2000));
-                })
-                .then(() => opening.ending())
-    })
     .then(() => { // helloworld
         helloWorld = new HelloWorld(viewport, items);
         return helloWorld.ready();
@@ -102,7 +86,7 @@ preload
         return stage.ready();
     })
     .then(() => { // scroller
-        scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, 0.3);
+        scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, 2);
         scroller.enable = false;
         return scroller.ready();
     })
@@ -177,7 +161,12 @@ preload
         });
 
         ticker.on('aftertick', e => {
-            elementCount && elementCount.update(stage.specialAmount, stage.specialFound);
+            elementCount && elementCount.update(
+                stage.specialAmount,
+                stage.specialFound,
+                stage.totalAmount,
+                stage.focusedAmount
+            );
 
             elements.drawImages(hoverSlice, focusSlice, scrollX, scrollY);
             cloud.drawImages(hoverSlice, focusSlice, scrollX, scrollY);
@@ -192,10 +181,22 @@ preload
         });
     })
     .then(() => { // show helloworld
-        const tickerId = ticker.add(helloWorld.play());
-        return ticker.end(tickerId)
-                    .then(() => delay(2000))
-                    .then(() => helloWorld.ending());
+        const repeat = 8;
+        let promise = Promise.resolve();
+
+        for (let i = 0; i < repeat; i++) {
+            promise = promise.then(() => {
+                const tickerId = ticker.add(helloWorld.play());
+                return ticker.end(tickerId);
+            }).then(() => delay(500 + Math.random() * 500))
+        }
+
+        return promise.then(() => delay(1000))
+                .then(() => helloWorld.ending());
+    })
+    .then(() => { // pop
+        pop = new Pop(viewport);
+        return pop.ready();
     })
     .then(() => { // map
         map = new Map(viewport, stage.hSlice, stage.vSlice);
@@ -210,7 +211,8 @@ preload
             const xp = e.x / stage.width;
             const yp = e.y / stage.height;
             map.clear(xp, yp);
-            const focusSlice = stage.getFocusSlice(e.x, e.y);
+            
+            const focusSlice = stage.getFocusSlice(e.x + stage.sliceWidth / 2, e.y + stage.sliceHeight / 2);
             if (focusSlice && focusSlice.distance) {
                 map.text(focusSlice.distance);
             }
@@ -218,19 +220,26 @@ preload
 
         return map.ready();
     })
-    .then(() => { // pop
-        pop = new Pop(viewport);
-        return pop.ready();
-    })
     .then(() => { // elements count
         elementCount = new ElementCount(viewport, items);
 
-        elementCount.on('found', ({
+        elementCount.on('update', ({
             found,
             amount,
-            time
+            total,
+            focus
         }) => {
-            const config = textConfig[`found${found}`];
+            let config;
+
+            if (found === amount
+                && focus === total) {
+                config = textConfig['gg'];
+            } else if (focus === total) {
+                config = textConfig['blacksheepwall'];
+            } else {
+                config = textConfig[`found${found}`];
+            }
+
 
             if (config) {
                 if (config.type === 'tip') {
@@ -249,6 +258,7 @@ preload
         scroller.enable = true;
         scroller.scrollTo(boneX, boneY);
     })
+    .then(() => delay(2000))
     .then(() => { // show guide
-        showTip(textConfig.guide);
+        return showPop(textConfig.gl);
     })

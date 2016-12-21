@@ -16,8 +16,7 @@ export default class HelloWorld {
     }
 
     play() {
-        const duration = 3000;
-        const times = 5;
+        const duration = 400;
         const count = 6;
 
         return ({
@@ -25,7 +24,7 @@ export default class HelloWorld {
             delta
         }) => {
             if (elapsed <= duration) {
-                const index = parseInt(count * times * elapsed / duration) % count;
+                const index = parseInt(count * elapsed / duration);
                 this.wrapEl.style.backgroundPositionX = `-${index * 10}rem`;
             } else {
                 this.wrapEl.style.backgroundPositionX = '0';

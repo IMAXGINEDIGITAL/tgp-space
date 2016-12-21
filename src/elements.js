@@ -231,10 +231,10 @@ export class Elements extends CanvasImage {
         });
 
         Object.keys(this.items).filter(id => {
-            return id.match(/^i\d+\-e\-(s|t|g)/);
+            return id.match(/^i\d+\-e\-(s|w|g)/);
         }).forEach(id => {
             const item = this.items[id];
-            const [, index, type] = id.match(/^i(\d+)\-e\-(s|t|g)$/);
+            const [, index, type] = id.match(/^i(\d+)\-e\-(s|w|g)$/);
 
             const x = Number(index) % this.hSlice;
             const y = parseInt(Number(index) / this.hSlice);
@@ -256,7 +256,7 @@ export class Elements extends CanvasImage {
             
             if (type === 's') {
                 slice.staticImg = item.obj;
-            } else if (type === 't') {
+            } else if (type === 'w') {
                 slice.textImg = item.obj;
             } else if (type === 'g') {
                 slice.goldImg = item.obj;
@@ -271,7 +271,6 @@ export class ElementCount extends Event {
     constructor(viewport, items) {
         super();
 
-        this.step = 5;
         this.wrapEl = query(viewport, '#elements-count');
         this.textEl = query(this.wrapEl, '.text');
         this.textNumberEl = query(this.textEl, '.number');
@@ -279,26 +278,35 @@ export class ElementCount extends Event {
         this.textBgEl = query(this.textEl, '.bg');
         this.barEl = query(this.wrapEl, '.progress .bar');
         this.tipsEl = query(this.wrapEl, '.tips'); 
+
         this.found = 0;
         this.amount = 0;
+        this.total = 0;
+        this.focus = 0;
         this.items = items;
     }
 
-    update(amount, found) {
+    update(amount, found, total, focus) {
         if (found !== this.found 
-            || amount !== this.amount) {
+            || amount !== this.amount
+            || total !== this.total
+            || focus !== this.focus) {
             this.textNumberEl.textContent = `${found}/${amount}`;
             this.barEl.style.width = `${found/amount*100}%`;
 
-            if (found !== 0 && found % this.step === 0) {
-                this.emit('found', {
-                    found: found,
-                    amount: amount,
-                    time: parseInt(found / this.step)
+            if (found !== 0) {
+                this.emit('update', {
+                    found,
+                    amount,
+                    total,
+                    focus
                 });
             }
+
             this.found = found;
             this.amount = amount;
+            this.total = total;
+            this.focus = focus;
         }
     }
 
@@ -364,7 +372,6 @@ export class ElementCount extends Event {
             `);
 
             this.tipsEl.style.webkitAnimation = 'coin 1s linear 0s infinite';
-            // this.tipsEl.style.backgroundImage = `url(${this.items['coin1'].src})`
 
             resolve(this);
         });

@@ -6,9 +6,8 @@ const assetsPrefix = os.isIOS ? '2x' : '1x';
 export const preload = {
     path: `assets/${assetsPrefix}/preload/`,
     manifest: [
-        {id: 'bg', src: 'bg.jpg'},
-        {id: 'light', src: 'light.jpg'},
-        {id: 'logo', src: 'logo.jpg'}
+        {id: 'bg1', src: 'bg1.jpg'},
+        {id: 'bg2', src: 'bg2.jpg'}
     ]
 };
 
@@ -44,8 +43,8 @@ Object.keys(sliceConfig).forEach(key => {
 
         if (config.type >= 2) {
             elementsManifest.push({
-                id: `i${key}-e-t`,
-                src: `i${key}-e-t.png`
+                id: `i${key}-e-w`,
+                src: `i${key}-e-w.png`
             });
         }
 
@@ -73,9 +72,9 @@ export const game = [
             {id: 'popBtn', src: 'popBtn.png'},
             {id: 'popBg1', src: 'popBg-1.png'},
             {id: 'popBg2', src: 'popBg-2.png'},
+            {id: 'popBg3', src: 'popBg-3.png'},
             {id: 'tipBg1', src: 'tipBg-1.png'},
             {id: 'tipBg2', src: 'tipBg-2.png'},
-            {id: 'tipBg3', src: 'tipBg-3.png'},
             {id: 'coin1', src: 'coin-1.png'},
             {id: 'coin2', src: 'coin-2.png'},
             {id: 'coin3', src: 'coin-3.png'},

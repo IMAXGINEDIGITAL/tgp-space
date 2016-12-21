@@ -62,13 +62,19 @@ export default class Ticker extends Event{
         }
     }
 
+    cancel() {
+        if (this.rid) {
+            caf(this.rid);
+        }
+    }
+
     run() {
         this.start = Date.now();
         this.elapsed = 0;
         this.delta = 0;
 
         const tick = () => {
-            raf(tick);
+            this.rid = raf(tick);
 
             let now = Date.now();
             let elapsed = now - this.start;
@@ -113,7 +119,8 @@ export default class Ticker extends Event{
                 elapsed: this.elapsed
             });
         }
-        raf(tick);
+
+        this.rid = raf(tick);
 
         return true;
     }
