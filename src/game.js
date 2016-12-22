@@ -14,10 +14,8 @@ import Stage from './stage';
 import HelloWorld from './helloWorld';
 import Cloud from './cloud';
 import Star from './star';
-import {
-    Elements,
-    ElementCount
-} from './elements';
+import Elements from './elements';
+import Found from './found';
 import Map from './map';
 import Ticker from './ticker';
 import Pop from './pop';
@@ -31,7 +29,6 @@ const {
     assetsItems: items,
 } = win;
 
-const scrollSlowRatio = 0.5;
 let viewport = query(doc.body, '#game');
 let scroller;
 let ticker;
@@ -40,7 +37,7 @@ let helloWorld;
 let cloud;
 let star;
 let elements;
-let elementCount;
+let found;
 let map;
 let pop;
 let tip;
@@ -100,6 +97,7 @@ preload
         return stage.ready();
     })
     .then(() => { // scroller
+        const scrollSlowRatio = 1;
         scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, scrollSlowRatio);
         scroller.enable = false;
         return scroller.ready();
@@ -123,13 +121,13 @@ preload
         let scrollX = 0;
         let scrollY = 0;
         let starRollY = stage.vh;
+        let starRollSpeed = 0.4;
         let starRollId = ticker.add(() => {
             starRollY -= starRollSpeed;
             if (starRollY < 0) {
                 starRollY = stage.vh;
             }
         });
-        let starRollSpeed = 1;
         let showTextId;
         let showGlodId;
         let flyCoinId;
@@ -154,6 +152,7 @@ preload
         scroller.on('scrollend', e => {
             if (focusSlice) {
                 clearCloudId = ticker.add(cloud.clear(focusSlice));
+
                 if (focusSlice.type >= 2) {
                     showTextId = ticker.add(elements.showText(focusSlice));
                 }
@@ -161,9 +160,9 @@ preload
         });
 
         scroller.on('tap', e => {
-            if (e.originalEvent.target === stage.canvas
-                    && focusSlice) {
+            if (e.originalEvent.target === stage.canvas) {
                 const tapFocusSlice = stage.getFocusSlice(e.ex, e.ey);
+                
                 if (tapFocusSlice) {
                     showGlodId = ticker.add(elements.showGold(tapFocusSlice));
                     ticker.end(showGlodId)
@@ -175,7 +174,7 @@ preload
         });
 
         ticker.on('aftertick', e => {
-            elementCount && elementCount.update(
+            found && found.update(
                 stage.specialAmount,
                 stage.specialFound,
                 stage.totalAmount,
@@ -195,7 +194,7 @@ preload
         });
     })
     .then(() => { // show helloworld
-        const repeat = 8;
+        const repeat = 5;
         let promise = Promise.resolve();
 
         for (let i = 0; i < repeat; i++) {
@@ -211,6 +210,14 @@ preload
     .then(() => { // map
         map = new Map(viewport, stage.hSlice, stage.vSlice);
 
+        let randomTextId;
+
+        scroller.on('scrollstart', e => {
+            if (randomTextId == null) {
+                randomTextId = ticker.add(map.randomText());
+            }
+        });
+
         scroller.on('scrolling', e => {
             const xp = e.x / stage.width;
             const yp = e.y / stage.height;
@@ -224,16 +231,19 @@ preload
             
             const focusSlice = stage.getFocusSlice(e.x + stage.sliceWidth / 2, e.y + stage.sliceHeight / 2);
             if (focusSlice && focusSlice.distance) {
+                ticker.delete(randomTextId);
+                randomTextId = null;
+
                 map.text(focusSlice.distance);
             }
         });
 
         return map.ready();
     })
-    .then(() => { // elements count
-        elementCount = new ElementCount(viewport, items);
+    .then(() => { // found
+        found = new Found(viewport, items);
 
-        elementCount.on('update', ({
+        found.on('update', ({
             found,
             amount,
             total,
@@ -246,11 +256,14 @@ preload
                 config = textConfig['gg'];
             } else if (focus === total) {
                 config = textConfig['blacksheepwall'];
+            } else if (found === 1) {
+                config = textConfig['gl'];
             } else {
                 config = textConfig[`found${found}`];
             }
 
-            if (config) {
+            if (config && !config.shown) {
+                config.shown = true;
                 if (config.type === 'tip') {
                     showTip(config);
                 } else if (config.type === 'popup') {
@@ -259,7 +272,7 @@ preload
             }
         });
 
-        return elementCount.ready();
+        return found.ready();
     })
     .then(() => { // pop
         pop = new Pop(viewport);
@@ -286,6 +299,6 @@ preload
     // .then(() => delay(2000))
     .then(() => { // show guide
         // showTip(textConfig.found5);
-        // return showPop(textConfig.gg);
+        // showPop(textConfig.gg);
         music.play();
     })

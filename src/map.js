@@ -24,6 +24,31 @@ export default class Map extends Event {
         this.opened = false;
     }
 
+    randomText() {
+        let n = 1000;
+        let sumDelta = 16;
+        let sign = -1;
+
+        return ({
+            elapsed,
+            delta
+        }) => {
+            // if (sumDelta > 15) {
+                // sumDelta = 0;
+                if (n < 1000 && sign === -1) {
+                    sign = 1;
+                } else if (n > 10000 & sign === 1) {
+                    sign = -1;
+                }
+
+                this.text(n);
+                n += parseInt(Math.random() * 100 + 100) * sign;
+            // } else {
+                // sumDelta += delta;
+            // }
+        }
+    }
+
     text(str) {
         this.textEl.textContent = str;
     }

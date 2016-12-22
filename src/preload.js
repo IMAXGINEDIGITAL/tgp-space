@@ -143,13 +143,13 @@ window.assetsPreload = domready()
         const textPLen = texts.length;
         let textPIndex = 0;
         let textLIndex = 0;
-        let sumDelta = 301;
+        let sumDelta = 801;
 
         tickId = ticker.add(({
             delta,
             elapsed
         }) => {
-            if (sumDelta > 300) {
+            if (sumDelta > 800) {
                 sumDelta = 0;
                 let p = texts[textPIndex];
                 let t = p[textLIndex];

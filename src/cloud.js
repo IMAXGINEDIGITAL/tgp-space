@@ -93,7 +93,7 @@ export default class Cloud extends CanvasImage {
             } = slice;
 
             if (!cleared) {
-                const duration = 2500;
+                const duration = 1000;
 
                 return ({
                     delta,

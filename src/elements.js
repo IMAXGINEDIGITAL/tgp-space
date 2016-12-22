@@ -1,4 +1,3 @@
-import './elements.css';
 import {
     win,
     doc,
@@ -21,7 +20,7 @@ import {
 const originSliceWidth = 750;
 const originSliceHeight = 1334
 
-export class Elements extends CanvasImage {
+export default class Elements extends CanvasImage {
     constructor(stage, items) {
         super(stage.vw, stage.vh);
 
@@ -41,7 +40,7 @@ export class Elements extends CanvasImage {
 
         const slice = this.slices[String(index)];
         if (slice) {
-            if (!shown) {
+            if (shown == null) {
                 const delay = 1500;
                 const duration = 1000;
 
@@ -51,13 +50,16 @@ export class Elements extends CanvasImage {
                 }) => {
                     if (elapsed <= delay) {
                         slice.textAlpha = 0;
+                        focus.shown = 1;
                     } else if (elapsed - delay <= duration) {
                         slice.textAlpha = (elapsed - delay) / duration;
+                        focus.shown = 1;
                     } else {
                         slice.textAlpha = 1;
-                        focus.shown = true;
+                        focus.shown = 2;
                     }
-                    return focus.shown;
+
+                    return focus.shown === 2;
                 }
             }
         }
@@ -73,7 +75,7 @@ export class Elements extends CanvasImage {
 
         const slice = this.slices[String(index)];
         if (slice) {
-            if (!found) {
+            if (found == null) {
                 const duration = 1000;
 
                 return ({
@@ -82,12 +84,13 @@ export class Elements extends CanvasImage {
                 }) => {
                     if (elapsed <= duration) {
                         slice.goldY = y1 + (y2 - y1) * elapsed / duration;
+                        focus.found = 1;
                     } else {
                         slice.goldY = y2;
-                        focus.found = true;
+                        focus.found = 2;
                     }
 
-                    return focus.found;
+                    return focus.found === 2;
                 }
             }
         }
@@ -142,8 +145,7 @@ export class Elements extends CanvasImage {
                     y2,
                     coinX,
                     coinY,
-                    noCoin,
-                    found
+                    noCoin
                 } = hover;
 
                 const slice = this.slices[String(index)];
@@ -169,7 +171,7 @@ export class Elements extends CanvasImage {
 
                     if (type >= 2) {
                         canvasImage.render.save();
-                        canvasImage.render.globalAlpha = textAlpha || 0;
+                        canvasImage.render.globalAlpha = textAlpha;
                         canvasImage.render.drawImage(textImg, 0, 0, width, height);
                         canvasImage.render.restore();
                     }
@@ -244,7 +246,7 @@ export class Elements extends CanvasImage {
                     coin: {
                         index: 0,
                         slow: 8,
-                        scale: 3
+                        scale: 5
                     },
                     canvasImage: new CanvasImage(this.sliceWidth, this.sliceHeight),
                     x: x * this.sliceWidth,
@@ -264,85 +266,5 @@ export class Elements extends CanvasImage {
         });
 
         return Promise.all(loaded);
-    }
-}
-
-export class ElementCount extends Event {
-    constructor(viewport, items) {
-        super();
-
-        this.wrapEl = query(viewport, '#elements-count');
-        this.textEl = query(this.wrapEl, '.text');
-        this.textNumberEl = query(this.textEl, '.number');
-        this.textTipEl = query(this.textEl, '.tip');
-        this.textBgEl = query(this.textEl, '.bg');
-        this.barEl = query(this.wrapEl, '.progress .bar');
-        this.goldEl = query(this.wrapEl, '.gold'); 
-
-        this.found = 0;
-        this.amount = 0;
-        this.total = 0;
-        this.focus = 0;
-        this.items = items;
-    }
-
-    update(amount, found, total, focus) {
-        if (found !== this.found 
-            || amount !== this.amount
-            || total !== this.total
-            || focus !== this.focus) {
-            this.textNumberEl.textContent = `${found}/${amount}`;
-            this.barEl.style.width = `${found/amount*100}%`;
-
-            if (found !== 0) {
-                this.emit('update', {
-                    found,
-                    amount,
-                    total,
-                    focus
-                });
-            }
-
-            this.found = found;
-            this.amount = amount;
-            this.total = total;
-            this.focus = focus;
-        }
-    }
-
-    ready() {
-        return new Promise((resolve, reject) => {
-            this.wrapEl.style.display = '';
-
-            let keyframes = '';
-            Object.keys(this.items).filter(id =>
-                id.match(/^coin\d$/)
-            ).forEach((id, i) => {
-                const item = this.items[id];
-                keyframes += `
-                    ${1 / 6 * i * 100}% {
-                        background-image: url(${item.src});
-                    }
-                `;
-
-                if (i === 0) {
-                    keyframes += `
-                        100% {
-                            background-image: url(${item.src});
-                        }
-                    `;  
-                }
-            });
-
-            appendStyle(`
-                @-webkit-keyframes coin {
-                    ${keyframes}
-                }
-            `);
-
-            this.goldEl.style.webkitAnimation = 'coin 1s linear 0s infinite';
-
-            resolve(this);
-        });
     }
 }

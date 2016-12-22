@@ -1,4 +1,4 @@
-#elements-count {
+#found {
     position: absolute;
     right: 0.73rem;
     top: 0.4rem;
@@ -12,7 +12,7 @@
     background-size: 1.106rem 0.413rem;
 }
 
-#elements-count .textWrap {
+#found .textWrap {
     width: 1.106rem;
     height: 0.413rem;
     position: relative;
@@ -23,7 +23,7 @@
     overflow: visible;
 }
 
-#elements-count .text {
+#found .text {
     width: 1.3rem;
     height: 0.5rem;
     position: absolute;
@@ -37,13 +37,7 @@
     overflow: visible;
 }
 
-#elements-count.open .text {
-    width: 5.8rem;
-    height: 2.3rem;
-    box-shadow: none;
-}
-
-#elements-count .text .number {
+#found .text .number {
     text-align: center;
     position: absolute;
     top: 0;
@@ -54,42 +48,7 @@
     text-align: center;
 }
 
-#elements-count .text .tip {
-    position: absolute;
-    width: 3.306rem;
-    height: 1.24rem;
-    line-height: 1.2em;
-    left: 0.2rem;
-    top: 0.36rem;
-    font-size: 12px;
-    color: #00ddf1;
-}
-
-#elements-count .text .bg {
-    position: absolute;
-    left: 3.506rem;
-    top: 0.36rem;
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    background-size: contain;
-}
-
-#elements-count .text .bg.bg1 {
-    width: 2.066rem;
-    height: 1.8rem;
-}
-
-#elements-count .text .bg.bg2 {
-    width: 2.253rem;
-    height: 1.946rem;
-}
-
-#elements-count .text .bg.bg3 {
-    width: 2.346rem;
-    height: 1.933rem;
-}
-
-#elements-count .progress {
+#found .progress {
     box-sizing: border-box;
     width: 1.8rem;
     height: 0.3rem;
@@ -98,14 +57,14 @@
     margin: 0 4px;
 }
 
-#elements-count .progress .bar{
+#found .progress .bar{
     width: 0;
     height: 100%;
     background-color: #00ddf1;
     border-radius: 0.15rem;
 }
 
-#elements-count .gold {
+#found .gold {
     width: 0.667rem;
     height: 0.64rem;
     background-size: contain;
