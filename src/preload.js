@@ -9,7 +9,6 @@ import {
     appendStyle,
     domready,
     Promise,
-    loadImg,
     delay,
     defer,
     query,
@@ -56,6 +55,7 @@ function setBgClear(val) {
 
 function fileload(e, viewport) {
     const {item} = e;
+
     items[item.id] = item;
 
     if (item.type === createjs.AbstractLoader.IMAGE) {
@@ -77,12 +77,11 @@ function fileload(e, viewport) {
     }
 }
 
+const preloadQueue = new createjs.LoadQueue(true);
 const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
-    const queue = new createjs.LoadQueue(true);
+    preloadQueue.on('fileload', e => fileload(e, viewport));
 
-    queue.on('fileload', e => fileload(e, viewport));
-
-    queue.on('progress', e => {
+    preloadQueue.on('progress', e => {
         const {
             loaded,
             total
@@ -92,19 +91,18 @@ const loadPreloadManifest = viewport => new Promise((resolve, reject) => {
         setBgClear(val);
     });
 
-    queue.on('error', () => reject(viewport));
+    preloadQueue.on('error', () => reject(viewport));
 
-    queue.on('complete', () => resolve(viewport));
+    preloadQueue.on('complete', () => resolve(viewport));
 
-    queue.loadManifest(preloadAssets);
+    preloadQueue.loadManifest(preloadAssets);
 });
 
+const gameQueue = new createjs.LoadQueue(true);
 const loadGameManifest = viewport => new Promise((resolve, reject) => {
-    const queue = new createjs.LoadQueue(true);
+    gameQueue.on('fileload',  e => fileload(e, viewport));
 
-    queue.on('fileload',  e => fileload(e, viewport));
-
-    queue.on('progress', e => {
+    gameQueue.on('progress', e => {
         const {
             loaded,
             total
@@ -114,23 +112,22 @@ const loadGameManifest = viewport => new Promise((resolve, reject) => {
         setBgClear(val);
     });
 
-    queue.on('error', () => reject(viewport));
+    gameQueue.on('error', () => reject(viewport));
 
-    queue.on('complete', () => resolve(viewport));
+    gameQueue.on('complete', () => resolve(viewport));
 
     gameAssets.forEach(assets => 
-        queue.loadManifest(assets)
+        gameQueue.loadManifest(assets)
     );
 });
 
-const loadImgObject = (items) => {
+const loadObject = (items) => {
     const promises = Object.keys(items)
-        .filter(key => items[key].type === createjs.AbstractLoader.IMAGE)
         .map(key => {
             const item = items[key];
-            const [image, promise] = loadImg(item.src);
-            item.obj = image;
-            return promise;
+            item.obj = gameQueue.getResult(key) 
+                        || preloadQueue.getResult(key);
+            return Promise.resolve();
         });
     return Promise.all(promises);
 };
@@ -187,5 +184,5 @@ window.assetsPreload = domready()
         ticker.cancel();
         preloadWrapEl.style.display = 'none';
         gameWrapEl.style.display = 'block';
-        return loadImgObject(items);
+        return loadObject(items);
     });

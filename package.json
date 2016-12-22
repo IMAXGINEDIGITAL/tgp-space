@@ -7,6 +7,7 @@
     "build-dist": "webpack --config build/webpack.dist.config.js",
     "minify-preload": "uglifyjs --screw-ie8 -c -o dist/preload.js -- dist/preload.js",
     "minify-game": "uglifyjs --screw-ie8 -c -o dist/game.js -- dist/game.js",
+    "minify": "minify-preload && minify-game",
     "dev": "npm run clear && npm run build-dev -- --watch",
     "release-dev": "npm run clear && npm run build-dev",
     "release": "npm run clear && npm run build-dist && npm run minify"
@@ -14,9 +15,7 @@
   "dependencies": {
     "amfe-env": "^2.0.0",
     "event-emitter": "^0.3.4",
-    "gesture-js": "^0.1.0",
-    "hilojs": "^1.0.2",
-    "iscroll": "^5.2.0"
+    "gesture-js": "^0.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",

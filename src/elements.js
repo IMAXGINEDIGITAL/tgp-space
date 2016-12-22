@@ -277,7 +277,7 @@ export class ElementCount extends Event {
         this.textTipEl = query(this.textEl, '.tip');
         this.textBgEl = query(this.textEl, '.bg');
         this.barEl = query(this.wrapEl, '.progress .bar');
-        this.tipsEl = query(this.wrapEl, '.tips'); 
+        this.goldEl = query(this.wrapEl, '.gold'); 
 
         this.found = 0;
         this.amount = 0;
@@ -310,37 +310,6 @@ export class ElementCount extends Event {
         }
     }
 
-    show({
-        tip,
-        bgType
-    }) {
-        const items = this.items;
-
-        return new Promise((resolve, reject) => {
-            this.textTipEl.innerHTML = tip;
-            this.textBgEl.className = `bg bg${bgType}`;
-            this.textBgEl.style.backgroundImage = 
-                `url(${items['tipBg' + bgType].src})`;
-            this.wrapEl.className = 'open';
-
-            delay(400)
-                .then(() => {
-                    this.textTipEl.style.display = '';
-                    this.textBgEl.style.display = '';
-                    return delay(3000);
-                })
-                .then(() => {
-                    this.textTipEl.style.display = 'none';
-                    this.textBgEl.style.display = 'none';
-                    this.wrapEl.className = '';
-                    return delay(400);
-                })
-                .then(() => {
-                    resolve();
-                })
-        });
-    }
-
     ready() {
         return new Promise((resolve, reject) => {
             this.wrapEl.style.display = '';
@@ -371,7 +340,7 @@ export class ElementCount extends Event {
                 }
             `);
 
-            this.tipsEl.style.webkitAnimation = 'coin 1s linear 0s infinite';
+            this.goldEl.style.webkitAnimation = 'coin 1s linear 0s infinite';
 
             resolve(this);
         });

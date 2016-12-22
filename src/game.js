@@ -21,6 +21,9 @@ import {
 import Map from './map';
 import Ticker from './ticker';
 import Pop from './pop';
+import Tip from './tip';
+import Share from './share';
+import Music from './music';
 import textConfig from './textConfig';
 
 const {
@@ -40,9 +43,16 @@ let elements;
 let elementCount;
 let map;
 let pop;
+let tip;
+let share;
+let music;
+
+function showShare() {
+    return share.show();
+}
 
 function showTip(config) {
-    elementCount && elementCount.show({
+    return tip.show({
         tip: config.tip,
         bgType: config.bgType
     });
@@ -51,13 +61,16 @@ function showTip(config) {
 function showPop(config) {
     scroller && (scroller.enable = false);
 
-    return pop && pop.popup({
+    return pop.popup({
         title: config.title,
         text: config.text,
         shareble: config.shareble,
         bgType: config.bgType,
         onleftclick: () => {
-            pop.close().then(() => scroller.enable = true);
+            Promise.all([
+                pop.close(),
+                showShare()
+            ]).then(() => scroller.enable = true);
         },
         onrightclick: () => {
             pop.close().then(() => scroller.enable = true);
@@ -195,10 +208,6 @@ preload
         return promise.then(() => delay(1000))
                 .then(() => helloWorld.ending());
     })
-    .then(() => { // pop
-        pop = new Pop(viewport);
-        return pop.ready();
-    })
     .then(() => { // map
         map = new Map(viewport, stage.hSlice, stage.vSlice);
 
@@ -241,7 +250,6 @@ preload
                 config = textConfig[`found${found}`];
             }
 
-
             if (config) {
                 if (config.type === 'tip') {
                     showTip(config);
@@ -253,13 +261,31 @@ preload
 
         return elementCount.ready();
     })
+    .then(() => { // pop
+        pop = new Pop(viewport);
+        return pop.ready();
+    })
+    .then(() => { // tip
+        tip = new Tip(viewport);
+        return tip.ready();
+    })
+    .then(() => { // share
+        share = new Share(viewport);
+        return share.ready();
+    })
+    .then(() => { // music
+        music = new Music(viewport, items);
+        return music.ready();
+    })
     .then(() => { // bone
         const boneX = stage.width / 2 - stage.vw / 2;
         const boneY = stage.height - stage.vh / 2;
         scroller.enable = true;
         scroller.scrollTo(boneX, boneY);
     })
-    .then(() => delay(2000))
+    // .then(() => delay(2000))
     .then(() => { // show guide
-        return showPop(textConfig.gl);
+        // showTip(textConfig.found5);
+        // return showPop(textConfig.gg);
+        music.play();
     })

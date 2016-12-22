@@ -1,0 +1,19 @@
+#music {
+    position: absolute;
+    left: 0.3rem;
+    top: 0.5rem;
+    padding-right: 0.3rem;
+    padding-bottom: 0.5rem;
+}
+
+#music div {
+    width: 0.49333rem;
+    height: 0.44rem;
+    background-position: left 0;
+    background-repeat: no-repeat;
+    background-size: 1.06666667rem 0.44rem;
+}
+
+#music.mute div {
+    background-position: right 0;
+}

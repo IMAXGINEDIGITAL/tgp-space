@@ -53,18 +53,6 @@ function getDistance(x1, y1, x2, y2) {
     return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
-function loadImg(src) {
-    const image = new Image();
-
-    return [
-        image,
-        new Promise((resolve, reject) => {
-            image.onload = () => resolve(image);
-            image.src = src;
-        })
-    ];
-}
-
 function img2Canvas(image, width, height) {
     const canvas = doc.createElement('canvas');
     canvas.width = width;
@@ -91,7 +79,6 @@ export {
     appendStyle,
     domready,
     delay,
-    loadImg,
     img2Canvas,
     query,
     queryAll,

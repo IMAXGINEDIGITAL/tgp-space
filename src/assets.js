@@ -73,6 +73,7 @@ export const game = [
             {id: 'popBg1', src: 'popBg-1.png'},
             {id: 'popBg2', src: 'popBg-2.png'},
             {id: 'popBg3', src: 'popBg-3.png'},
+            {id: 'tip', src: 'tip.png'},  
             {id: 'tipBg1', src: 'tipBg-1.png'},
             {id: 'tipBg2', src: 'tipBg-2.png'},
             {id: 'coin1', src: 'coin-1.png'},
@@ -80,7 +81,9 @@ export const game = [
             {id: 'coin3', src: 'coin-3.png'},
             {id: 'coin4', src: 'coin-4.png'},
             {id: 'coin5', src: 'coin-5.png'},
-            {id: 'coin6', src: 'coin-6.png'}
+            {id: 'coin6', src: 'coin-6.png'},
+            {id: 'share', src: 'share.png'},
+            {id: 'music', src: 'music.png'},
         ]
     },
     {
@@ -94,7 +97,8 @@ export const game = [
     {
         path: 'assets/',
         manifest: [
-            'font.ttf'
+            {id: 'font', src: 'font.ttf'},
+            {id: 'music', src: 'bg.mp3'}
         ]
     },
     {
