@@ -78,14 +78,12 @@ export default class Ticker extends Event{
 
             let now = Date.now();
             let elapsed = now - this.start;
-
-            this.delta = elapsed - this.elapsed;
-            this.elapsed = elapsed;
+            let delta = elapsed - this.elapsed;
 
             this.emit('beforetick', {
                 start: this.start,
-                delta: this.delta,
-                elapsed: this.elapsed
+                delta: delta,
+                elapsed: elapsed
             });
 
             const keys = [...this._mapC.keys()];
@@ -109,15 +107,16 @@ export default class Ticker extends Event{
 
             now = Date.now();
             elapsed = now - this.start;
-
-            this.delta = elapsed - this.elapsed;
-            this.elapsed = elapsed;
+            delta = elapsed - this.elapsed;
 
             this.emit('aftertick', {
                 start: this.start,
-                delta: this.delta,
-                elapsed: this.elapsed
+                delta: delta,
+                elapsed: elapsed
             });
+
+            this.delta = delta;
+            this.elapsed =  elapsed;
         }
 
         this.rid = raf(tick);

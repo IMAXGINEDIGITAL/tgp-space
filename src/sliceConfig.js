@@ -204,7 +204,8 @@ export default {
         coinY: 200
     },
     '120': {
-        type: 1
+        type: 1,
+        isEarth: true
     },
     '121': {
         distance: '0公里',
@@ -212,10 +213,12 @@ export default {
         y2: 0,
         type: 3,
         coinX: 360,
-        coinY: 200
+        coinY: 200,
+        isEarth: true
     },
     '122': {
-        type: 1
+        type: 1,
+        isEarth: true
     },
     '123': {
         distance: '38.44公里',

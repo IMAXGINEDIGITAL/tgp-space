@@ -1,3 +1,4 @@
+import * as Bezier from 'amfe-cubicbezier';
 import {
     win,
     doc,
@@ -134,7 +135,7 @@ export default class Elements extends CanvasImage {
         }
     }
     
-    drawImages(hovers, focus, scrollX, scrollY) {
+    drawImages(hovers, focus, scrollX, scrollY, e) {
         const params = [];
         if (hovers) {
            for (const hover of hovers) {
@@ -145,7 +146,8 @@ export default class Elements extends CanvasImage {
                     y2,
                     coinX,
                     coinY,
-                    noCoin
+                    noCoin,
+                    isEarth
                 } = hover;
 
                 const slice = this.slices[String(index)];
@@ -160,13 +162,28 @@ export default class Elements extends CanvasImage {
                         textImg,
                         textAlpha = 0,
                         goldImg,
-                        coin
+                        coin,
+                        flow
                     } = slice;
+
+                    let offsetY = 0;
+
+                    if (!isEarth) {
+                        offsetY = flow.range[0] + (flow.range[1] - flow.range[0]) * flow.ease(flow.elapsed / flow.duration);
+                        if (flow.elapsed > flow.duration) {
+                            offsetY = flow.range[1];
+                            flow.range = [flow.range[1], flow.range[0]];
+                            flow.ease = flow.ease === Bezier.easeIn ? Bezier.easeOut : Bezier.easeIn;
+                            flow.elapsed = 0;
+                        } else {
+                            flow.elapsed += e.delta;
+                        }
+                    }
 
                     canvasImage.render.clearRect(0, 0, width, height);
 
                     if (type >= 1) {
-                        canvasImage.render.drawImage(staticImg, 0, 0, width, height);
+                        canvasImage.render.drawImage(staticImg, 0, 0 + offsetY, width, height);
                     }
 
                     if (type >= 2) {
@@ -181,7 +198,7 @@ export default class Elements extends CanvasImage {
                         if (slice.goldY != null) {
                             const goldY = slice.goldY;
                             const y = goldY * this.scaleRatio;
-                            canvasImage.render.drawImage(goldImg, 0, goldY, originSliceWidth, originSliceHeight - goldY, 0, y, width, height - y);
+                            canvasImage.render.drawImage(goldImg, 0, goldY, originSliceWidth, originSliceHeight - goldY, 0, y + offsetY, width, height - y);
                         }
 
                         if (this.coins.length
@@ -247,6 +264,12 @@ export default class Elements extends CanvasImage {
                         index: 0,
                         slow: 8,
                         scale: 5
+                    },
+                    flow: {
+                        duration: 800,
+                        elapsed: 0,
+                        range: [0, 10],
+                        ease: Bezier.easeIn
                     },
                     canvasImage: new CanvasImage(this.sliceWidth, this.sliceHeight),
                     x: x * this.sliceWidth,

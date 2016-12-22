@@ -13,6 +13,7 @@
     "release": "npm run clear && npm run build-dist && npm run minify"
   },
   "dependencies": {
+    "amfe-cubicbezier": "^2.0.0",
     "amfe-env": "^2.0.0",
     "event-emitter": "^0.3.4",
     "gesture-js": "^0.1.0"

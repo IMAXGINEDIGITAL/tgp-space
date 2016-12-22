@@ -162,7 +162,7 @@ preload
         scroller.on('tap', e => {
             if (e.originalEvent.target === stage.canvas) {
                 const tapFocusSlice = stage.getFocusSlice(e.ex, e.ey);
-                
+
                 if (tapFocusSlice) {
                     showGlodId = ticker.add(elements.showGold(tapFocusSlice));
                     ticker.end(showGlodId)
@@ -181,8 +181,8 @@ preload
                 stage.focusedAmount
             );
 
-            elements.drawImages(hoverSlice, focusSlice, scrollX, scrollY);
-            cloud.drawImages(hoverSlice, focusSlice, scrollX, scrollY);
+            elements.drawImages(hoverSlice, focusSlice, scrollX, scrollY, e);
+            cloud.drawImages(hoverSlice, focusSlice, scrollX, scrollY, e);
 
             stage.offscreenRender.clearRect(0, 0, stage.vw, stage.vh);
             stage.offscreenRender.drawImage(star.image, 0, starRollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
