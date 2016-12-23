@@ -100,7 +100,7 @@ preload
     })
     .then(() => { // scroller
         const scrollSlowRatio = 1.2;
-        scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, scrollSlowRatio);
+        scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, scrollSlowRatio, stage.dpr);
         scroller.enable = false;
         return scroller.ready();
     })

@@ -40,6 +40,7 @@ export default class Stage extends CanvasRender{
         this.sliceWidth = this.width / hSlice;
         this.sliceHeight = this.height / vSlice;
         this.slices = [];
+        this.dpr = dpr;
 
 
         for (let v = 0; v < this.vSlice; v++) {
@@ -132,7 +133,7 @@ export default class Stage extends CanvasRender{
         const dx = parseInt(cx % this.sliceWidth);
         const dy = parseInt(cy % this.sliceHeight);
 
-        const ratio = 0.9;
+        const ratio = 0.8;
         let slice;
         if (dx > this.sliceWidth * (1 - ratio) / 2 && dx < this.sliceWidth * (1 - (1 - ratio) / 2)
                 && dy > this.sliceHeight * (1 - ratio) / 2 && dy < this.sliceHeight * (1 - (1 - ratio) / 2)) {

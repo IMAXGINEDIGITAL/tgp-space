@@ -10,13 +10,13 @@ import 'gesture-js';
 import Event from './event';
 
 export default class Scroller extends Event{
-    constructor(width, height, vw, vh, scale = 1) {
+    constructor(width, height, vw, vh, scale = 1, dpr = 1) {
         super();
 
         this._isScrolling = false;
         this._enable = false;
         this._scale = scale;
-
+        this.dpr = dpr;
         this.width = width;
         this.height = height;
         this.vw = vw;
@@ -69,8 +69,8 @@ export default class Scroller extends Event{
 
             const emitTap = e => {
                 this._emit('tap', e, {
-                    ex: this.x + e.touch.clientX,
-                    ey: this.y + e.touch.clientY
+                    ex: this.x + e.touch.clientX * this.dpr,
+                    ey: this.y + e.touch.clientY * this.dpr
                 });
             }
 
