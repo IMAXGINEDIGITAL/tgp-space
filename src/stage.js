@@ -1,3 +1,4 @@
+import {os} from 'amfe-env';
 import './stage.css';
 import {
     win,
@@ -18,12 +19,15 @@ const hSlice = 9;
 const vSlice = 14;
 const width = sliceWidth * hSlice;
 const height = sliceHeight * vSlice;
+const dpr = os.isIOS ? 2 : 1;
 
 export default class Stage extends CanvasRender{
     constructor(viewport) {
-        const {width: vw, height: vh} = getRect(viewport);
         const stageEl = query(viewport, '#stage');
+        let {width: vw, height: vh} = getRect(viewport);
 
+        vw *= dpr;
+        vh *= dpr;
         super(stageEl, vw, vh);
 
         this.stageEl = stageEl;
@@ -128,9 +132,10 @@ export default class Stage extends CanvasRender{
         const dx = parseInt(cx % this.sliceWidth);
         const dy = parseInt(cy % this.sliceHeight);
 
+        const ratio = 0.9;
         let slice;
-        if (dx > this.sliceWidth * 0.25 && dx < this.sliceWidth * 0.75
-                && dy > this.sliceHeight * 0.25 && dy < this.sliceHeight * 0.75) {
+        if (dx > this.sliceWidth * (1 - ratio) / 2 && dx < this.sliceWidth * (1 - (1 - ratio) / 2)
+                && dy > this.sliceHeight * (1 - ratio) / 2 && dy < this.sliceHeight * (1 - (1 - ratio) / 2)) {
             slice = this.slices[v * this.hSlice + h];
             slice.focused = true;
         }

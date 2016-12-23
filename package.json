@@ -7,7 +7,7 @@
     "build-dist": "webpack --config build/webpack.dist.config.js",
     "minify-preload": "uglifyjs --screw-ie8 -c -o dist/preload.js -- dist/preload.js",
     "minify-game": "uglifyjs --screw-ie8 -c -o dist/game.js -- dist/game.js",
-    "minify": "minify-preload && minify-game",
+    "minify": "npm run minify-preload && npm run minify-game",
     "dev": "npm run clear && npm run build-dev -- --watch",
     "release-dev": "npm run clear && npm run build-dev",
     "release": "npm run clear && npm run build-dist && npm run minify"

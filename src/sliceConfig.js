@@ -22,38 +22,38 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '23': {
         distance: '1400光年',
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '28': {
         distance: '980光年',
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '31': {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '34': {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '38': {
         distance: '4000光年',
@@ -63,24 +63,24 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '44': {
         distance: '400光年',
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '46': {
         distance: '8.6光年',
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '49': {
         distance: '25.04光年',
@@ -110,23 +110,23 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '74': {
         distance: '59亿公里',
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '76': {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '79': {
         distance: '43.5亿公里',
@@ -137,23 +137,23 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '84': {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '87': {
         distance: '12.8亿公里',
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '91': {
         type: 1
@@ -163,8 +163,8 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '97': {
         type: 1
@@ -181,16 +181,16 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '113': {
         distance: '4150万公里',
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '115': {
         type: 2
@@ -200,8 +200,8 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '120': {
         type: 1,
@@ -212,8 +212,8 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200,
+        coinX: 380,
+        coinY: 220,
         isEarth: true
     },
     '122': {
@@ -225,8 +225,8 @@ export default {
         y1: 1334,
         y2: 0,
         type: 3,
-        coinX: 360,
-        coinY: 200
+        coinX: 380,
+        coinY: 220
     },
     '125': {
         type: 2

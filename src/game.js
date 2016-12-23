@@ -12,7 +12,6 @@ import {
 import Scroller from './scroller';
 import Stage from './stage';
 import HelloWorld from './helloWorld';
-import Cloud from './cloud';
 import Star from './star';
 import Elements from './elements';
 import Found from './found';
@@ -34,7 +33,6 @@ let scroller;
 let ticker;
 let stage;
 let helloWorld;
-let cloud;
 let star;
 let elements;
 let found;
@@ -84,6 +82,10 @@ preload
         viewport.addEventListener('touchmove', e => e.preventDefault());
         viewport.addEventListener('touchend', e => e.preventDefault());
     })
+    .then(() => { // music
+        music = new Music(viewport, items);
+        return music.ready();
+    })
     .then(() => { // ticker
         ticker = new Ticker();
         ticker.run();
@@ -111,9 +113,6 @@ preload
         elements = new Elements(stage, items);
         promises.push(elements.ready());
 
-        cloud = new Cloud(stage, items);
-        promises.push(cloud.ready());
-
         return Promise.all(promises);
     })
     .then(() => { // render
@@ -131,15 +130,11 @@ preload
         let showTextId;
         let showGlodId;
         let flyCoinId;
-        let clearCloudId;
         let hoverSlice = stage.getHoverSlice(0, 0);
         let focusSlice = stage.getFocusSlice(stage.sliceWidth / 2, stage.sliceHeight / 2);
 
         scroller.on('scrollstart', e => {
-            if (clearCloudId) {
-                ticker.delete(clearCloudId);
-                clearCloudId = null;
-            }
+
         });
 
         scroller.on('scrolling', e => {
@@ -151,8 +146,6 @@ preload
 
         scroller.on('scrollend', e => {
             if (focusSlice) {
-                clearCloudId = ticker.add(cloud.clear(focusSlice));
-
                 if (focusSlice.type >= 2) {
                     showTextId = ticker.add(elements.showText(focusSlice));
                 }
@@ -182,12 +175,10 @@ preload
             );
 
             elements.drawImages(hoverSlice, focusSlice, scrollX, scrollY, e);
-            cloud.drawImages(hoverSlice, focusSlice, scrollX, scrollY, e);
 
             stage.offscreenRender.clearRect(0, 0, stage.vw, stage.vh);
             stage.offscreenRender.drawImage(star.image, 0, starRollY, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
             stage.offscreenRender.drawImage(elements.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
-            stage.offscreenRender.drawImage(cloud.canvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
 
             stage.render.clearRect(0, 0, stage.vw, stage.vh);
             stage.render.drawImage(stage.offscreenCanvas, 0, 0, stage.vw, stage.vh, 0, 0, stage.vw, stage.vh);
@@ -204,8 +195,9 @@ preload
             }).then(() => delay(500 + Math.random() * 500))
         }
 
-        return promise.then(() => delay(1000))
-                .then(() => helloWorld.ending());
+        return promise.then(() => 
+                helloWorld.start(() => music.play())
+                );
     })
     .then(() => { // map
         map = new Map(viewport, stage.hSlice, stage.vSlice);
@@ -286,10 +278,6 @@ preload
         share = new Share(viewport);
         return share.ready();
     })
-    .then(() => { // music
-        music = new Music(viewport, items);
-        return music.ready();
-    })
     .then(() => { // bone
         const boneX = stage.width / 2 - stage.vw / 2;
         const boneY = stage.height - stage.vh / 2;
@@ -300,5 +288,4 @@ preload
     .then(() => { // show guide
         // showTip(textConfig.found5);
         // showPop(textConfig.gg);
-        music.play();
     })

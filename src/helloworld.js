@@ -4,6 +4,7 @@ import {
     doc,
     Promise,
     defer,
+    delay,
     query,
     queryAll,
     getRect
@@ -12,7 +13,9 @@ import {
 export default class HelloWorld {
     constructor(viewport, items) {
         this.wrapEl = query(viewport, '#helloworld');
-        this.wrapEl.style.backgroundImage = `url(${items['helloworld'].src})`;
+        this.textEl = query(this.wrapEl, '.helloworld');
+        this.startEl = query(this.wrapEl, '.start');
+        // this.textEl.style.backgroundImage = `url(${items['helloworld'].src})`;
     }
 
     play() {
@@ -25,21 +28,31 @@ export default class HelloWorld {
         }) => {
             if (elapsed <= duration) {
                 const index = parseInt(count * elapsed / duration);
-                this.wrapEl.style.backgroundPositionX = `-${index * 10}rem`;
+                this.textEl.style.backgroundPositionX = `-${index * 10}rem`;
             } else {
-                this.wrapEl.style.backgroundPositionX = '0';
+                this.textEl.style.backgroundPositionX = '0';
                 return true;
             }
         };
     }
 
-    ending() {
-        this.wrapEl.style.display = 'none';
+    start(onclick) {
+        return new Promise((resolve, reject) => {
+            this.startEl.style.display = '';
+            this.startEl.addEventListener('tap', e => {
+                onclick && onclick();
+                this.wrapEl.className += ' fadeout';
+                delay(650)
+                    .then(() => this.wrapEl.style.display = 'none')
+                    .then(resolve);
+            });
+        });
     }
 
     ready() {
         return new Promise((resolve, reject) => {
             this.wrapEl.style.display = '';
+
             resolve();
         });
     }

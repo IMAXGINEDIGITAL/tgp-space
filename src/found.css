@@ -13,26 +13,19 @@
 }
 
 #found .textWrap {
-    width: 1.106rem;
-    height: 0.413rem;
+    width: 1.5rem;
+    height: 0.553rem;
     position: relative;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAfCAYAAAA89UfsAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANdJREFUeNqclD0LgVEYho+P8lqMMsrMrkxkNCn8LYMfQTEYSBaTUjIZRcliUaQM5ON+6o1Fby53XZ06dXW+nvOE3PrUdM7F3SctsXQBCX+Zq4solZKiSCVLRSSo5IkqlSx5kaFSSDT88WfJkvZXRJLzz+ZRKeHfJpIsJZGiUkTUqGTJihyV3nVJJavLMpUshfAfWxyaEAPCVszIKk/RtpFIc7EhV34VPfq4I3Ek0kGMacHatm5EWokF+YQP0aE9Yip2RLqIPm1hA3Em0l5MaFvuinuQ9BJgAFqNIhUPhZOEAAAAAElFTkSuQmCC);
     background-repeat: no-repeat;
     background-position: right center;
-    background-size: 0.173rem 0.413rem;
-    overflow: visible;
+    background-size: 1.5rem 0.553rem;
+    margin: -0.1rem;
 }
 
 #found .text {
     width: 1.3rem;
     height: 0.5rem;
     position: absolute;
-    border: 1px solid #00ddf1;
-    border-radius: 4px;
-    box-sizing: border-box;
-    right: 0.17rem;
-    top: -0.18rem;
-    box-shadow: 2px 3px 0px rgba(0, 221, 241, 0.5);
     -webkit-transition: all 0.4s ease-in 0s;
     overflow: visible;
 }

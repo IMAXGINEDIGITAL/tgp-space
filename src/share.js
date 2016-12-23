@@ -21,6 +21,7 @@ export default class Share {
             const hide = e => {
                 this.shareEl.removeEventListener('tap', hide);
                 this.shareEl.style.display = 'none';
+                resolve();
             }
 
             this.shareEl.addEventListener('tap', hide);

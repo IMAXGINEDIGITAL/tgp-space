@@ -42,8 +42,8 @@ export default class Elements extends CanvasImage {
         const slice = this.slices[String(index)];
         if (slice) {
             if (shown == null) {
-                const delay = 1500;
-                const duration = 1000;
+                const delay = 750;
+                const duration = 500;
 
                 return ({
                     delta,
@@ -263,7 +263,7 @@ export default class Elements extends CanvasImage {
                     coin: {
                         index: 0,
                         slow: 8,
-                        scale: 5
+                        scale: 3
                     },
                     flow: {
                         duration: 800,

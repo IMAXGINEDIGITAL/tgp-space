@@ -5,6 +5,15 @@
 <meta charset="utf-8" />
 <meta name="description" content="TGP世界探索">
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?2f032c447774943524f4e7daaa0e8b14";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
 <script flexible>!function(a,b){function c(){var b=f.getBoundingClientRect().width;b/i>540&&(b=540*i);var c=b/10;f.style.fontSize=c+"px",k.rem=a.rem=c}var d,e=a.document,f=e.documentElement,g=e.querySelector('meta[name="viewport"]'),h=e.querySelector('meta[name="flexible"]'),i=0,j=0,k=b.flexible||(b.flexible={});if(g){console.warn("将根据已有的meta标签来设置缩放比例");var l=g.getAttribute("content").match(/initial\-scale=([\d\.]+)/);l&&(j=parseFloat(l[1]),i=parseInt(1/j))}else if(h){var m=h.getAttribute("content");if(m){var n=m.match(/initial\-dpr=([\d\.]+)/),o=m.match(/maximum\-dpr=([\d\.]+)/);n&&(i=parseFloat(n[1]),j=parseFloat((1/i).toFixed(2))),o&&(i=parseFloat(o[1]),j=parseFloat((1/i).toFixed(2)))}}if(!i&&!j){var p=(a.navigator.appVersion.match(/android/gi),a.navigator.appVersion.match(/iphone/gi)),q=a.devicePixelRatio;i=p?q>=3&&(!i||i>=3)?3:q>=2&&(!i||i>=2)?2:1:1,j=1/i}if(f.setAttribute("data-dpr",i),!g)if(g=e.createElement("meta"),g.setAttribute("name","viewport"),g.setAttribute("content","initial-scale="+j+", maximum-scale="+j+", minimum-scale="+j+", user-scalable=no"),f.firstElementChild)f.firstElementChild.appendChild(g);else{var r=e.createElement("div");r.appendChild(g),e.write(r.innerHTML)}a.addEventListener("resize",function(){clearTimeout(d),d=setTimeout(c,300)},!1),a.addEventListener("pageshow",function(a){a.persisted&&(clearTimeout(d),d=setTimeout(c,300))},!1),"complete"===e.readyState?e.body.style.fontSize=12*i+"px":e.addEventListener("DOMContentLoaded",function(){e.body.style.fontSize=12*i+"px"},!1),c(),k.dpr=a.dpr=i,k.refreshRem=c,k.rem2px=function(a){var b=parseFloat(a)*this.rem;return"string"==typeof a&&a.match(/rem$/)&&(b+="px"),b},k.px2rem=function(a){var b=parseFloat(a)/this.rem;return"string"==typeof a&&a.match(/px$/)&&(b+="rem"),b}}(window,window.lib||(window.lib={}));</script>
 <style>
 html, body {
@@ -28,19 +37,43 @@ body > div[stagewrap] {
     left: 0;
     top: 0;
 }
+
+#bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    left: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 1);
+}
+
+.tgplogo {
+    position: absolute;
+    width: 100%;
+    height: 0.8rem;
+    left: 0;
+    bottom: 0.5rem;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 2.28rem 0.8rem;
+    background-image: url(data:image/png;base64,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);
+}
 </style>
 </head>
 <body>
-<img src="assets/logo.jpg" style="-webkit-transform: translate(-100000px, -100000px)"/>
+<img src="assets/logo.jpg"/>
+<div id="bg"></div>
 <div id="preload" stagewrap>
     <div class="bg1" rol="image"></div>
     <div class="bg2" rol="image"></div>
     <div class="texts"></div>
+    <div class="tgplogo"></div>
 </div>
 <div id="game" stagewrap>
     <canvas id="stage" style="display:none;"></canvas>
     <div id="found" style="display:none;">
-        <div class="textWrap">
+        <div class="textWrap tipText" rol="image">
             <div class="text">
                 <div class="number ventouse"></div>
             </div>
@@ -57,8 +90,14 @@ body > div[stagewrap] {
         </div>
         <div class="text">你现在距离地球<br><b></b></div>
     </div>
-    <div id="opening" style="display:none;"></div>
-    <div id="helloworld" class="helloworld" rol="image" style="display:none;"></div>
+    <div id="helloworld" class="cloud" rol="image">
+        <div class="helloworld" rol="image" ></div>
+        <div class="start" style="display:none;">
+            <div class="arrow-left" rol="image"></div>
+            <div class="text">开始探索</div>
+            <div class="arrow-right" rol="image"></div>
+        </div>
+    </div>
     <div id="tip" class="tip" rol="image">
         <p></p>
         <div class="bg tipBg1" rol="image"></div>
@@ -85,9 +124,20 @@ body > div[stagewrap] {
             </div>
         </div>
     </div>
-    <div id="share" class="share" rol="image" style="display:none;"></div>
-    <div id="music" style="display:none;">
-        <div class="music" rol="image"></div>
+    <div id="share" class="share" rol="image" style="display:none;">
+        <div class="tgplogo"></div>
+    </div>
+    <div id="music" class="mute">
+        <div class="music">
+            <div class="bars">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </div>
     </div>
 </div>
 <script promise>!function a(b,c,d){function e(g,h){if(!c[g]){if(!b[g]){var i="function"==typeof require&&require;if(!h&&i)return i(g,!0);if(f)return f(g,!0);var j=new Error("Cannot find module '"+g+"'");throw j.code="MODULE_NOT_FOUND",j}var k=c[g]={exports:{}};b[g][0].call(k.exports,function(a){var c=b[g][1][a];return e(c?c:a)},k,k.exports,a,b,c,d)}return c[g].exports}for(var f="function"==typeof require&&require,g=0;g<d.length;g++)e(d[g]);return e}({1:[function(a,b){function c(){}var d=b.exports={};d.nextTick=function(){var a="undefined"!=typeof window&&window.setImmediate,b="undefined"!=typeof window&&window.postMessage&&window.addEventListener;if(a)return function(a){return window.setImmediate(a)};if(b){var c=[];return window.addEventListener("message",function(a){var b=a.source;if((b===window||null===b)&&"process-tick"===a.data&&(a.stopPropagation(),c.length>0)){var d=c.shift();d()}},!0),function(a){c.push(a),window.postMessage("process-tick","*")}}return function(a){setTimeout(a,0)}}(),d.title="browser",d.browser=!0,d.env={},d.argv=[],d.on=c,d.addListener=c,d.once=c,d.off=c,d.removeListener=c,d.removeAllListeners=c,d.emit=c,d.binding=function(){throw new Error("process.binding is not supported")},d.cwd=function(){return"/"},d.chdir=function(){throw new Error("process.chdir is not supported")}},{}],2:[function(a,b){"use strict";function c(a){function b(a){return null===i?void k.push(a):void f(function(){var b=i?a.onFulfilled:a.onRejected;if(null===b)return void(i?a.resolve:a.reject)(j);var c;try{c=b(j)}catch(d){return void a.reject(d)}a.resolve(c)})}function c(a){try{if(a===l)throw new TypeError("A promise cannot be resolved with itself.");if(a&&("object"==typeof a||"function"==typeof a)){var b=a.then;if("function"==typeof b)return void e(b.bind(a),c,g)}i=!0,j=a,h()}catch(d){g(d)}}function g(a){i=!1,j=a,h()}function h(){for(var a=0,c=k.length;c>a;a++)b(k[a]);k=null}if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof a)throw new TypeError("not a function");var i=null,j=null,k=[],l=this;this.then=function(a,c){return new l.constructor(function(e,f){b(new d(a,c,e,f))})},e(a,c,g)}function d(a,b,c,d){this.onFulfilled="function"==typeof a?a:null,this.onRejected="function"==typeof b?b:null,this.resolve=c,this.reject=d}function e(a,b,c){var d=!1;try{a(function(a){d||(d=!0,b(a))},function(a){d||(d=!0,c(a))})}catch(e){if(d)return;d=!0,c(e)}}var f=a("asap");b.exports=c},{asap:4}],3:[function(a,b){"use strict";function c(a){this.then=function(b){return"function"!=typeof b?this:new d(function(c,d){e(function(){try{c(b(a))}catch(e){d(e)}})})}}var d=a("./core.js"),e=a("asap");b.exports=d,c.prototype=d.prototype;var f=new c(!0),g=new c(!1),h=new c(null),i=new c(void 0),j=new c(0),k=new c("");d.resolve=function(a){if(a instanceof d)return a;if(null===a)return h;if(void 0===a)return i;if(a===!0)return f;if(a===!1)return g;if(0===a)return j;if(""===a)return k;if("object"==typeof a||"function"==typeof a)try{var b=a.then;if("function"==typeof b)return new d(b.bind(a))}catch(e){return new d(function(a,b){b(e)})}return new c(a)},d.all=function(a){var b=Array.prototype.slice.call(a);return new d(function(a,c){function d(f,g){try{if(g&&("object"==typeof g||"function"==typeof g)){var h=g.then;if("function"==typeof h)return void h.call(g,function(a){d(f,a)},c)}b[f]=g,0===--e&&a(b)}catch(i){c(i)}}if(0===b.length)return a([]);for(var e=b.length,f=0;f<b.length;f++)d(f,b[f])})},d.reject=function(a){return new d(function(b,c){c(a)})},d.race=function(a){return new d(function(b,c){a.forEach(function(a){d.resolve(a).then(b,c)})})},d.prototype["catch"]=function(a){return this.then(null,a)}},{"./core.js":2,asap:4}],4:[function(a,b){(function(a){function c(){for(;e.next;){e=e.next;var a=e.task;e.task=void 0;var b=e.domain;b&&(e.domain=void 0,b.enter());try{a()}catch(d){if(i)throw b&&b.exit(),setTimeout(c,0),b&&b.enter(),d;setTimeout(function(){throw d},0)}b&&b.exit()}g=!1}function d(b){f=f.next={task:b,domain:i&&a.domain,next:null},g||(g=!0,h())}var e={task:void 0,next:null},f=e,g=!1,h=void 0,i=!1;if("undefined"!=typeof a&&a.nextTick)i=!0,h=function(){a.nextTick(c)};else if("function"==typeof setImmediate)h="undefined"!=typeof window?setImmediate.bind(window,c):function(){setImmediate(c)};else if("undefined"!=typeof MessageChannel){var j=new MessageChannel;j.port1.onmessage=c,h=function(){j.port2.postMessage(0)}}else h=function(){setTimeout(c,0)};b.exports=d}).call(this,a("_process"))},{_process:1}],5:[function(){"function"!=typeof Promise.prototype.done&&(Promise.prototype.done=function(){var a=arguments.length?this.then.apply(this,arguments):this;a.then(null,function(a){setTimeout(function(){throw a},0)})})},{}],6:[function(a){a("asap");"undefined"==typeof Promise&&(Promise=a("./lib/core.js"),a("./lib/es6-extensions.js")),a("./polyfill-done.js")},{"./lib/core.js":2,"./lib/es6-extensions.js":3,"./polyfill-done.js":5,asap:4}]},{},[6]);</script>

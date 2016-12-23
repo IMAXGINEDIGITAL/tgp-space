@@ -14,16 +14,22 @@ import {
 export default class Music {
     constructor(viewport, items) {
         this.musicEl = query(viewport, '#music');
+        this.barsEl = queryAll(viewport, '.bar');
         this.audio = items['music'].obj;
     }
 
     play() {
+        for (let i = 0; i < this.barsEl.length; i++) {
+            this.barsEl[i].style.cssText = `-webkit-animation-duration: ${Math.random() * 0.3 + 0.3}s`;
+        }
         this.audio.play();
+        this.musicEl.className = '';
     }
 
 
     pause() {
         this.audio.pause();
+        this.musicEl.className = 'mute';
     }
 
     ready() {
@@ -35,11 +41,9 @@ export default class Music {
                 e.preventDefault();
                 e.stopPropagation();
                 if (!this.audio.paused) {
-                    this.audio.pause();
-                    this.musicEl.className = 'mute';
+                    this.pause();
                 } else {
-                    this.audio.play();
-                    this.musicEl.className = '';
+                    this.play();
                 }
             });
 

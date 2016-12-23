@@ -27,7 +27,7 @@ export default class Tip {
                 .then(() => {
                     this.tipEl.className = `tip open bg${bgType}`;
                     this.textEl.innerHTML = tip;
-                    return delay(3000);
+                    return delay(5000);
                 })
                 .then(() => {
                     this.tipEl.className = 'tip close';
