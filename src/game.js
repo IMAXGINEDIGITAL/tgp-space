@@ -99,7 +99,7 @@ preload
         return stage.ready();
     })
     .then(() => { // scroller
-        const scrollSlowRatio = 1;
+        const scrollSlowRatio = 1.2;
         scroller = new Scroller(stage.width, stage.height, stage.vw, stage.vh, scrollSlowRatio);
         scroller.enable = false;
         return scroller.ready();
@@ -287,5 +287,5 @@ preload
     // .then(() => delay(2000))
     .then(() => { // show guide
         // showTip(textConfig.found5);
-        showPop(textConfig.gg);
+        // showPop(textConfig.gg);
     })

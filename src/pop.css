@@ -20,11 +20,15 @@
 
 #pop .popPanel {
     width: 50%;
-    height: 88%;
+    height: 100%;
     position: absolute;
     background-repeat: no-repeat;
     background-size: 200% 100%;
     overflow: hidden;
+}
+
+#pop.shareble .popPanel {
+    height: 88%;
 }
 
 #pop .popPanel.left {
