@@ -287,5 +287,5 @@ preload
     // .then(() => delay(2000))
     .then(() => { // show guide
         // showTip(textConfig.found5);
-        // showPop(textConfig.gg);
+        showPop(textConfig.gg);
     })

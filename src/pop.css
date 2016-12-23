@@ -19,11 +19,11 @@
 }
 
 #pop .popPanel {
-    width: 4.26rem;
-    height: 7.84rem;
+    width: 50%;
+    height: 88%;
     position: absolute;
     background-repeat: no-repeat;
-    background-size: 8.52rem 7.84rem;
+    background-size: 200% 100%;
     overflow: hidden;
 }
 
