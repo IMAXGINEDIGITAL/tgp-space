@@ -1,0 +1,66 @@
+#found {
+    position: absolute;
+    right: 0.73rem;
+    top: 0.4rem;
+    color: #00ddf1;
+    font-size: 12px;
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    background-repeat: no-repeat;
+    background-position: 0 center;
+    background-size: 1.106rem 0.413rem;
+}
+
+#found .textWrap {
+    width: 1.5rem;
+    height: 0.553rem;
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 1.5rem 0.553rem;
+    margin: -0.1rem;
+}
+
+#found .text {
+    width: 1.3rem;
+    height: 0.5rem;
+    position: absolute;
+    -webkit-transition: all 0.4s ease-in 0s;
+    overflow: visible;
+}
+
+#found .text .number {
+    text-align: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1.3rem;
+    height: 0.5rem;
+    line-height: 0.5rem;
+    text-align: center;
+}
+
+#found .progress {
+    box-sizing: border-box;
+    width: 1.8rem;
+    height: 0.3rem;
+    border: 1px solid #00ddf1;
+    border-radius: 0.15rem;
+    margin: 0 4px;
+}
+
+#found .progress .bar{
+    width: 0;
+    height: 100%;
+    background-color: #00ddf1;
+    border-radius: 0.15rem;
+}
+
+#found .gold {
+    width: 0.667rem;
+    height: 0.64rem;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+}

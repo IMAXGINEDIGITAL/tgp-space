@@ -1,0 +1,51 @@
+#music {
+    position: absolute;
+    left: 0.3rem;
+    top: 0.5rem;
+    padding-right: 0.3rem;
+    padding-bottom: 0.5rem;
+
+}
+
+#music .music {
+    box-sizing: border-box;
+    width: 18px;
+    height: 16px;
+    padding-bottom: 2px;
+    border-bottom: 2px solid #555;
+}
+
+#music .bars {
+    width: 100%;
+    height: 100%;
+    display: -webkit-box;
+    -webkit-box-pack: justify;
+    -webkit-box-align: end;
+}
+
+#music .bar {
+    width: 14%;
+    margin: 1%;
+    height: 15%;
+    background-color: #00ddf1;
+    -webkit-animation-name: play;
+    -webkit-animation-delay: 0s;
+    -webkit-animation-timing-function: ease-in-out;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-direction: alternate;
+}
+
+@-webkit-keyframes play {
+    0% {
+        height: 15%;
+    }
+
+    100% {
+        height: 80%;
+    }
+}
+
+
+#music.mute .bar {
+    -webkit-animation: none;
+}
