@@ -63,12 +63,7 @@ function showPop(config, data) {
         onleftclick: () => {
             Promise.all([
                 pop.close(),
-                share.show({
-                    title: '离开地表！和TGP去看看5000光年外的星辰大海',
-                    desc: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.n}秒就滑了${data.n}百万光年`,
-                    link: 'http://mp.imaxgine.com/tgp/space/index.html',
-                    imgUrl: 'http://mp.imaxgine.com/tgp/space/assets/logo.jpg'
-                })
+                share.show()
             ]).then(() => scroller.enable = true);
         },
         onrightclick: () => {
@@ -78,6 +73,15 @@ function showPop(config, data) {
             pop.close().then(() => scroller.enable = true);
         }
     })
+}
+
+function shareWx(data) {
+    share.shareWx({
+        title: '离开地表！和TGP去看看5000光年外的星辰大海',
+        desc: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.n}秒就滑了${data.n}百万光年`,
+        link: 'http://mp.imaxgine.com/tgp/space/index.html',
+        imgUrl: 'http://mp.imaxgine.com/tgp/space/assets/logo.jpg'
+    });
 }
 
 preload
@@ -251,7 +255,8 @@ preload
             data.m = parseInt(ticker.elapsed / 1000 / 60);
             data.s = parseInt(ticker.elapsed / 1000 - 60 * data.m);
             data.n = found;
-            console.log(data);
+
+            shareWx(data);
 
             if (found === amount
                 && focus === total) {
