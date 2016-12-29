@@ -59,8 +59,8 @@ export default class Share {
     ready() {
         return new Promise((resolve, reject) => {
             const url = 'wx.php';
-            // const url = 'http://mp.imaxgine.net/kd/touching2016/wx.php';            
-            xhr.get(`${url}?method="calculate"`, (err, resp) => {
+            // const url = 'http://mp.imaxgine.com/tgp/space/wx.php';            
+            xhr.get(`${url}?method=calculate`, (err, resp) => {
                 if (err) {
                     resolve();
                     return;
