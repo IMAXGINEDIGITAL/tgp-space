@@ -11,7 +11,7 @@
 	$app_id = "wx00ba438394c59242";
 	$app_secret = "a4e017b2bfffa1ccbf56ac3326d1453e";
 
-	$method = $_POST['method'];
+	$method = $_GET['method'];
 
 	if ($method == 'calculate') {
 	// if (1) {
