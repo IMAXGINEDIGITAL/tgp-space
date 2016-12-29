@@ -42,29 +42,33 @@ let tip;
 let share;
 let music;
 
-function showShare() {
-    return share.show();
-}
-
-function showTip(config) {
+function showTip(config, data) {
     return tip.show({
         tip: config.tip,
         bgType: config.bgType
     });
 }
 
-function showPop(config) {
+function showPop(config, data) {
     scroller && (scroller.enable = false);
+
+    const text = typeof config.text === 'function'
+                    ? config.text(data) : config.text;
 
     return pop.popup({
         title: config.title,
-        text: config.text,
+        text: text,
         shareble: config.shareble,
         bgType: config.bgType,
         onleftclick: () => {
             Promise.all([
                 pop.close(),
-                showShare()
+                share.show({
+                    title: '离开地表！和TGP去看看5000光年外的星辰大海',
+                    desc: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.n}秒就滑了${data.n}百万光年`,
+                    link: 'http://mp.imaxgine.com/tgp/space/index.html',
+                    imgUrl: 'http://mp.imaxgine.com/tgp/space/assets/logo.jpg'
+                })
             ]).then(() => scroller.enable = true);
         },
         onrightclick: () => {
@@ -242,6 +246,12 @@ preload
             focus
         }) => {
             let config;
+            let data = {};
+
+            data.m = parseInt(ticker.elapsed / 1000 / 60);
+            data.s = parseInt(ticker.elapsed / 1000 - 60 * data.m);
+            data.n = found;
+            console.log(data);
 
             if (found === amount
                 && focus === total) {
@@ -257,9 +267,9 @@ preload
             if (config && !config.shown) {
                 config.shown = true;
                 if (config.type === 'tip') {
-                    showTip(config);
+                    showTip(config, data);
                 } else if (config.type === 'popup') {
-                    showPop(config);
+                    showPop(config, data);
                 }
             }
         });
@@ -275,7 +285,7 @@ preload
         return tip.ready();
     })
     .then(() => { // share
-        share = new Share(viewport);
+        share = new Share(viewport, items);
         return share.ready();
     })
     .then(() => { // bone
@@ -287,5 +297,9 @@ preload
     // .then(() => delay(2000))
     .then(() => { // show guide
         // showTip(textConfig.found5);
-        // showPop(textConfig.gg);
+        // showPop(textConfig.gg, {
+        //     m: 1,
+        //     s: 5,
+        //     n: 6
+        // });
     })

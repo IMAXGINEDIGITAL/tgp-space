@@ -16,7 +16,8 @@
     "amfe-cubicbezier": "^2.0.0",
     "amfe-env": "^2.0.0",
     "event-emitter": "^0.3.4",
-    "gesture-js": "^0.1.0"
+    "gesture-js": "^0.1.0",
+    "xhr": "^2.3.2"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",

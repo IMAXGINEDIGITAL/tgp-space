@@ -36,7 +36,9 @@ export default {
     found20: { // 找到20个
         type: 'popup',
         title: '找到全部游戏星球！',
-        text: '给跪！你还真点完了！来吧，鸡腿送你！<br/>现在去TGP发现更大的游戏世界！',
+        text(data) {
+            return `${data.m}分${data.s}秒，我发现了所有游戏星球！宇宙辣么大，我的手最快！`
+        },
         bgType: 3,
         shareble: true
     },
@@ -44,7 +46,9 @@ export default {
     blacksheepwall: { // 地图全开
         type: 'popup',
         title: '探索了整个宇宙！',
-        text: '勤奋的少年，你已走遍宇宙。<br/>但是，星空深处的秘密还在等着你！再去看看？',
+        text(data) {
+            return `${data.m}分${data.s}秒，我发现了${data.n}个游戏星球！剩下的有本事你来找！`
+        },
         bgType: 2,
         shareble: true
     },
@@ -52,7 +56,9 @@ export default {
     gg: { //地图全开 + 找到20个
         type: 'popup', 
         title: '找到全部游戏星球！',
-        text: '腿给你，手借我，点击分享！<br/>让更多探索者，一起来发现更大的游戏世界',
+        text(data) {
+            return `${data.m}分${data.s}秒，我发现了所有游戏星球！宇宙辣么大，我的手最快！`
+        },
         bgType: 3,
         shareble: true
     }
