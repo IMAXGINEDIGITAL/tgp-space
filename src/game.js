@@ -76,9 +76,20 @@ function showPop(config, data) {
 }
 
 function shareWx(data) {
+    const n = data.n;
+    let s;
+
+    if (n >= 100) {
+        s = `${n / 100}亿`;
+    } else if (n >= 10) {
+        s = `${n / 10}千万`;
+    } else {
+        s = `${n}百万`;
+    }
+
     share.shareWx({
         title: '离开地表！和TGP去看看5000光年外的星辰大海',
-        desc: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.n}秒就滑了${data.n * 100}万光年`,
+        desc: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.n}秒就滑了${s}光年`,
         link: 'http://mp.imaxgine.com/tgp/space/index.html',
         imgUrl: 'http://mp.imaxgine.com/tgp/space/assets/logo.jpg'
     });
