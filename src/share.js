@@ -83,12 +83,7 @@ export default class Share {
         }
     }
 
-    show({
-        title,
-        desc,
-        link,
-        imgUrl
-    }) {
+    show() {
         return new Promise((resolve, reject) => {
             const hide = e => {
                 this.shareEl.removeEventListener('tap', hide);

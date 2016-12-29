@@ -78,7 +78,7 @@ function showPop(config, data) {
 function shareWx(data) {
     share.shareWx({
         title: '离开地表！和TGP去看看5000光年外的星辰大海',
-        desc: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.n}秒就滑了${data.n}百万光年`,
+        desc: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.n}秒就滑了${data.n * 100}万光年`,
         link: 'http://mp.imaxgine.com/tgp/space/index.html',
         imgUrl: 'http://mp.imaxgine.com/tgp/space/assets/logo.jpg'
     });
