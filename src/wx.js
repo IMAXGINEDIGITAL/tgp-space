@@ -95,22 +95,19 @@ export default class WXShare {
                 } catch(e) {}
 
                 if (config
-                        && (config.success === true || config.sucess === 'true')) {
+                        && (config.success === true || config.success === 'true')) {
                     config.data.jsApiList = ['onMenuShareTimeline', 'onMenuShareAppMessage'];
                     return new Promise((resolve, reject) => {
                         wx.config(config.data);
                         wx.ready(() => {
-                            // alert('wx ready');
                             this.wxReady = true;
-                            // resolve();
+                            resolve();
+
                         });
                         wx.error((e) => {
-                            // alert('wx not ready');
-                            // alert(JSON.stringify(e));
                             this.wxReady = false;
                             // resolve();
                         });
-                        resolve();
                     });
                 } else {
                     return Promise.resolve();

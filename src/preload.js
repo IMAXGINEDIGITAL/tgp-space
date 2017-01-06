@@ -141,6 +141,7 @@ let tickId;
 
 window.assetsPreload = domready()
     .then(() => wxs.ready())
+    .then(() => delay(1000))
     .then(() => {
         wxs.share(textConfig.normal.wx);
     })
