@@ -83,8 +83,8 @@ export default class WXShare {
 
     ready() {
         const method = 'GET';
-        // const url = 'wx.php';
-        const url = 'http://120.76.215.155/tgp/space/wx.php';
+        const url = 'wx.php';
+        // const url = 'http://120.76.215.155/tgp/space/wx.php';
 
         return makeCorsRequest(method, `${url}?method=calculate`)  
             .then((xhr) => {
