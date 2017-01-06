@@ -56,6 +56,12 @@ export default {
         text(data) {
             return `${data.m}分${data.s}秒，我发现了所有游戏星球！宇宙辣么大，我的手最快！`
         },
+        wx: {
+            title(data) {
+                return `${data.m}分${data.s}秒，我发现了所有游戏星球！宇宙辣么大，我的手最快！`
+            },
+            desc: '离开地表，和TGP去看5000光年外的星辰大海！'
+        },
         bgType: 3,
         shareble: true
     },
