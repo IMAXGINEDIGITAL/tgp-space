@@ -13,12 +13,29 @@ export default {
         ]
     },
 
+    normal: {
+        wx: {
+            title: '离开地表，和TGP去看5000光年外的星辰大海！',
+            desc: '发现更大的游戏世界'
+        }
+    },
+
+
     gl: { // 开场引导
         type: 'popup',
         title: '欢迎来到TGP游戏世界',
         text: '这是散布在宇宙中的神秘力量，集齐所有金币，召唤神秘“鸡腿”！',
         shareble: false,
         bgType: 1
+    },
+
+    playing: { // 游戏进行中
+        wx: {
+            title(data) {
+                return `${data.m}分${data.s}秒，我发现了${data.n}个星球！剩下的有本事你来找！`
+            },
+            desc: '离开地表，和TGP去看5000光年外的星辰大海！'
+        }
     },
 
     found5: { // 找到5个
@@ -49,6 +66,12 @@ export default {
         text(data) {
             return `${data.m}分${data.s}秒，我发现了${data.n}个游戏星球！剩下的有本事你来找！`
         },
+        wx: {
+            title(data) {
+                return `${data.m}分${data.s}秒，我发现了${data.n}个游戏星球！剩下的有本事你来找！`
+            },
+            desc: '离开地表，和TGP去看5000光年外的星辰大海！'
+        },
         bgType: 2,
         shareble: true
     },
@@ -58,6 +81,12 @@ export default {
         title: '找到全部游戏星球！',
         text(data) {
             return `${data.m}分${data.s}秒，我发现了所有游戏星球！宇宙辣么大，我的手最快！`
+        },
+        wx: {
+            title(data) {
+                return `${data.m}分${data.s}秒，我发现了所有游戏星球！宇宙辣么大，我的手最快！`
+            },
+            desc: '离开地表，和TGP去看5000光年外的星辰大海！'
         },
         bgType: 3,
         shareble: true

@@ -18,7 +18,11 @@ import {
     caf
 } from './util';
 import textConfig from './textConfig';
+import WXShare from './wx';
 import Ticker from './ticker';
+
+const wxs = new WXShare();
+window.wxs = wxs;
 
 const items = {};
 window.assetsItems = items;
@@ -136,6 +140,10 @@ const ticker = new Ticker();
 let tickId;
 
 window.assetsPreload = domready()
+    .then(() => wxs.ready())
+    .then(() => {
+        wxs.share(textConfig.normal.wx);
+    })
     .then(() => {
         ticker.run();
 

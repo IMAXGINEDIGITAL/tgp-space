@@ -26,6 +26,7 @@ import textConfig from './textConfig';
 const {
     assetsPreload: preload,
     assetsItems: items,
+    wxs
 } = win;
 
 let viewport = query(doc.body, '#game');
@@ -75,23 +76,27 @@ function showPop(config, data) {
     })
 }
 
-function shareWx(data) {
-    const n = data.n;
-    let s;
+function shareWx(wx, data) {
+    // const n = data.n;
+    // let s;
 
-    if (n >= 100) {
-        s = `${n / 100}亿`;
-    } else if (n >= 10) {
-        s = `${n / 10}千万`;
-    } else {
-        s = `${n}百万`;
-    }
+    // if (n >= 100) {
+    //     s = `${n / 100}亿`;
+    // } else if (n >= 10) {
+    //     s = `${n / 10}千万`;
+    // } else {
+    //     s = `${n}百万`;
+    // }
+    
+    const title = typeof wx.title === 'function'
+                    ? wx.title(data) : wx.title;
 
-    share.shareWx({
-        title: `茫茫游戏宇宙深不见底，我${data.m * 60 + data.s}秒就滑了${s}光年`,
-        desc: '离开地表！和TGP去看看5000光年外的星辰大海',
-        link: 'http://mp.imaxgine.com/tgp/space/index.html',
-        imgUrl: 'http://mp.imaxgine.com/tgp/space/assets/logo.jpg'
+    const desc = typeof wx.desc === 'function'
+                    ? wx.desc(data) : wx.desc;
+
+    wxs.share({
+        title,
+        desc
     });
 }
 
@@ -267,8 +272,6 @@ preload
             data.s = parseInt(ticker.elapsed / 1000 - 60 * data.m);
             data.n = found;
 
-            shareWx(data);
-
             if (found === amount
                 && focus === total) {
                 config = textConfig['gg'];
@@ -279,6 +282,9 @@ preload
             } else {
                 config = textConfig[`found${found}`];
             }
+
+            const wx = (config && config.wx) || textConfig.playing.wx;
+            shareWx(wx, data);
 
             if (config && !config.shown) {
                 config.shown = true;
